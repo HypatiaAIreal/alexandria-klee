@@ -27,9 +27,11 @@ GLOSSARY_PATH = DATA_DIR / "glossary.json"
 # ── Source archive ──────────────────────────────────────────────
 # The Zentrum Paul Klee Gestaltungslehre archive. Override with the
 # KLEE_BASE_URL env var if the host changes.
+# NOTE: the archive is served over plain HTTP at the .zpk.org host, e.g.
+#   http://www.kleegestaltungslehre.zpk.org/ee/ZPK/BG/2012/01/02/001/
 import os
 
-BASE_URL = os.environ.get("KLEE_BASE_URL", "https://www.kleegestaltungslehre.ch")
+BASE_URL = os.environ.get("KLEE_BASE_URL", "http://www.kleegestaltungslehre.zpk.org")
 REQUEST_DELAY = 1.0  # seconds between requests — be gentle with the server
 USER_AGENT = "Alexandria-Klee-Research/1.0 (private academic study)"
 

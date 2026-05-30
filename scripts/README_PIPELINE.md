@@ -74,7 +74,7 @@ glossary and corpus statistics are recomputed across the full merged corpus.
 ## Configuration
 
 - `KLEE_BASE_URL` — override the archive host (default
-  `https://www.kleegestaltungslehre.ch`).
+  `http://www.kleegestaltungslehre.zpk.org`).
 - Request pacing (`REQUEST_DELAY`) and the chapter map live in `common.py`.
 
 ## Data format (per article)
