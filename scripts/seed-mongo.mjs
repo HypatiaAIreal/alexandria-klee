@@ -36,15 +36,54 @@ if (!URI) {
 
 const seed = JSON.parse(fs.readFileSync(path.join(PROJECT, "src", "data", "seed.json"), "utf-8"));
 
+// slug — kept in sync with src/lib/util.ts / build-seed.mjs
+const slug = (s) =>
+  String(s)
+    .toLowerCase()
+    .replace(/[.\s/]+/g, "-")
+    .replace(/[^a-z0-9-]/g, "")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
+
+// Guarantee every article has a unique, non-null `id`. Pipeline-extracted
+// articles can be missing it, which collides on the unique articles.id index
+// (duplicate null key). Generate one from page_ref + article_number and
+// de-duplicate defensively.
+function ensureIds(articles, label) {
+  if (!Array.isArray(articles)) return;
+  const seen = new Set();
+  let fixed = 0;
+  articles.forEach((a, i) => {
+    let id = a.id ? String(a.id).trim() : "";
+    if (!id) {
+      const base = a.page_ref ? slug(a.page_ref) : "article";
+      const num = a.article_number ?? i;
+      id = `${base}-a${num}`;
+      fixed++;
+    }
+    let unique = id;
+    let n = 1;
+    while (seen.has(unique)) unique = `${id}-${n++}`;
+    seen.add(unique);
+    a.id = unique;
+  });
+  if (fixed) console.log(`  [ids] generated ${fixed} missing id(s) in ${label}`);
+}
+
+ensureIds(seed.articles, "articles");
+for (const p of seed.pages ?? []) ensureIds(p.articles, `page ${p.page_ref ?? p.id}`);
+
 async function main() {
   const client = new MongoClient(URI);
   await client.connect();
   console.log(`Connected → ${DB}`);
   const db = client.db(DB);
 
+  // Drop each collection first (clears stale docs AND old indexes) so a
+  // re-seed can't trip over leftover unique-index entries.
   const load = async (name, docs) => {
     const col = db.collection(name);
-    await col.deleteMany({});
+    await col.drop().catch(() => {}); // ignore "ns not found"
     if (docs.length) await col.insertMany(docs);
     console.log(`  ${name}: ${docs.length}`);
   };
