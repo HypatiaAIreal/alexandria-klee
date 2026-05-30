@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #100d0a;
+  --panel: #1b1611;
+  --line: #2c241b;
+  --text: #efe6d4;
+  --muted: #a99d88;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    background-image:
+      radial-gradient(1200px 600px at 12% -8%, rgba(216, 166, 87, 0.10), transparent 60%),
+      radial-gradient(1000px 700px at 100% 0%, rgba(111, 155, 179, 0.08), transparent 55%),
+      radial-gradient(900px 900px at 50% 120%, rgba(193, 99, 47, 0.07), transparent 60%);
+    background-attachment: fixed;
+    font-feature-settings: "liga" 1, "kern" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection {
+    background: rgba(216, 166, 87, 0.3);
+    color: #fff;
+  }
+  mark {
+    background: rgba(216, 166, 87, 0.28);
+    color: #f7f1e4;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+  /* Thin, warm scrollbars */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #3a3024 transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: #3a3024;
+    border-radius: 9px;
+  }
+}
+
+@layer components {
+  .panel {
+    @apply rounded-xl border border-ink-700/70 bg-ink-850/70 backdrop-blur-sm;
+  }
+  .panel-hover {
+    @apply transition-all duration-300 hover:border-ochre/40 hover:bg-ink-800/80;
+  }
+  .label {
+    @apply font-mono text-[0.68rem] uppercase tracking-[0.18em] text-parchment-400;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full border border-ink-700 bg-ink-800/60 px-2.5 py-0.5 font-mono text-[0.66rem] tracking-wide text-parchment-200;
+  }
+  .link-underline {
+    @apply bg-[linear-gradient(currentColor,currentColor)] bg-[length:0%_1px] bg-left-bottom bg-no-repeat transition-[background-size] duration-300 hover:bg-[length:100%_1px];
+  }
+  /* Manuscript transcription text */
+  .ms {
+    @apply font-serif text-[1.05rem] leading-relaxed text-parchment-100;
+  }
+}

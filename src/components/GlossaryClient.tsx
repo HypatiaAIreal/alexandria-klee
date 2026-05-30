@@ -1,0 +1,169 @@
+"use client";
+
+import Link from "next/link";
+import { useMemo, useState } from "react";
+import type { GlossaryEntry } from "@/lib/types";
+import { slug } from "@/lib/util";
+import { ConceptBarChart } from "@/components/Charts";
+
+function refToHref(ref: string): { href: string; label: string } {
+  // ref like "BG I.2/3 art.24"
+  const m = ref.match(/^(.*?)\s+art\.(\d+)/);
+  if (!m) return { href: "#", label: ref };
+  const [, pageRef, art] = m;
+  return { href: `/page/${slug(pageRef)}#a${art}`, label: ref };
+}
+
+type Sort = "frequency" | "alpha";
+
+export default function GlossaryClient({ glossary }: { glossary: GlossaryEntry[] }) {
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<"all" | "core_concept" | "discovered">("all");
+  const [sort, setSort] = useState<Sort>("frequency");
+  const [openTerm, setOpenTerm] = useState<string | null>(null);
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let list = glossary.filter((g) => {
+      if (category !== "all" && g.category !== category) return false;
+      if (!q) return true;
+      return (
+        g.term_de.toLowerCase().includes(q) ||
+        g.term_en.toLowerCase().includes(q) ||
+        g.term_es.toLowerCase().includes(q)
+      );
+    });
+    list = [...list].sort((a, b) =>
+      sort === "frequency" ? b.frequency - a.frequency : a.term_de.localeCompare(b.term_de)
+    );
+    return list;
+  }, [glossary, query, category, sort]);
+
+  const chartData = useMemo(
+    () =>
+      glossary
+        .filter((g) => g.frequency > 0)
+        .slice(0, 15)
+        .map((g) => ({
+          term: g.term_de,
+          count: g.frequency,
+          color: g.category === "core_concept" ? "#d8a657" : "#4f8a86",
+        })),
+    [glossary]
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* Frequency chart */}
+      <div className="panel p-6">
+        <h2 className="font-display text-xl text-parchment-50">Frequency across the corpus</h2>
+        <p className="mt-1 text-sm text-parchment-400">
+          The 15 most-used terms. Gold = core concept, teal = discovered.
+        </p>
+        <div className="mt-4">
+          <ConceptBarChart data={chartData} />
+        </div>
+      </div>
+
+      {/* Controls */}
+      <div className="panel flex flex-col gap-3 p-4 sm:flex-row sm:items-end">
+        <label className="flex flex-1 flex-col gap-1">
+          <span className="label">Filter terms</span>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="e.g. Gliederung, energy, línea…"
+            className="rounded-md border border-ink-700 bg-ink-850 px-3 py-1.5 text-sm text-parchment-100 outline-none focus:border-ochre/50"
+          />
+        </label>
+        <label className="flex flex-col gap-1">
+          <span className="label">Category</span>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value as typeof category)}
+            className="rounded-md border border-ink-700 bg-ink-850 px-3 py-1.5 text-sm text-parchment-100 outline-none focus:border-ochre/50"
+          >
+            <option value="all">All</option>
+            <option value="core_concept">Core concept</option>
+            <option value="discovered">Discovered</option>
+          </select>
+        </label>
+        <label className="flex flex-col gap-1">
+          <span className="label">Sort</span>
+          <select
+            value={sort}
+            onChange={(e) => setSort(e.target.value as Sort)}
+            className="rounded-md border border-ink-700 bg-ink-850 px-3 py-1.5 text-sm text-parchment-100 outline-none focus:border-ochre/50"
+          >
+            <option value="frequency">By frequency</option>
+            <option value="alpha">Alphabetical</option>
+          </select>
+        </label>
+      </div>
+
+      {/* Table */}
+      <div className="panel overflow-hidden">
+        <div className="grid grid-cols-[1.4fr_1.4fr_1.4fr_auto] gap-3 border-b border-ink-700/60 px-5 py-3 text-parchment-300">
+          <span className="label">Deutsch</span>
+          <span className="label">English</span>
+          <span className="label">Español</span>
+          <span className="label text-right">Freq.</span>
+        </div>
+        <ul>
+          {filtered.map((g) => {
+            const open = openTerm === g.term_de;
+            return (
+              <li key={g.term_de} className="border-b border-ink-700/40 last:border-0">
+                <button
+                  onClick={() => setOpenTerm(open ? null : g.term_de)}
+                  className="grid w-full grid-cols-[1.4fr_1.4fr_1.4fr_auto] items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-ink-800/50"
+                >
+                  <span className="flex items-center gap-2">
+                    <span
+                      className="h-2 w-2 shrink-0 rounded-full"
+                      style={{ background: g.category === "core_concept" ? "#d8a657" : "#4f8a86" }}
+                    />
+                    <span className="font-serif text-lg text-parchment-50">{g.term_de}</span>
+                  </span>
+                  <span className="text-sm text-parchment-300">{g.term_en || "—"}</span>
+                  <span className="text-sm italic text-parchment-300">{g.term_es || "—"}</span>
+                  <span className="text-right font-mono text-sm text-ochre">{g.frequency}</span>
+                </button>
+
+                {open && (
+                  <div className="bg-ink-900/40 px-5 pb-4 pt-1">
+                    <span className="chip">{g.category.replace("_", " ")}</span>
+                    {g.example_contexts.length > 0 ? (
+                      <ul className="mt-3 space-y-2">
+                        {g.example_contexts.map((ctx, i) => {
+                          const { href, label } = refToHref(ctx.ref);
+                          return (
+                            <li key={i} className="text-sm">
+                              <Link href={href} className="font-mono text-xs text-kleeblue hover:text-ochre">
+                                {label}
+                              </Link>
+                              <p className="ms mt-0.5 text-[0.95rem] text-parchment-300">
+                                …{ctx.context}…
+                              </p>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    ) : (
+                      <p className="mt-2 text-sm text-parchment-400">
+                        In the seed dictionary; not yet attested in the extracted pages.
+                      </p>
+                    )}
+                  </div>
+                )}
+              </li>
+            );
+          })}
+          {filtered.length === 0 && (
+            <li className="px-5 py-10 text-center text-parchment-400">No terms match.</li>
+          )}
+        </ul>
+      </div>
+    </div>
+  );
+}
