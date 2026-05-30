@@ -5,6 +5,7 @@ import type { Article, Lang, Page } from "@/lib/types";
 import { MetaChips, TagList } from "@/components/MetaChips";
 import Lightbox, { type LightboxImage } from "@/components/Lightbox";
 import AnnotationPanel from "@/components/AnnotationPanel";
+import { useI18n } from "@/components/LanguageProvider";
 
 const ZPK = "http://www.kleegestaltungslehre.zpk.org";
 
@@ -23,12 +24,14 @@ function paras(article: Article, lang: Lang): string[] {
 }
 
 function LangBlock({ article, lang }: { article: Article; lang: Lang }) {
+  const { t } = useI18n();
   const meta = LANG_META[lang];
   const p = paras(article, lang).filter(Boolean);
+  const label = lang === "de" ? t("page.deutschOriginal") : meta.label;
   return (
     <div className="border-l-2 pl-4" style={{ borderColor: `${meta.color}88` }}>
       <div className="label mb-1.5" style={{ color: meta.color }}>
-        {meta.label}
+        {label}
       </div>
       {p.length ? (
         <div className="ms space-y-1.5">
@@ -39,18 +42,19 @@ function LangBlock({ article, lang }: { article: Article; lang: Lang }) {
           ))}
         </div>
       ) : (
-        <p className="text-sm italic text-parchment-400">— diagram only, no transcription —</p>
+        <p className="text-sm italic text-parchment-400">{t("page.diagramOnly")}</p>
       )}
     </div>
   );
 }
 
 export default function PageReader({ page }: { page: Page }) {
+  const { t } = useI18n();
   const [mode, setMode] = useState<Mode>("all");
   const [box, setBox] = useState<LightboxImage | null>(null);
 
   const modes: { id: Mode; label: string }[] = [
-    { id: "all", label: "Trilingual" },
+    { id: "all", label: t("page.modeTrilingual") },
     { id: "de", label: "DE" },
     { id: "en", label: "EN" },
     { id: "es", label: "ES" },
@@ -60,7 +64,7 @@ export default function PageReader({ page }: { page: Page }) {
     <>
       {/* language mode bar */}
       <div className="sticky top-[57px] z-30 -mx-1 mb-6 flex items-center gap-2 rounded-lg border border-ink-700/60 bg-ink-900/80 px-3 py-2 backdrop-blur">
-        <span className="label hidden sm:block">View</span>
+        <span className="label hidden sm:block">{t("page.view")}</span>
         <div className="flex gap-1">
           {modes.map((m) => (
             <button
@@ -103,16 +107,14 @@ export default function PageReader({ page }: { page: Page }) {
             )}
           </div>
           <div className="mt-2 flex items-center justify-between px-1">
-            <span className="font-mono text-xs text-parchment-400">
-              Click to enlarge the manuscript
-            </span>
+            <span className="font-mono text-xs text-parchment-400">{t("page.facsimileHint")}</span>
             <a
               href={page.url}
               target="_blank"
               rel="noreferrer noopener"
               className="font-mono text-xs text-kleeblue hover:text-ochre"
             >
-              View on ZPK ↗
+              {t("page.viewOnZpk")}
             </a>
           </div>
         </div>
@@ -143,7 +145,7 @@ export default function PageReader({ page }: { page: Page }) {
                 {/* Footnotes */}
                 {a.footnotes_de.length > 0 && (
                   <div className="mt-4 rounded-md bg-ink-900/50 p-3">
-                    <div className="label mb-1.5">Manuscript footnotes / corrections</div>
+                    <div className="label mb-1.5">{t("page.footnotes")}</div>
                     <ul className="space-y-0.5 font-serif text-sm text-parchment-300">
                       {a.footnotes_de.map((f, i) => (
                         <li key={i}>{f}</li>
@@ -153,15 +155,15 @@ export default function PageReader({ page }: { page: Page }) {
                 )}
 
                 {!hasText && a.images.length > 0 && (
-                  <p className="mb-2 text-sm italic text-parchment-400">
-                    This region of the manuscript is a drawing without running text.
-                  </p>
+                  <p className="mb-2 text-sm italic text-parchment-400">{t("page.diagramNoText")}</p>
                 )}
 
                 {/* Drawings */}
                 {a.images.length > 0 && (
                   <div className="mt-4">
-                    <div className="label mb-2">Klee&rsquo;s drawings · {a.images.length}</div>
+                    <div className="label mb-2">
+                      {t("page.drawings")} · {a.images.length}
+                    </div>
                     <div className="flex flex-wrap gap-3">
                       {a.images.map((img, i) => (
                         <button
@@ -195,7 +197,7 @@ export default function PageReader({ page }: { page: Page }) {
                       rel="noreferrer noopener"
                       className="inline-block font-mono text-xs text-kleeblue hover:text-ochre"
                     >
-                      Original article PDF ↗
+                      {t("page.articlePdf")}
                     </a>
                   )}
                 </div>

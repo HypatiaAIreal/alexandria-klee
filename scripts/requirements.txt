@@ -1,0 +1,7 @@
+# Alexandria-Klee extraction pipeline (Python 3.10+)
+requests>=2.31
+beautifulsoup4>=4.12
+lxml>=5.0
+deep-translator>=1.11        # free DE→EN/ES (Google Translate, no API key)
+Pillow>=10.0                 # image handling
+pytesseract>=0.3.10          # optional OCR (requires Tesseract + the 'deu' language pack)

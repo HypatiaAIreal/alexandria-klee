@@ -1,0 +1,694 @@
+// ─────────────────────────────────────────────────────────────
+//  UI internationalisation (DE / EN / ES).
+//
+//  Pattern: a flat-ish nested dictionary per locale + a `translate`
+//  helper with dotted-path lookup and {var} interpolation. The React
+//  context lives in components/LanguageProvider.tsx.
+//
+//  Default locale: English. Persisted in localStorage ("klee_lang").
+// ─────────────────────────────────────────────────────────────
+
+export type UILang = "en" | "de" | "es";
+export const UI_LANGS: UILang[] = ["en", "de", "es"];
+export const DEFAULT_LANG: UILang = "en";
+export const LANG_STORAGE_KEY = "klee_lang";
+
+export const LANG_NAMES: Record<UILang, string> = {
+  en: "English",
+  de: "Deutsch",
+  es: "Español",
+};
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
+type Dict = Record<string, any>;
+
+const en: Dict = {
+  nav: {
+    overview: "Overview",
+    browse: "Browse",
+    search: "Search",
+    glossary: "Glossary",
+    concepts: "Concept map",
+    language: "Language",
+  },
+  account: {
+    login: "Sign in",
+    register: "Create account",
+    logout: "Sign out",
+    signedInAs: "Signed in as",
+  },
+  footer: {
+    title: "Proyecto Alexandria-Klee",
+    tagline:
+      "“Making Paul Klee's visual thinking habitable.” — A study system for the Bildnerische Form- und Gestaltungslehre.",
+    source:
+      "Source manuscripts: Zentrum Paul Klee, Bern. This is a private, non-commercial study archive.",
+  },
+  home: {
+    kicker: "Proyecto Alexandria-Klee · Zentrum Paul Klee",
+    heroPre: "Making Paul Klee's visual thinking",
+    heroHighlight: "habitable.",
+    heroBody:
+      "A trilingual study interface for the Bildnerische Form- und Gestaltungslehre — the ~3,900 pages of manuscripts Klee wrote for his Bauhaus courses between 1921 and 1931. Read the original German alongside English and Spanish, with the facsimiles of his own drawings beside every passage.",
+    browseCta: "Browse the archive",
+    beginReading: "Begin reading",
+    stats: {
+      pages: "Pages extracted",
+      articles: "Articles",
+      drawings: "Drawings & diagrams",
+      facsimiles: "Facsimiles",
+      glossary: "Glossary terms",
+      words: "Words transcribed",
+    },
+    poc: {
+      title: "Proof of concept",
+      body: "This build is seeded with the first chapter extracted end-to-end — {chapter} (“Principial Order”) — fully transcribed, translated and enriched. The pipeline scales to the remaining {count} chapters.",
+      cta: "Open chapter →",
+    },
+    concepts: {
+      title: "Most frequent concepts",
+      desc: "How often each of Klee's key terms appears across the extracted corpus.",
+    },
+    domains: {
+      title: "By Bauhaus domain",
+      desc: "Distribution of articles across teaching domains.",
+    },
+    features: {
+      browse: "Navigate chapter → page → article, exactly like the original notebooks.",
+      search: "Full-text search across German, English and Spanish at once.",
+      glossary: "Klee's vocabulary as a living, trilingual lexicon with frequencies.",
+      concepts: "See which of Klee's terms recur together across the manuscripts.",
+      open: "Open →",
+    },
+  },
+  browse: {
+    kicker: "The archive",
+    title: "Browse by structure",
+    intro:
+      "The complete structure of Klee's teaching corpus. Chapters marked extracted are available to read now; the rest map the full scope the pipeline will cover.",
+    extracted: "extracted",
+    pending: "pending",
+    pagesReady: "{count} page(s) · ready",
+    pagesApprox: "~{count} pages",
+    notMapped: "not yet mapped",
+    parts: {
+      "BF::": "A · Bildnerische Formlehre",
+      "BG:I": "B · Bildnerische Gestaltungslehre — I. Allgemeiner Teil",
+      "BG:II": "II. Planimetrische Gestaltung",
+      "BG:III": "III. Stereometrische Gestaltung",
+      "BG:Anhang": "Anhang",
+    },
+  },
+  chapter: {
+    part: "Part",
+    chapterWord: "Chapter",
+    pagesArticles: "{pages} page(s) · {articles} articles",
+    articles: "{count} article(s)",
+  },
+  page: {
+    pageWord: "Page",
+    view: "View",
+    modeTrilingual: "Trilingual",
+    facsimileHint: "Click to enlarge the manuscript",
+    viewOnZpk: "View on ZPK ↗",
+    deutschOriginal: "Deutsch · original",
+    diagramOnly: "— diagram only, no transcription —",
+    diagramNoText: "This region of the manuscript is a drawing without running text.",
+    footnotes: "Manuscript footnotes / corrections",
+    drawings: "Klee's drawings",
+    articlePdf: "Original article PDF ↗",
+    prev: "← Previous page",
+    next: "Next page →",
+    annotations: {
+      title: "My annotations",
+      noTags: "No tags yet — add your own below.",
+      addPlaceholder: "add a semantic tag…",
+      add: "Add",
+      notePlaceholder: "a private note on this passage…",
+      syncedCloud: "● synced to MongoDB Atlas",
+      savedLocal: "● saved in this browser",
+    },
+  },
+  search: {
+    kicker: "Full-text · trilingual",
+    title: "Search the manuscripts",
+    intro:
+      "Search across the German originals and the English & Spanish translations at once. Try Gliederung, energy, or hoja.",
+    placeholder: "Search any word in German, English or Spanish…",
+    language: "Language",
+    allLanguages: "All languages",
+    domain: "Domain",
+    complexity: "Complexity",
+    contentType: "Content type",
+    tag: "Semantic tag",
+    all: "All",
+    results: "{count} result(s)",
+    searching: "Searching…",
+    showingAll: " · showing all articles",
+    filtered: " · filtered",
+    clearFilters: "Clear filters",
+    noneTitle: "No passages found",
+    noneBody: "Try a different term or clear the filters.",
+    diagramOnly: "— diagram only —",
+  },
+  glossary: {
+    kicker: "Klee's vocabulary · trilingual lexicon",
+    title: "Glossary",
+    intro:
+      "Every term Klee leans on, with frequency across the corpus and the passages where it appears. Core concepts come from a seed dictionary; discovered terms surfaced through frequency analysis.",
+    chartTitle: "Frequency across the corpus",
+    chartDesc: "The 15 most-used terms. Gold = core concept, teal = discovered.",
+    filterTerms: "Filter terms",
+    filterPlaceholder: "e.g. Gliederung, energy, línea…",
+    category: "Category",
+    sort: "Sort",
+    byFrequency: "By frequency",
+    alphabetical: "Alphabetical",
+    all: "All",
+    coreConcept: "Core concept",
+    discovered: "Discovered",
+    headerDe: "Deutsch",
+    headerEn: "English",
+    headerEs: "Español",
+    headerFreq: "Freq.",
+    inSeedDict: "In the seed dictionary; not yet attested in the extracted pages.",
+    noMatch: "No terms match.",
+  },
+  concepts: {
+    kicker: "Co-occurrence network",
+    title: "Concept map",
+    intro:
+      "Which of Klee's terms think alongside one another. Two concepts are linked when they appear in the same article; the more often, the stronger the bond.",
+    howTitle: "How to read this map",
+    howBody:
+      "Each circle is one of Klee's concepts; its size is how often the term appears. A line joins two concepts that share an article — thicker lines mean they recur together more often.",
+    howHint: "Hover a concept to trace its connections, or click to pin it.",
+    appearsTogether: "Appears together with",
+    sharedArticles: "{count} shared article(s)",
+    inCorpus: "{count}× in corpus",
+    noCo: "No co-occurrences in this corpus.",
+    domainsTitle: "Bauhaus domains",
+  },
+  auth: {
+    loginTitle: "Sign in",
+    loginSubtitle: "Welcome back to the archive.",
+    registerTitle: "Create your account",
+    registerSubtitle: "Request access to the Klee study archive.",
+    name: "Name",
+    email: "Email",
+    password: "Password",
+    accessCode: "Access code",
+    accessCodeHint: "Required to register for this private archive.",
+    signIn: "Sign in",
+    createAccount: "Create account",
+    noAccount: "No account yet?",
+    haveAccount: "Already have an account?",
+    registerLink: "Create one",
+    loginLink: "Sign in",
+    working: "Please wait…",
+    errorGeneric: "Something went wrong. Please try again.",
+    errorCredentials: "Invalid email or password.",
+    errorAccessCode: "Invalid access code.",
+    errorExists: "An account with this email already exists.",
+    errorNoDb: "Authentication store is not configured.",
+    logout: "Sign out",
+  },
+  domains: {
+    form_theory: "Form theory",
+    color_theory: "Colour theory",
+    composition: "Composition",
+    dynamics: "Dynamics",
+    lineature: "Lineature",
+    planimetry: "Planimetry",
+    mechanics: "Mechanics",
+    general: "General",
+  },
+  contentTypes: {
+    theory: "Theory",
+    exercise: "Exercise",
+    example: "Example",
+    diagram: "Diagram",
+    diagram_analysis: "Diagram analysis",
+  },
+  complexity: {
+    introductory: "Introductory",
+    intermediate: "Intermediate",
+    advanced: "Advanced",
+  },
+};
+
+const de: Dict = {
+  nav: {
+    overview: "Übersicht",
+    browse: "Durchsuchen",
+    search: "Suche",
+    glossary: "Glossar",
+    concepts: "Begriffskarte",
+    language: "Sprache",
+  },
+  account: {
+    login: "Anmelden",
+    register: "Konto erstellen",
+    logout: "Abmelden",
+    signedInAs: "Angemeldet als",
+  },
+  footer: {
+    title: "Proyecto Alexandria-Klee",
+    tagline:
+      "„Paul Klees bildnerisches Denken bewohnbar machen.“ — Ein Studiensystem zur Bildnerischen Form- und Gestaltungslehre.",
+    source:
+      "Quellmanuskripte: Zentrum Paul Klee, Bern. Dies ist ein privates, nicht-kommerzielles Studienarchiv.",
+  },
+  home: {
+    kicker: "Proyecto Alexandria-Klee · Zentrum Paul Klee",
+    heroPre: "Paul Klees bildnerisches Denken",
+    heroHighlight: "bewohnbar machen.",
+    heroBody:
+      "Eine dreisprachige Studienoberfläche für die Bildnerische Form- und Gestaltungslehre — die ~3.900 Manuskriptseiten, die Klee zwischen 1921 und 1931 für seine Bauhaus-Kurse schrieb. Lesen Sie das deutsche Original neben Englisch und Spanisch, mit den Faksimiles seiner eigenen Zeichnungen neben jeder Passage.",
+    browseCta: "Archiv durchsuchen",
+    beginReading: "Lesen beginnen",
+    stats: {
+      pages: "Extrahierte Seiten",
+      articles: "Artikel",
+      drawings: "Zeichnungen & Diagramme",
+      facsimiles: "Faksimiles",
+      glossary: "Glossarbegriffe",
+      words: "Transkribierte Wörter",
+    },
+    poc: {
+      title: "Machbarkeitsnachweis",
+      body: "Dieser Aufbau ist mit dem ersten vollständig extrahierten Kapitel bestückt — {chapter} („Principielle Ordnung“) — vollständig transkribiert, übersetzt und angereichert. Die Pipeline skaliert auf die übrigen {count} Kapitel.",
+      cta: "Kapitel öffnen →",
+    },
+    concepts: {
+      title: "Häufigste Begriffe",
+      desc: "Wie oft jeder von Klees Schlüsselbegriffen im extrahierten Korpus vorkommt.",
+    },
+    domains: {
+      title: "Nach Bauhaus-Bereich",
+      desc: "Verteilung der Artikel auf die Lehrbereiche.",
+    },
+    features: {
+      browse: "Navigieren Sie Kapitel → Seite → Artikel, genau wie in den Originalheften.",
+      search: "Volltextsuche über Deutsch, Englisch und Spanisch zugleich.",
+      glossary: "Klees Vokabular als lebendiges, dreisprachiges Lexikon mit Häufigkeiten.",
+      concepts: "Sehen Sie, welche von Klees Begriffen gemeinsam auftreten.",
+      open: "Öffnen →",
+    },
+  },
+  browse: {
+    kicker: "Das Archiv",
+    title: "Nach Struktur durchsuchen",
+    intro:
+      "Die vollständige Struktur von Klees Lehrkorpus. Als „extrahiert“ markierte Kapitel sind sofort lesbar; die übrigen kartieren den vollen Umfang, den die Pipeline abdecken wird.",
+    extracted: "extrahiert",
+    pending: "ausstehend",
+    pagesReady: "{count} Seite(n) · bereit",
+    pagesApprox: "~{count} Seiten",
+    notMapped: "noch nicht erfasst",
+    parts: {
+      "BF::": "A · Bildnerische Formlehre",
+      "BG:I": "B · Bildnerische Gestaltungslehre — I. Allgemeiner Teil",
+      "BG:II": "II. Planimetrische Gestaltung",
+      "BG:III": "III. Stereometrische Gestaltung",
+      "BG:Anhang": "Anhang",
+    },
+  },
+  chapter: {
+    part: "Teil",
+    chapterWord: "Kapitel",
+    pagesArticles: "{pages} Seite(n) · {articles} Artikel",
+    articles: "{count} Artikel",
+  },
+  page: {
+    pageWord: "Seite",
+    view: "Ansicht",
+    modeTrilingual: "Dreisprachig",
+    facsimileHint: "Zum Vergrößern auf das Manuskript klicken",
+    viewOnZpk: "Auf ZPK ansehen ↗",
+    deutschOriginal: "Deutsch · Original",
+    diagramOnly: "— nur Zeichnung, keine Transkription —",
+    diagramNoText: "Dieser Bereich des Manuskripts ist eine Zeichnung ohne Fließtext.",
+    footnotes: "Manuskript-Fußnoten / Korrekturen",
+    drawings: "Klees Zeichnungen",
+    articlePdf: "Original-Artikel-PDF ↗",
+    prev: "← Vorherige Seite",
+    next: "Nächste Seite →",
+    annotations: {
+      title: "Meine Anmerkungen",
+      noTags: "Noch keine Schlagwörter — fügen Sie unten eigene hinzu.",
+      addPlaceholder: "semantisches Schlagwort hinzufügen…",
+      add: "Hinzufügen",
+      notePlaceholder: "eine private Notiz zu dieser Passage…",
+      syncedCloud: "● mit MongoDB Atlas synchronisiert",
+      savedLocal: "● in diesem Browser gespeichert",
+    },
+  },
+  search: {
+    kicker: "Volltext · dreisprachig",
+    title: "Die Manuskripte durchsuchen",
+    intro:
+      "Suchen Sie zugleich in den deutschen Originalen und den englischen & spanischen Übersetzungen. Versuchen Sie Gliederung, energy oder hoja.",
+    placeholder: "Beliebiges Wort auf Deutsch, Englisch oder Spanisch suchen…",
+    language: "Sprache",
+    allLanguages: "Alle Sprachen",
+    domain: "Bereich",
+    complexity: "Komplexität",
+    contentType: "Inhaltstyp",
+    tag: "Semantisches Tag",
+    all: "Alle",
+    results: "{count} Ergebnis(se)",
+    searching: "Suche läuft…",
+    showingAll: " · alle Artikel werden angezeigt",
+    filtered: " · gefiltert",
+    clearFilters: "Filter zurücksetzen",
+    noneTitle: "Keine Passagen gefunden",
+    noneBody: "Versuchen Sie einen anderen Begriff oder setzen Sie die Filter zurück.",
+    diagramOnly: "— nur Zeichnung —",
+  },
+  glossary: {
+    kicker: "Klees Vokabular · dreisprachiges Lexikon",
+    title: "Glossar",
+    intro:
+      "Jeder Begriff, auf den Klee sich stützt, mit Häufigkeit im Korpus und den Passagen, in denen er erscheint. Kernbegriffe stammen aus einem Ausgangswörterbuch; entdeckte Begriffe ergaben sich aus der Häufigkeitsanalyse.",
+    chartTitle: "Häufigkeit im Korpus",
+    chartDesc: "Die 15 häufigsten Begriffe. Gold = Kernbegriff, Türkis = entdeckt.",
+    filterTerms: "Begriffe filtern",
+    filterPlaceholder: "z. B. Gliederung, energy, línea…",
+    category: "Kategorie",
+    sort: "Sortieren",
+    byFrequency: "Nach Häufigkeit",
+    alphabetical: "Alphabetisch",
+    all: "Alle",
+    coreConcept: "Kernbegriff",
+    discovered: "Entdeckt",
+    headerDe: "Deutsch",
+    headerEn: "Englisch",
+    headerEs: "Spanisch",
+    headerFreq: "Häufigk.",
+    inSeedDict: "Im Ausgangswörterbuch; in den extrahierten Seiten noch nicht belegt.",
+    noMatch: "Keine Begriffe gefunden.",
+  },
+  concepts: {
+    kicker: "Kookkurrenz-Netzwerk",
+    title: "Begriffskarte",
+    intro:
+      "Welche von Klees Begriffen miteinander denken. Zwei Begriffe sind verbunden, wenn sie im selben Artikel vorkommen; je öfter, desto stärker die Bindung.",
+    howTitle: "So lesen Sie diese Karte",
+    howBody:
+      "Jeder Kreis ist einer von Klees Begriffen; seine Größe zeigt, wie oft der Begriff vorkommt. Eine Linie verbindet zwei Begriffe, die sich einen Artikel teilen — dickere Linien bedeuten häufigeres gemeinsames Auftreten.",
+    howHint: "Fahren Sie über einen Begriff, um seine Verbindungen zu verfolgen, oder klicken Sie zum Anheften.",
+    appearsTogether: "Tritt gemeinsam auf mit",
+    sharedArticles: "{count} gemeinsame(r) Artikel",
+    inCorpus: "{count}× im Korpus",
+    noCo: "Keine Kookkurrenzen in diesem Korpus.",
+    domainsTitle: "Bauhaus-Bereiche",
+  },
+  auth: {
+    loginTitle: "Anmelden",
+    loginSubtitle: "Willkommen zurück im Archiv.",
+    registerTitle: "Konto erstellen",
+    registerSubtitle: "Zugang zum Klee-Studienarchiv anfordern.",
+    name: "Name",
+    email: "E-Mail",
+    password: "Passwort",
+    accessCode: "Zugangscode",
+    accessCodeHint: "Für die Registrierung in diesem privaten Archiv erforderlich.",
+    signIn: "Anmelden",
+    createAccount: "Konto erstellen",
+    noAccount: "Noch kein Konto?",
+    haveAccount: "Bereits ein Konto?",
+    registerLink: "Erstellen",
+    loginLink: "Anmelden",
+    working: "Bitte warten…",
+    errorGeneric: "Etwas ist schiefgelaufen. Bitte erneut versuchen.",
+    errorCredentials: "Ungültige E-Mail oder ungültiges Passwort.",
+    errorAccessCode: "Ungültiger Zugangscode.",
+    errorExists: "Ein Konto mit dieser E-Mail existiert bereits.",
+    errorNoDb: "Authentifizierungsspeicher ist nicht konfiguriert.",
+    logout: "Abmelden",
+  },
+  domains: {
+    form_theory: "Formlehre",
+    color_theory: "Farblehre",
+    composition: "Komposition",
+    dynamics: "Dynamik",
+    lineature: "Lineatur",
+    planimetry: "Planimetrie",
+    mechanics: "Mechanik",
+    general: "Allgemein",
+  },
+  contentTypes: {
+    theory: "Theorie",
+    exercise: "Übung",
+    example: "Beispiel",
+    diagram: "Diagramm",
+    diagram_analysis: "Diagrammanalyse",
+  },
+  complexity: {
+    introductory: "Einführend",
+    intermediate: "Mittel",
+    advanced: "Fortgeschritten",
+  },
+};
+
+const es: Dict = {
+  nav: {
+    overview: "Resumen",
+    browse: "Explorar",
+    search: "Buscar",
+    glossary: "Glosario",
+    concepts: "Mapa de conceptos",
+    language: "Idioma",
+  },
+  account: {
+    login: "Iniciar sesión",
+    register: "Crear cuenta",
+    logout: "Cerrar sesión",
+    signedInAs: "Sesión iniciada como",
+  },
+  footer: {
+    title: "Proyecto Alexandria-Klee",
+    tagline:
+      "«Hacer habitable el pensamiento visual de Paul Klee.» — Un sistema de estudio para la Bildnerische Form- und Gestaltungslehre.",
+    source:
+      "Manuscritos originales: Zentrum Paul Klee, Berna. Este es un archivo de estudio privado y sin fines comerciales.",
+  },
+  home: {
+    kicker: "Proyecto Alexandria-Klee · Zentrum Paul Klee",
+    heroPre: "Hacer habitable el pensamiento visual de",
+    heroHighlight: "Paul Klee.",
+    heroBody:
+      "Una interfaz de estudio trilingüe para la Bildnerische Form- und Gestaltungslehre — las ~3.900 páginas de manuscritos que Klee escribió para sus clases en la Bauhaus entre 1921 y 1931. Lee el alemán original junto al inglés y al español, con los facsímiles de sus propios dibujos al lado de cada pasaje.",
+    browseCta: "Explorar el archivo",
+    beginReading: "Empezar a leer",
+    stats: {
+      pages: "Páginas extraídas",
+      articles: "Artículos",
+      drawings: "Dibujos y diagramas",
+      facsimiles: "Facsímiles",
+      glossary: "Términos del glosario",
+      words: "Palabras transcritas",
+    },
+    poc: {
+      title: "Prueba de concepto",
+      body: "Esta versión está sembrada con el primer capítulo extraído de principio a fin — {chapter} («Orden principial») — totalmente transcrito, traducido y enriquecido. El pipeline escala a los {count} capítulos restantes.",
+      cta: "Abrir capítulo →",
+    },
+    concepts: {
+      title: "Conceptos más frecuentes",
+      desc: "Con qué frecuencia aparece cada término clave de Klee en el corpus extraído.",
+    },
+    domains: {
+      title: "Por dominio de la Bauhaus",
+      desc: "Distribución de los artículos entre los dominios de enseñanza.",
+    },
+    features: {
+      browse: "Navega capítulo → página → artículo, igual que en los cuadernos originales.",
+      search: "Búsqueda de texto completo en alemán, inglés y español a la vez.",
+      glossary: "El vocabulario de Klee como un léxico trilingüe vivo con frecuencias.",
+      concepts: "Mira qué términos de Klee reaparecen juntos en los manuscritos.",
+      open: "Abrir →",
+    },
+  },
+  browse: {
+    kicker: "El archivo",
+    title: "Explorar por estructura",
+    intro:
+      "La estructura completa del corpus docente de Klee. Los capítulos marcados como extraídos ya se pueden leer; el resto traza el alcance completo que cubrirá el pipeline.",
+    extracted: "extraído",
+    pending: "pendiente",
+    pagesReady: "{count} página(s) · listo",
+    pagesApprox: "~{count} páginas",
+    notMapped: "aún sin mapear",
+    parts: {
+      "BF::": "A · Bildnerische Formlehre",
+      "BG:I": "B · Bildnerische Gestaltungslehre — I. Allgemeiner Teil",
+      "BG:II": "II. Planimetrische Gestaltung",
+      "BG:III": "III. Stereometrische Gestaltung",
+      "BG:Anhang": "Anhang",
+    },
+  },
+  chapter: {
+    part: "Parte",
+    chapterWord: "Capítulo",
+    pagesArticles: "{pages} página(s) · {articles} artículos",
+    articles: "{count} artículo(s)",
+  },
+  page: {
+    pageWord: "Página",
+    view: "Vista",
+    modeTrilingual: "Trilingüe",
+    facsimileHint: "Haz clic para ampliar el manuscrito",
+    viewOnZpk: "Ver en ZPK ↗",
+    deutschOriginal: "Alemán · original",
+    diagramOnly: "— solo dibujo, sin transcripción —",
+    diagramNoText: "Esta región del manuscrito es un dibujo sin texto corrido.",
+    footnotes: "Notas al pie del manuscrito / correcciones",
+    drawings: "Dibujos de Klee",
+    articlePdf: "PDF del artículo original ↗",
+    prev: "← Página anterior",
+    next: "Página siguiente →",
+    annotations: {
+      title: "Mis anotaciones",
+      noTags: "Aún no hay etiquetas — añade las tuyas abajo.",
+      addPlaceholder: "añadir una etiqueta semántica…",
+      add: "Añadir",
+      notePlaceholder: "una nota privada sobre este pasaje…",
+      syncedCloud: "● sincronizado con MongoDB Atlas",
+      savedLocal: "● guardado en este navegador",
+    },
+  },
+  search: {
+    kicker: "Texto completo · trilingüe",
+    title: "Buscar en los manuscritos",
+    intro:
+      "Busca a la vez en los originales alemanes y en las traducciones al inglés y al español. Prueba Gliederung, energy o hoja.",
+    placeholder: "Busca cualquier palabra en alemán, inglés o español…",
+    language: "Idioma",
+    allLanguages: "Todos los idiomas",
+    domain: "Dominio",
+    complexity: "Complejidad",
+    contentType: "Tipo de contenido",
+    tag: "Etiqueta semántica",
+    all: "Todos",
+    results: "{count} resultado(s)",
+    searching: "Buscando…",
+    showingAll: " · mostrando todos los artículos",
+    filtered: " · filtrado",
+    clearFilters: "Borrar filtros",
+    noneTitle: "No se encontraron pasajes",
+    noneBody: "Prueba otro término o borra los filtros.",
+    diagramOnly: "— solo dibujo —",
+  },
+  glossary: {
+    kicker: "El vocabulario de Klee · léxico trilingüe",
+    title: "Glosario",
+    intro:
+      "Cada término en el que se apoya Klee, con su frecuencia en el corpus y los pasajes donde aparece. Los conceptos clave provienen de un diccionario semilla; los términos descubiertos surgieron del análisis de frecuencia.",
+    chartTitle: "Frecuencia en el corpus",
+    chartDesc: "Los 15 términos más usados. Oro = concepto clave, turquesa = descubierto.",
+    filterTerms: "Filtrar términos",
+    filterPlaceholder: "p. ej. Gliederung, energy, línea…",
+    category: "Categoría",
+    sort: "Ordenar",
+    byFrequency: "Por frecuencia",
+    alphabetical: "Alfabético",
+    all: "Todos",
+    coreConcept: "Concepto clave",
+    discovered: "Descubierto",
+    headerDe: "Alemán",
+    headerEn: "Inglés",
+    headerEs: "Español",
+    headerFreq: "Frec.",
+    inSeedDict: "En el diccionario semilla; aún no atestiguado en las páginas extraídas.",
+    noMatch: "Ningún término coincide.",
+  },
+  concepts: {
+    kicker: "Red de coocurrencia",
+    title: "Mapa de conceptos",
+    intro:
+      "Qué términos de Klee piensan juntos. Dos conceptos se enlazan cuando aparecen en el mismo artículo; cuanto más a menudo, más fuerte el vínculo.",
+    howTitle: "Cómo leer este mapa",
+    howBody:
+      "Cada círculo es uno de los conceptos de Klee; su tamaño indica con qué frecuencia aparece el término. Una línea une dos conceptos que comparten un artículo — las líneas más gruesas indican que reaparecen juntos con más frecuencia.",
+    howHint: "Pasa el cursor sobre un concepto para trazar sus conexiones, o haz clic para fijarlo.",
+    appearsTogether: "Aparece junto con",
+    sharedArticles: "{count} artículo(s) compartido(s)",
+    inCorpus: "{count}× en el corpus",
+    noCo: "Sin coocurrencias en este corpus.",
+    domainsTitle: "Dominios de la Bauhaus",
+  },
+  auth: {
+    loginTitle: "Iniciar sesión",
+    loginSubtitle: "Bienvenido de nuevo al archivo.",
+    registerTitle: "Crea tu cuenta",
+    registerSubtitle: "Solicita acceso al archivo de estudio de Klee.",
+    name: "Nombre",
+    email: "Correo electrónico",
+    password: "Contraseña",
+    accessCode: "Código de acceso",
+    accessCodeHint: "Necesario para registrarse en este archivo privado.",
+    signIn: "Iniciar sesión",
+    createAccount: "Crear cuenta",
+    noAccount: "¿Aún no tienes cuenta?",
+    haveAccount: "¿Ya tienes cuenta?",
+    registerLink: "Crear una",
+    loginLink: "Iniciar sesión",
+    working: "Espera por favor…",
+    errorGeneric: "Algo salió mal. Inténtalo de nuevo.",
+    errorCredentials: "Correo o contraseña no válidos.",
+    errorAccessCode: "Código de acceso no válido.",
+    errorExists: "Ya existe una cuenta con este correo.",
+    errorNoDb: "El almacén de autenticación no está configurado.",
+    logout: "Cerrar sesión",
+  },
+  domains: {
+    form_theory: "Teoría de la forma",
+    color_theory: "Teoría del color",
+    composition: "Composición",
+    dynamics: "Dinámica",
+    lineature: "Lineatura",
+    planimetry: "Planimetría",
+    mechanics: "Mecánica",
+    general: "General",
+  },
+  contentTypes: {
+    theory: "Teoría",
+    exercise: "Ejercicio",
+    example: "Ejemplo",
+    diagram: "Diagrama",
+    diagram_analysis: "Análisis de diagrama",
+  },
+  complexity: {
+    introductory: "Introductorio",
+    intermediate: "Intermedio",
+    advanced: "Avanzado",
+  },
+};
+
+export const DICTS: Record<UILang, Dict> = { en, de, es };
+
+function getPath(obj: Dict, path: string): unknown {
+  return path.split(".").reduce<unknown>((acc, k) => {
+    if (acc && typeof acc === "object" && k in (acc as Dict)) return (acc as Dict)[k];
+    return undefined;
+  }, obj);
+}
+
+/** Translate a dotted key for a given locale, with {var} interpolation. */
+export function translate(
+  lang: UILang,
+  key: string,
+  vars?: Record<string, string | number>
+): string {
+  let val = getPath(DICTS[lang], key);
+  if (val === undefined) val = getPath(DICTS[DEFAULT_LANG], key);
+  if (typeof val !== "string") return key;
+  if (vars) {
+    return val.replace(/\{(\w+)\}/g, (_, k) =>
+      vars[k] !== undefined ? String(vars[k]) : `{${k}}`
+    );
+  }
+  return val;
+}

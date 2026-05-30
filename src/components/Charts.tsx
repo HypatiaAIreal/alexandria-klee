@@ -11,7 +11,8 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { domainColor, domainLabel } from "@/lib/labels";
+import { domainColor } from "@/lib/labels";
+import { useI18n } from "@/components/LanguageProvider";
 
 const AXIS = "#a99d88";
 const tooltipStyle = {
@@ -53,6 +54,7 @@ export function ConceptBarChart({
 }
 
 export function DomainDonut({ data }: { data: { domain: string; count: number }[] }) {
+  const { t } = useI18n();
   return (
     <ResponsiveContainer width="100%" height={260}>
       <PieChart>
@@ -72,7 +74,7 @@ export function DomainDonut({ data }: { data: { domain: string; count: number }[
         </Pie>
         <Tooltip
           contentStyle={tooltipStyle}
-          formatter={(value: number, name: string) => [`${value} articles`, domainLabel(name)]}
+          formatter={(value: number, name: string) => [`${value}`, t(`domains.${name}`)]}
         />
       </PieChart>
     </ResponsiveContainer>
@@ -80,12 +82,13 @@ export function DomainDonut({ data }: { data: { domain: string; count: number }[
 }
 
 export function DomainLegend({ data }: { data: { domain: string; count: number }[] }) {
+  const { t } = useI18n();
   return (
     <ul className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
       {data.map((d) => (
         <li key={d.domain} className="flex items-center gap-2 text-parchment-300">
           <span className="h-2.5 w-2.5 rounded-sm" style={{ background: domainColor(d.domain) }} />
-          <span className="flex-1 truncate">{domainLabel(d.domain)}</span>
+          <span className="flex-1 truncate">{t(`domains.${d.domain}`)}</span>
           <span className="font-mono text-parchment-400">{d.count}</span>
         </li>
       ))}

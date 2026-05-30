@@ -1,38 +1,37 @@
+"use client";
+
 import type { ArticleMetadata } from "@/lib/types";
-import {
-  complexityLabel,
-  contentTypeLabel,
-  domainColor,
-  domainLabel,
-  COMPLEXITY_COLORS,
-  tagLabel,
-} from "@/lib/labels";
+import { COMPLEXITY_COLORS, domainColor, tagLabel } from "@/lib/labels";
+import { useI18n } from "@/components/LanguageProvider";
 
 export function DomainChip({ domain }: { domain: string }) {
+  const { t } = useI18n();
   const c = domainColor(domain);
   return (
-    <span
-      className="chip"
-      style={{ borderColor: `${c}55`, color: c }}
-      title="Bauhaus domain"
-    >
+    <span className="chip" style={{ borderColor: `${c}55`, color: c }} title="Bauhaus domain">
       <span className="h-1.5 w-1.5 rounded-full" style={{ background: c }} />
-      {domainLabel(domain)}
+      {t(`domains.${domain}`)}
     </span>
   );
 }
 
 export function ComplexityChip({ level }: { level: string }) {
+  const { t } = useI18n();
   const c = COMPLEXITY_COLORS[level] ?? "#a99d88";
   return (
     <span className="chip" style={{ color: c }} title="Complexity level">
-      {complexityLabel(level)}
+      {t(`complexity.${level}`)}
     </span>
   );
 }
 
 export function ContentTypeChip({ type }: { type: string }) {
-  return <span className="chip" title="Content type">{contentTypeLabel(type)}</span>;
+  const { t } = useI18n();
+  return (
+    <span className="chip" title="Content type">
+      {t(`contentTypes.${type}`)}
+    </span>
+  );
 }
 
 export function MetaChips({ metadata }: { metadata: ArticleMetadata }) {

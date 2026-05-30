@@ -5,9 +5,9 @@ import { useMemo, useState } from "react";
 import type { GlossaryEntry } from "@/lib/types";
 import { slug } from "@/lib/util";
 import { ConceptBarChart } from "@/components/Charts";
+import { useI18n } from "@/components/LanguageProvider";
 
 function refToHref(ref: string): { href: string; label: string } {
-  // ref like "BG I.2/3 art.24"
   const m = ref.match(/^(.*?)\s+art\.(\d+)/);
   if (!m) return { href: "#", label: ref };
   const [, pageRef, art] = m;
@@ -17,6 +17,7 @@ function refToHref(ref: string): { href: string; label: string } {
 type Sort = "frequency" | "alpha";
 
 export default function GlossaryClient({ glossary }: { glossary: GlossaryEntry[] }) {
+  const { t } = useI18n();
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<"all" | "core_concept" | "discovered">("all");
   const [sort, setSort] = useState<Sort>("frequency");
@@ -52,62 +53,61 @@ export default function GlossaryClient({ glossary }: { glossary: GlossaryEntry[]
     [glossary]
   );
 
+  const selectCls =
+    "rounded-md border border-ink-700 bg-ink-850 px-3 py-1.5 text-sm text-parchment-100 outline-none focus:border-ochre/50";
+
+  const catLabel = (c: string) =>
+    c === "core_concept" ? t("glossary.coreConcept") : c === "discovered" ? t("glossary.discovered") : c;
+
   return (
     <div className="space-y-6">
-      {/* Frequency chart */}
+      <header className="animate-fade-up pt-4">
+        <p className="label mb-3">{t("glossary.kicker")}</p>
+        <h1 className="font-display text-4xl text-parchment-50">{t("glossary.title")}</h1>
+        <p className="mt-3 max-w-2xl text-parchment-300">{t("glossary.intro")}</p>
+      </header>
+
       <div className="panel p-6">
-        <h2 className="font-display text-xl text-parchment-50">Frequency across the corpus</h2>
-        <p className="mt-1 text-sm text-parchment-400">
-          The 15 most-used terms. Gold = core concept, teal = discovered.
-        </p>
+        <h2 className="font-display text-xl text-parchment-50">{t("glossary.chartTitle")}</h2>
+        <p className="mt-1 text-sm text-parchment-400">{t("glossary.chartDesc")}</p>
         <div className="mt-4">
           <ConceptBarChart data={chartData} />
         </div>
       </div>
 
-      {/* Controls */}
       <div className="panel flex flex-col gap-3 p-4 sm:flex-row sm:items-end">
         <label className="flex flex-1 flex-col gap-1">
-          <span className="label">Filter terms</span>
+          <span className="label">{t("glossary.filterTerms")}</span>
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="e.g. Gliederung, energy, línea…"
-            className="rounded-md border border-ink-700 bg-ink-850 px-3 py-1.5 text-sm text-parchment-100 outline-none focus:border-ochre/50"
+            placeholder={t("glossary.filterPlaceholder")}
+            className={selectCls}
           />
         </label>
         <label className="flex flex-col gap-1">
-          <span className="label">Category</span>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value as typeof category)}
-            className="rounded-md border border-ink-700 bg-ink-850 px-3 py-1.5 text-sm text-parchment-100 outline-none focus:border-ochre/50"
-          >
-            <option value="all">All</option>
-            <option value="core_concept">Core concept</option>
-            <option value="discovered">Discovered</option>
+          <span className="label">{t("glossary.category")}</span>
+          <select value={category} onChange={(e) => setCategory(e.target.value as typeof category)} className={selectCls}>
+            <option value="all">{t("glossary.all")}</option>
+            <option value="core_concept">{t("glossary.coreConcept")}</option>
+            <option value="discovered">{t("glossary.discovered")}</option>
           </select>
         </label>
         <label className="flex flex-col gap-1">
-          <span className="label">Sort</span>
-          <select
-            value={sort}
-            onChange={(e) => setSort(e.target.value as Sort)}
-            className="rounded-md border border-ink-700 bg-ink-850 px-3 py-1.5 text-sm text-parchment-100 outline-none focus:border-ochre/50"
-          >
-            <option value="frequency">By frequency</option>
-            <option value="alpha">Alphabetical</option>
+          <span className="label">{t("glossary.sort")}</span>
+          <select value={sort} onChange={(e) => setSort(e.target.value as Sort)} className={selectCls}>
+            <option value="frequency">{t("glossary.byFrequency")}</option>
+            <option value="alpha">{t("glossary.alphabetical")}</option>
           </select>
         </label>
       </div>
 
-      {/* Table */}
       <div className="panel overflow-hidden">
         <div className="grid grid-cols-[1.4fr_1.4fr_1.4fr_auto] gap-3 border-b border-ink-700/60 px-5 py-3 text-parchment-300">
-          <span className="label">Deutsch</span>
-          <span className="label">English</span>
-          <span className="label">Español</span>
-          <span className="label text-right">Freq.</span>
+          <span className="label">{t("glossary.headerDe")}</span>
+          <span className="label">{t("glossary.headerEn")}</span>
+          <span className="label">{t("glossary.headerEs")}</span>
+          <span className="label text-right">{t("glossary.headerFreq")}</span>
         </div>
         <ul>
           {filtered.map((g) => {
@@ -132,7 +132,7 @@ export default function GlossaryClient({ glossary }: { glossary: GlossaryEntry[]
 
                 {open && (
                   <div className="bg-ink-900/40 px-5 pb-4 pt-1">
-                    <span className="chip">{g.category.replace("_", " ")}</span>
+                    <span className="chip">{catLabel(g.category)}</span>
                     {g.example_contexts.length > 0 ? (
                       <ul className="mt-3 space-y-2">
                         {g.example_contexts.map((ctx, i) => {
@@ -142,17 +142,13 @@ export default function GlossaryClient({ glossary }: { glossary: GlossaryEntry[]
                               <Link href={href} className="font-mono text-xs text-kleeblue hover:text-ochre">
                                 {label}
                               </Link>
-                              <p className="ms mt-0.5 text-[0.95rem] text-parchment-300">
-                                …{ctx.context}…
-                              </p>
+                              <p className="ms mt-0.5 text-[0.95rem] text-parchment-300">…{ctx.context}…</p>
                             </li>
                           );
                         })}
                       </ul>
                     ) : (
-                      <p className="mt-2 text-sm text-parchment-400">
-                        In the seed dictionary; not yet attested in the extracted pages.
-                      </p>
+                      <p className="mt-2 text-sm text-parchment-400">{t("glossary.inSeedDict")}</p>
                     )}
                   </div>
                 )}
@@ -160,7 +156,7 @@ export default function GlossaryClient({ glossary }: { glossary: GlossaryEntry[]
             );
           })}
           {filtered.length === 0 && (
-            <li className="px-5 py-10 text-center text-parchment-400">No terms match.</li>
+            <li className="px-5 py-10 text-center text-parchment-400">{t("glossary.noMatch")}</li>
           )}
         </ul>
       </div>

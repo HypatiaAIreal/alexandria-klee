@@ -102,6 +102,14 @@ const GlossarySchema = new Schema({
 
 const StatsSchema = new Schema({}, { strict: false });
 
+// App users (authentication). Stored in the klee_gestaltungslehre DB.
+const UserSchema = new Schema({
+  name: String,
+  email: { type: String, index: true, unique: true },
+  password_hash: String,
+  created_at: { type: Date, default: Date.now },
+});
+
 // Annotations created by users in the app (the "tag system").
 const AnnotationSchema = new Schema({
   article_id: { type: String, index: true },
@@ -110,13 +118,17 @@ const AnnotationSchema = new Schema({
   created_at: { type: Date, default: Date.now },
 });
 
+// Collection names are pinned explicitly (3rd arg) so they match the
+// names written by scripts/seed-mongo.mjs — Mongoose's default
+// pluralisation would otherwise read "glossaries" instead of "glossary".
 export const ArticleModel =
-  mongoose.models.Article || mongoose.model("Article", ArticleSchema);
-export const PageModel = mongoose.models.Page || mongoose.model("Page", PageSchema);
+  mongoose.models.Article || mongoose.model("Article", ArticleSchema, "articles");
+export const PageModel = mongoose.models.Page || mongoose.model("Page", PageSchema, "pages");
 export const ChapterModel =
-  mongoose.models.Chapter || mongoose.model("Chapter", ChapterSchema);
+  mongoose.models.Chapter || mongoose.model("Chapter", ChapterSchema, "chapters");
 export const GlossaryModel =
-  mongoose.models.Glossary || mongoose.model("Glossary", GlossarySchema);
-export const StatsModel = mongoose.models.Stats || mongoose.model("Stats", StatsSchema);
+  mongoose.models.Glossary || mongoose.model("Glossary", GlossarySchema, "glossary");
+export const StatsModel = mongoose.models.Stats || mongoose.model("Stats", StatsSchema, "stats");
 export const AnnotationModel =
-  mongoose.models.Annotation || mongoose.model("Annotation", AnnotationSchema);
+  mongoose.models.Annotation || mongoose.model("Annotation", AnnotationSchema, "annotations");
+export const UserModel = mongoose.models.User || mongoose.model("User", UserSchema, "users");

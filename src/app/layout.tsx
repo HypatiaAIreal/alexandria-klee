@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import "./globals.css";
 import SiteHeader from "@/components/SiteHeader";
+import SiteFooter from "@/components/SiteFooter";
+import { LanguageProvider } from "@/components/LanguageProvider";
+import { AuthProvider, type SessionUser } from "@/components/AuthProvider";
+import { COOKIE_NAME, verifyToken } from "@/lib/auth";
 
 export const metadata: Metadata = {
   title: {
@@ -11,7 +16,14 @@ export const metadata: Metadata = {
     "A trilingual study interface for Paul Klee's Bauhaus teaching manuscripts — transcriptions, facsimiles, glossary and concept maps.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Resolve the session once on the server so the header never flickers.
+  const token = cookies().get(COOKIE_NAME)?.value;
+  const payload = token ? await verifyToken(token) : null;
+  const initialUser: SessionUser | null = payload
+    ? { id: payload.sub, name: payload.name, email: payload.email }
+    : null;
+
   return (
     <html lang="en">
       <head>
@@ -23,23 +35,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className="font-sans antialiased">
-        <SiteHeader />
-        <main className="mx-auto w-full max-w-8xl px-5 pb-24 pt-6 sm:px-8">{children}</main>
-        <footer className="border-t border-ink-700/60">
-          <div className="mx-auto flex max-w-8xl flex-col gap-1 px-5 py-8 text-sm text-parchment-400 sm:px-8">
-            <p className="font-display text-base text-parchment-200">
-              Proyecto Alexandria-Klee
-            </p>
-            <p>
-              “Hacer habitable el pensamiento visual de Paul Klee.” — A study system for the{" "}
-              <em>Bildnerische Form- und Gestaltungslehre</em>.
-            </p>
-            <p className="text-parchment-400/70">
-              Source manuscripts: Zentrum Paul Klee, Bern. This is a private, non-commercial
-              study archive.
-            </p>
-          </div>
-        </footer>
+        <LanguageProvider>
+          <AuthProvider initialUser={initialUser}>
+            <SiteHeader />
+            <main className="mx-auto w-full max-w-8xl px-5 pb-24 pt-6 sm:px-8">{children}</main>
+            <SiteFooter />
+          </AuthProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

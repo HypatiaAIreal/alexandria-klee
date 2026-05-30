@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from "react";
 import type { ConceptGraph } from "@/lib/types";
-import { domainColor, domainLabel } from "@/lib/labels";
+import { domainColor } from "@/lib/labels";
+import { useI18n } from "@/components/LanguageProvider";
 
 const W = 760;
 const H = 560;
@@ -97,6 +98,7 @@ function layout(graph: ConceptGraph): Pos[] {
 }
 
 export default function ConceptMap({ graph }: { graph: ConceptGraph }) {
+  const { t } = useI18n();
   const pos = useMemo(() => layout(graph), [graph]);
   const [active, setActive] = useState<string | null>(null);
   const [pinned, setPinned] = useState<string | null>(null);
@@ -127,7 +129,13 @@ export default function ConceptMap({ graph }: { graph: ConceptGraph }) {
   const isDim = (term: string) => current != null && term !== current && !neighbours.has(term);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="space-y-6">
+      <header className="animate-fade-up pt-4">
+        <p className="label mb-3">{t("concepts.kicker")}</p>
+        <h1 className="font-display text-4xl text-parchment-50">{t("concepts.title")}</h1>
+        <p className="mt-3 max-w-2xl text-parchment-300">{t("concepts.intro")}</p>
+      </header>
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
       <div className="panel overflow-hidden p-2">
         <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Concept co-occurrence map">
           {/* edges */}
@@ -207,11 +215,11 @@ export default function ConceptMap({ graph }: { graph: ConceptGraph }) {
                 <p className="mt-1 text-sm text-parchment-300">{currentNode.term_en}</p>
               )}
               <div className="mt-3 flex flex-wrap gap-2">
-                <span className="chip">{domainLabel(currentNode.domain)}</span>
-                <span className="chip text-ochre">{currentNode.frequency}× in corpus</span>
+                <span className="chip">{t(`domains.${currentNode.domain}`)}</span>
+                <span className="chip text-ochre">{t("concepts.inCorpus", { count: currentNode.frequency })}</span>
               </div>
               <div className="mt-4 border-t border-ink-700/60 pt-3">
-                <p className="label mb-2">Appears together with</p>
+                <p className="label mb-2">{t("concepts.appearsTogether")}</p>
                 {currentEdges.length ? (
                   <ul className="space-y-1.5">
                     {currentEdges.map((e) => (
@@ -223,42 +231,37 @@ export default function ConceptMap({ graph }: { graph: ConceptGraph }) {
                           {e.other}
                         </button>
                         <span className="font-mono text-xs text-parchment-400">
-                          {e.weight} shared article{e.weight === 1 ? "" : "s"}
+                          {t("concepts.sharedArticles", { count: e.weight })}
                         </span>
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p className="text-sm text-parchment-400">No co-occurrences in this corpus.</p>
+                  <p className="text-sm text-parchment-400">{t("concepts.noCo")}</p>
                 )}
               </div>
             </>
           ) : (
             <>
-              <h3 className="font-display text-xl text-parchment-50">How to read this map</h3>
-              <p className="mt-2 text-sm text-parchment-300">
-                Each circle is one of Klee&rsquo;s concepts; its size is how often the term appears.
-                A line joins two concepts that share an article — thicker lines mean they recur
-                together more often.
-              </p>
-              <p className="mt-2 text-sm text-parchment-400">
-                Hover a concept to trace its connections, or click to pin it.
-              </p>
+              <h3 className="font-display text-xl text-parchment-50">{t("concepts.howTitle")}</h3>
+              <p className="mt-2 text-sm text-parchment-300">{t("concepts.howBody")}</p>
+              <p className="mt-2 text-sm text-parchment-400">{t("concepts.howHint")}</p>
             </>
           )}
         </div>
 
         <div className="panel p-5">
-          <p className="label mb-3">Bauhaus domains</p>
+          <p className="label mb-3">{t("concepts.domainsTitle")}</p>
           <ul className="grid grid-cols-2 gap-1.5 text-sm text-parchment-300">
             {[...new Set(graph.nodes.map((n) => n.domain))].map((d) => (
               <li key={d} className="flex items-center gap-2">
                 <span className="h-2.5 w-2.5 rounded-full" style={{ background: domainColor(d) }} />
-                {domainLabel(d)}
+                {t(`domains.${d}`)}
               </li>
             ))}
           </ul>
         </div>
+      </div>
       </div>
     </div>
   );

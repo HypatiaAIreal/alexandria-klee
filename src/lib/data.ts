@@ -22,7 +22,7 @@ import type {
 } from "./types";
 import { hasMongo } from "./mongodb";
 
-let cache: SeedData | null = null;
+let cachePromise: Promise<SeedData> | null = null;
 
 async function loadFromMongo(): Promise<SeedData> {
   const { connectMongo } = await import("./mongodb");
@@ -46,21 +46,25 @@ async function loadFromMongo(): Promise<SeedData> {
   };
 }
 
-export async function getDataset(): Promise<SeedData> {
-  if (cache) return cache;
-  if (hasMongo) {
-    try {
-      cache = await loadFromMongo();
-      // If Atlas is empty, fall back to the bundled seed.
-      if (!cache.articles?.length) cache = seed as unknown as SeedData;
-    } catch (err) {
-      console.warn("[data] Mongo load failed, using bundled seed:", err);
-      cache = seed as unknown as SeedData;
+// Single-flight: cache the PROMISE so concurrent callers (e.g. a page's
+// Promise.all of getStats/getArticles/…) share one load and never race
+// on a shared result object.
+export function getDataset(): Promise<SeedData> {
+  if (cachePromise) return cachePromise;
+  cachePromise = (async () => {
+    if (hasMongo) {
+      try {
+        const data = await loadFromMongo();
+        // If Atlas has no content yet, fall back to the bundled seed.
+        return data.articles?.length ? data : (seed as unknown as SeedData);
+      } catch (err) {
+        console.warn("[data] Mongo load failed, using bundled seed:", err);
+        return seed as unknown as SeedData;
+      }
     }
-  } else {
-    cache = seed as unknown as SeedData;
-  }
-  return cache;
+    return seed as unknown as SeedData;
+  })();
+  return cachePromise;
 }
 
 // ── normalisation (diacritic-insensitive search) ────────────────

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useI18n } from "@/components/LanguageProvider";
 
 interface Annotation {
   tags: string[];
@@ -10,6 +11,7 @@ interface Annotation {
 const KEY = (id: string) => `klee:annotation:${id}`;
 
 export default function AnnotationPanel({ articleId }: { articleId: string }) {
+  const { t } = useI18n();
   const [tags, setTags] = useState<string[]>([]);
   const [note, setNote] = useState("");
   const [input, setInput] = useState("");
@@ -78,7 +80,8 @@ export default function AnnotationPanel({ articleId }: { articleId: string }) {
         className="flex w-full items-center justify-between text-left"
       >
         <span className="label">
-          My annotations {tags.length > 0 && <span className="text-ochre">· {tags.length}</span>}
+          {t("page.annotations.title")}{" "}
+          {tags.length > 0 && <span className="text-ochre">· {tags.length}</span>}
         </span>
         <span className="text-parchment-400">{open ? "−" : "+"}</span>
       </button>
@@ -98,7 +101,7 @@ export default function AnnotationPanel({ articleId }: { articleId: string }) {
               </span>
             ))}
             {tags.length === 0 && (
-              <span className="text-xs text-parchment-400">No tags yet — add your own below.</span>
+              <span className="text-xs text-parchment-400">{t("page.annotations.noTags")}</span>
             )}
           </div>
 
@@ -112,27 +115,27 @@ export default function AnnotationPanel({ articleId }: { articleId: string }) {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="add a semantic tag…"
+              placeholder={t("page.annotations.addPlaceholder")}
               className="flex-1 rounded-md border border-ink-700 bg-ink-850 px-3 py-1.5 text-sm text-parchment-100 outline-none placeholder:text-parchment-400/60 focus:border-ochre/50"
             />
             <button
               type="submit"
               className="rounded-md border border-ink-700 px-3 py-1.5 text-sm text-parchment-200 hover:border-ochre/50 hover:text-ochre"
             >
-              Add
+              {t("page.annotations.add")}
             </button>
           </form>
 
           <textarea
             value={note}
             onChange={(e) => saveNote(e.target.value)}
-            placeholder="a private note on this passage…"
+            placeholder={t("page.annotations.notePlaceholder")}
             rows={2}
             className="w-full resize-y rounded-md border border-ink-700 bg-ink-850 px-3 py-2 text-sm text-parchment-100 outline-none placeholder:text-parchment-400/60 focus:border-ochre/50"
           />
 
           <p className="font-mono text-[0.62rem] text-parchment-400/70">
-            {synced === "cloud" ? "● synced to MongoDB Atlas" : "● saved in this browser"}
+            {synced === "cloud" ? t("page.annotations.syncedCloud") : t("page.annotations.savedLocal")}
           </p>
         </div>
       )}

@@ -23,6 +23,9 @@ yarn-error.log*
 .env
 .env*.local
 
+# local dev user store (file-based auth fallback)
+/.data
+
 # vercel
 .vercel
 
