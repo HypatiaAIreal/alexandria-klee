@@ -36,3 +36,6 @@ next-env.d.ts
 # python
 __pycache__/
 *.pyc
+
+# OCR language data (download locally; see scripts/README_PIPELINE.md)
+scripts/tessdata/

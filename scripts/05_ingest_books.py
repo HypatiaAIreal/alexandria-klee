@@ -69,15 +69,60 @@ def is_heading(text: str, size: float, heading_min: float) -> bool:
     return False
 
 
-def ocr_page(page) -> str:
+_OCR_READY = False
+
+
+def configure_ocr(tess_cmd: str | None, tessdata_dir: str | None) -> bool:
+    """Point pytesseract at the Tesseract binary + tessdata. Returns True if usable."""
+    global _OCR_READY
+    try:
+        import os as _os
+        import pytesseract
+    except ImportError:
+        print("  [ocr] pytesseract not installed")
+        return False
+    # binary
+    cmd = tess_cmd or _os.environ.get("TESSERACT_CMD")
+    if not cmd:
+        for p in (
+            r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+            r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+        ):
+            if _os.path.exists(p):
+                cmd = p
+                break
+    if cmd:
+        pytesseract.pytesseract.tesseract_cmd = cmd
+    # tessdata (TESSDATA_PREFIX handles spaces in the path; --tessdata-dir does not)
+    td = tessdata_dir or _os.environ.get("TESSDATA_DIR")
+    if not td:
+        local = C.SCRIPTS_DIR / "tessdata"
+        if local.exists():
+            td = str(local)
+    if td:
+        _os.environ["TESSDATA_PREFIX"] = td
+    try:
+        ver = pytesseract.get_tesseract_version()
+        print(f"  [ocr] Tesseract {ver}  langs from {td or 'default tessdata'}")
+        _OCR_READY = True
+    except Exception as e:
+        print(f"  [ocr] Tesseract not usable: {e}")
+        _OCR_READY = False
+    return _OCR_READY
+
+
+def ocr_page(page, lang: str = "eng+deu") -> str:
+    if not _OCR_READY:
+        return ""
     try:
         import pytesseract
         from PIL import Image
         import io
         pix = page.get_pixmap(dpi=200)
         img = Image.open(io.BytesIO(pix.tobytes("png")))
-        return pytesseract.image_to_string(img).strip()
-    except Exception:
+        return pytesseract.image_to_string(img, lang=lang).strip()
+    except Exception as e:
+        print(f"  [ocr] page failed: {e}")
         return ""
 
 
@@ -96,10 +141,11 @@ def page_lines(page) -> list[tuple[str, float]]:
     return out
 
 
-def ingest_book(path, title, year, language, do_ocr=False, do_cover=True) -> dict:
+def ingest_book(path, title, year, language, do_ocr=False, do_cover=True, ocr_lang="eng+deu") -> dict:
     doc = fitz.open(path)
     n_pages = doc.page_count
     book_id = C.slug(title)
+    ocr_pages = 0
 
     # body font size (most common, weighted by char count)
     size_counts: Counter = Counter()
@@ -124,8 +170,10 @@ def ingest_book(path, title, year, language, do_ocr=False, do_cover=True) -> dic
         lines = page_lines(page)
         raw = page.get_text("text")
         if (not raw or len(raw.strip()) < 15) and do_ocr:
-            raw = ocr_page(page)
-            if raw:
+            ocr = ocr_page(page, ocr_lang)
+            if ocr:
+                raw = ocr
+                ocr_pages += 1
                 lines = [(ln, body_size) for ln in raw.splitlines() if ln.strip()]
         page_texts.append(raw or "")
 
@@ -140,8 +188,9 @@ def ingest_book(path, title, year, language, do_ocr=False, do_cover=True) -> dic
                 cur["page_end"] = pno
     flush()
 
-    # Fallback: no real headings detected → chunk by pages.
-    if len(sections) < 2:
+    # Fallback: no real headings, OR an OCR-derived book (font sizes are
+    # meaningless after OCR) → chunk by pages for clean navigation.
+    if len(sections) < 2 or ocr_pages >= max(1, n_pages * 0.5):
         sections = []
         CH = 10
         for start in range(0, n_pages, CH):
@@ -199,8 +248,11 @@ def assemble_books_seed() -> None:
     print(f"\nBundled {len(books)} book(s) → {C.BOOKS_SEED.relative_to(C.PROJECT_DIR)}")
 
 
-def run(only_file: str | None, include_large: bool, do_ocr: bool, max_mb: float) -> None:
+def run(only_file: str | None, include_large: bool, do_ocr: bool, max_mb: float,
+        ocr_lang: str = "eng+deu", tess_cmd: str | None = None, tessdata_dir: str | None = None) -> None:
     C.BOOKS_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    if do_ocr:
+        configure_ocr(tess_cmd, tessdata_dir)
     targets = BOOKS if not only_file else [b for b in BOOKS if b[0] == only_file]
     if only_file and not targets:
         # allow ingesting an arbitrary file not in the registry
@@ -220,7 +272,7 @@ def run(only_file: str | None, include_large: bool, do_ocr: bool, max_mb: float)
             print(f"  [skip] {size_mb:.0f} MB > {max_mb} MB cap: {title}")
             continue
         print(f"  Ingesting: {title}  ({size_mb:.0f} MB)…")
-        book = ingest_book(str(path), title, year, lang, do_ocr=do_ocr)
+        book = ingest_book(str(path), title, year, lang, do_ocr=do_ocr, ocr_lang=ocr_lang)
         C.write_json(C.BOOKS_DATA_DIR / f"{book['id']}.json", book)
         flag = " [needs OCR — image PDF]" if book["needs_ocr"] else ""
         print(f"    → {book['total_pages']} pages, {book['total_sections']} sections, "
@@ -237,6 +289,9 @@ if __name__ == "__main__":
     ap.add_argument("--all", action="store_true", help="Include the large notebooks too")
     ap.add_argument("--file", help="Ingest a single file name from the books dir")
     ap.add_argument("--ocr", action="store_true", help="OCR image-only pages (slow)")
+    ap.add_argument("--lang", default="eng+deu", help="Tesseract OCR languages (default eng+deu)")
+    ap.add_argument("--tess-cmd", help="Path to tesseract.exe (else auto-detect)")
+    ap.add_argument("--tessdata-dir", help="tessdata dir (else scripts/tessdata or TESSDATA_PREFIX)")
     ap.add_argument("--max-mb", type=float, default=15.0, help="Skip files larger than this (default 15)")
     ap.add_argument("--list", action="store_true", help="List the registry")
     args = ap.parse_args()
@@ -248,4 +303,5 @@ if __name__ == "__main__":
                   + ("  (large)" if skip else ""))
         raise SystemExit(0)
 
-    run(args.file, args.all, args.ocr, args.max_mb)
+    run(args.file, args.all, args.ocr, args.max_mb,
+        ocr_lang=args.lang, tess_cmd=args.tess_cmd, tessdata_dir=args.tessdata_dir)

@@ -18,11 +18,33 @@ python -m venv .venv && . .venv/Scripts/activate   # Windows
 pip install -r requirements.txt
 ```
 
-OCR (optional) also needs the Tesseract binary with the German pack:
+### OCR (for scanned PDFs)
 
-- Windows: install Tesseract, then ensure the `deu` language data is present.
+Scanned books/manuscripts (no text layer) need Tesseract + the language data.
+
+- Windows: install Tesseract (e.g. the UB-Mannheim build); it ships `eng`.
 - macOS: `brew install tesseract tesseract-lang`
 - Linux: `sudo apt install tesseract-ocr tesseract-ocr-deu`
+
+The ingester auto-detects `tesseract.exe` and a `scripts/tessdata/` folder
+(git-ignored). To OCR with `eng+deu`, put `eng.traineddata` + `deu.traineddata`
+there (the path may contain spaces, so we set `TESSDATA_PREFIX` rather than
+`--tessdata-dir`). To fetch the German model:
+
+```powershell
+# from scripts/
+mkdir tessdata
+copy "C:\Program Files\Tesseract-OCR\tessdata\eng.traineddata" tessdata\
+iwr https://github.com/tesseract-ocr/tessdata_fast/raw/main/deu.traineddata -OutFile tessdata\deu.traineddata
+```
+
+Then ingest a scanned book:
+
+```bash
+python 05_ingest_books.py --ocr --lang eng+deu --file "70856952-5-a-the-Diaries-of-Klee.pdf"
+```
+
+OCR-derived books are paginated into "Pages X–Y" sections automatically.
 
 ## The phases
 
