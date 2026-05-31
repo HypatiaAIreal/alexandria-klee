@@ -33,7 +33,8 @@ import common as C
 BOOKS = [
     ("70856952-5-a-the-Diaries-of-Klee.pdf", "The Diaries of Paul Klee, 1898–1918", 1957, "en", False),
     ("134343205-Klee-Paul-on-Modern-Art.pdf", "On Modern Art", 1948, "en", False),
-    ("146335658-Paul-Klee-Pedagogical-Sketchbook.pdf", "Pedagogical Sketchbook", 1925, "en", False),
+    # Use the text-based Praeger edition (the 146335658 scan has no text layer).
+    ("Klee, Paul - Pedagogical Sketchbook.pdf", "Pedagogical Sketchbook", 1925, "en", False),
     ("101315116-Paul-Klee-Some-Poems-by-Paul-Klee-1962.pdf", "Some Poems by Paul Klee", 1962, "en", False),
     ("231332962-Paul-Klee-Sketching-and-Drawing.pdf", "Sketching and Drawing", None, "en", False),
     ("Bases para la estructuración del arte (Paul Klee) .pdf", "Bases para la estructuración del arte", None, "es", False),
