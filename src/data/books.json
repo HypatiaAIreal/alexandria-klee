@@ -1,0 +1,1050 @@
+{
+  "books": [
+    {
+      "id": "pedagogical-sketchbook",
+      "title": "Pedagogical Sketchbook",
+      "author": "Paul Klee",
+      "year": 1925,
+      "language": "en",
+      "source_file": "146335658-Paul-Klee-Pedagogical-Sketchbook.pdf",
+      "total_pages": 31,
+      "total_sections": 0,
+      "total_chars": 0,
+      "needs_ocr": true,
+      "cover": "/books/pedagogical-sketchbook/cover.jpg",
+      "sections": [],
+      "ingested_at": "2026-05-31"
+    },
+    {
+      "id": "on-modern-art",
+      "title": "On Modern Art",
+      "author": "Paul Klee",
+      "year": 1948,
+      "language": "en",
+      "source_file": "134343205-Klee-Paul-on-Modern-Art.pdf",
+      "total_pages": 53,
+      "total_sections": 0,
+      "total_chars": 0,
+      "needs_ocr": true,
+      "cover": "/books/on-modern-art/cover.jpg",
+      "sections": [],
+      "ingested_at": "2026-05-31"
+    },
+    {
+      "id": "the-diaries-of-paul-klee-18981918",
+      "title": "The Diaries of Paul Klee, 1898–1918",
+      "author": "Paul Klee",
+      "year": 1957,
+      "language": "en",
+      "source_file": "70856952-5-a-the-Diaries-of-Klee.pdf",
+      "total_pages": 29,
+      "total_sections": 0,
+      "total_chars": 0,
+      "needs_ocr": true,
+      "cover": "/books/the-diaries-of-paul-klee-18981918/cover.jpg",
+      "sections": [],
+      "ingested_at": "2026-05-31"
+    },
+    {
+      "id": "some-poems-by-paul-klee",
+      "title": "Some Poems by Paul Klee",
+      "author": "Paul Klee",
+      "year": 1962,
+      "language": "en",
+      "source_file": "101315116-Paul-Klee-Some-Poems-by-Paul-Klee-1962.pdf",
+      "total_pages": 34,
+      "total_sections": 25,
+      "total_chars": 10661,
+      "needs_ocr": false,
+      "cover": "/books/some-poems-by-paul-klee/cover.jpg",
+      "sections": [
+        {
+          "index": 0,
+          "title": "KLEE",
+          "page_start": 3,
+          "page_end": 4,
+          "text": "First published in November 1962 by\nScorpion Press\nManor House, Pakefield Street,\nLowestoft, Suffolk.\nThis translation © copyright 1962 Anselm Hollo\nThe poems selected from :"
+        },
+        {
+          "index": 1,
+          "title": "' PAUL KLEE -",
+          "page_start": 4,
+          "page_end": 5,
+          "text": "Gedichte '\nVerlag der Arche, Zurich, 1960\nArtaud: 'A PAINTER OF THE MIND'\nfrom 'Oeuvres Completes,' Tome I, Gallimard, Paris,\n1956\n(John Wieners' poems were published by the Auerhahn\nPress, U.S.A., Peter Haertling's by Bechtle Verlag,\nMunich.)\nPrinted by Villiers Publications Ltd.,\nIngestre Road, London, N. W .5\nANSELM HOLLO:"
+        },
+        {
+          "index": 2,
+          "title": "• LOOK AT HIS FACE '",
+          "page_start": 5,
+          "page_end": 6,
+          "text": "A Note\nPaul Klee's poems were never published anywhere in his\nlifetime, 1879-1940, and were in fact only found after his\ndeath : part of them in a blue notebook, others dispersed\namong the jottings in his now-famous ' Diary '.\nThey are very much of a piece with his art, often\nhumorous or cryptically ironic, sometimes mystical;\nformally they are well-knit 'vers libre' (or, whatever, &c.),\nwhich I have tried to reproduce in my versions by using\nrecurrent rhythmical patterns, often ' sprung ', but generally\nsimple, as are the originals. It could be argued that some\nof them remain at a stage sometimes defined as ' materia\npoetica': of which, however, Wallace Stevens said that it\nis identical with poetry ....\nApart from the interest these texts have as commentaries\nand sidelights on Klee's painting, they have had considerable influence on post-war German poetry; Rainer M.\nGerhardt, a very fine poet and critic of the post-45\ngeneration, wrote of them in 1951 : ' I do not know what\nGerman poet has written comparable lines during the\nlast fifteen years.'\nFor an English or American reader, the most fascinating\nliterary aspect of these poems is their foresight and\nmodernity Imagism before Pound & Co., in 1906 :\nBrecht before Brecht (' A & B ', 1905 ), and even the\n'illiteralism' of a Beat Saint Peter Orlovsky, in 'Bimbo's\nPome' (1932) .... They should also be corrective to an\naccusation sometimes levelled at Klee's paintings by casual\nviewers or champions of the more doctrinaire Surrealists :\nthat of ' Prettiness '. As in Mozart, a mastery of ' line ', a\nlove for the modes of dance and play, combine in .Kleeboth poet and painter with a sombre, sceptical, sometimes even bitter vision of life, and intense care for achieving a truthful and effective fusion of these elements.\nBefore allowing Antonin Artaud, a great contemporary\nof Klee's, to have his illuminating say on the nature of that\nvision, I would like to end this note by quoting two word\nimages by young poets, one American, the other Klee's\ncountryman :\n' Paul Klee scratched for seven years\non smoked glass to develop\nhis line, Lavigne says : Look\nat his face ! he who has spent\nall night drawing mine.'\n-john Wieners,' A Poem for Painters'\n' Paul Klee sits weeping\nbehind the windowpane\nhe watches the people go by\nand they all become lines\nand he sees only the lines\nand the lines go by\nin front of the windowpane '\n-Peter H aertling, ' Paul Klee '\nLondon, 25th January, 1962"
+        },
+        {
+          "index": 3,
+          "title": "CONTENTS",
+          "page_start": 7,
+          "page_end": 7,
+          "text": "page\nA Painter of the Mind\n9\nThe Happy One\n11\nIrrational Speech\n12\nThe Two Mountains\n14\nIndividuality\n15\nA&B\n17\nThe Rescue\n18\nDream\n19\nDream\n21\nPoem\n23\nPoem\n24\nPoem\n25\nPoem\n26\nDream\n28\nA Friend\n29\nMy Star\n30\nThe Wolf Speaks\n31\nCaught\n32\nBimbo's Pome\n33\nThe Cat\n34\nLast Things Last\n35"
+        },
+        {
+          "index": 4,
+          "title": "A PAINTER OF THE MIND",
+          "page_start": 8,
+          "page_end": 9,
+          "text": "In the embryonic field\nPAUL KLEE from Germany\nhas produced interesting visions.\nI love some of his nightmares\nhis mental syntheses\nconceived like works of architecture\n(or, his architectural works of a mental character),\nand certain cosmic syntheses\nwhere all the secret objectivity of things\nhas been rendered apparent,\nmore apparent than in the realizations of Georges Grosz\n(a fellow-countryman).\nIf you compare these two, you will see\nthe profound difference in inspiration.\nGrosz sifts the world,\nreconstructs it to his vision.\nlnPAULKLEE\nthe objects of the world\nfall into order, and it seems as if he was only\nwriting down their dictation.\nAn ordering of visions\nof forms\na fixation and stabilization of thoughts\ninductions, deductions of images\nwith the conclusions to be drawn from these,\nalso an ordering of images\na search for the hidden sense\nan illumination of visions in the mind such is, to me, his art.\nThe dryness, the tidiness of Grosz\n9\n10\ncrumbles, if seen against Klee\nand his ordered visions,\nfor they have retained their true visionary aspect\ntheir character of things in the mind.\nAntonin Artaud\n(from ' Bilboquet ')"
+        },
+        {
+          "index": 5,
+          "title": "THE HAPPY ONE",
+          "page_start": 10,
+          "page_end": 11,
+          "text": "The happy one, who is almost\nan idiot, everything\nblossoms, bears fruit\nfor him. He stands\non his little acre,\none hand holding\na watering-pot,\nthe other pointing\nat himself,\nat the navel of\nthis world.\nVerdure\nand blossom,\nboughs heavy\nwith fruit\nbend down, above him.\n11\n1901\n12"
+        },
+        {
+          "index": 6,
+          "title": "IRRATIONAL SPEECH",
+          "page_start": 11,
+          "page_end": 13,
+          "text": "1\nA good catch is great consolation.\n2\nEven this year, infamy\nstalks me!\n3\nI must be saved.\nBy succeeding?\n4\nHas inspiration\neyes, or does she\nwalk in her sleep?\n5\nAt times, my hands\ndo fold;\nbut right there, beneath them,\nmy belly\ngoes on digesting, my kidneys\nfiltering their clear juices ....\n6\nTo love music\nmore than anything, that\nis unhappiness.\n7\nTwelve fishes,\ntwelve murders.\n13\n1901\n14"
+        },
+        {
+          "index": 7,
+          "title": "THE TWO MOUNTAINS",
+          "page_start": 13,
+          "page_end": 13,
+          "text": "A reign of light\nclarity on two mountains :\nthe mountain of animals\nthe mountain of gods.\nBut between them the dusky\nvalley of men.\nWhen\nsometimes, one of them\nlooks up\nhe is gripped\nby foreboding\nby unquenchable longings, he\nwho knows\nhe knows not, longing\nfor them who know not\nthey know not\nand for them who know that they know.\n1903"
+        },
+        {
+          "index": 8,
+          "title": "INDIVIDUALITY",
+          "page_start": 14,
+          "page_end": 15,
+          "text": "Individuality?\nis not of the substance of elements.\nIt is an organism, indivisibly\noccupied\nby elementary objects of a divergent character:\nif you\nwere to attempt division, these parts\nwould die.\nMyself,\nfor instance: an entire dramatic company.\nEnter an ancestor, prophetic;\nenter a hero, brutal\na rake, alcoholic, to argue\nwith a learned professor.\nA lyrical beauty, rolling her eyes\nheavenward, a case\nof chronic infatuationenter a heavy father,\nto take care of that,\nenter a liberal uncle to arbitrate ....\nAunt Chatterbox gossiping in a comer.\nChambermaid Lewdie, giggling.\nAnd I, watching it all,\nastonishment in my eyes.\nPoised, in my left hand\na sharpened pencil.\n15\n16\nA pregnant woman!, a mother\nis planning\nher\nentranceShushhh! you\ndon't belong here\nyou\nare divisible !\nShe fades.\n1905"
+        },
+        {
+          "index": 9,
+          "title": "A&B",
+          "page_start": 16,
+          "page_end": 17,
+          "text": "A & B have been arguing long, over a bottle\nof wine, about their diametrically opposed\npoints of view. But as they approach\nthat stage where drink moves the heart\nEach one is moved to such fiery speech\nthat B suddenly finds himself drawn\nto point A, and A, to point B. Faces a-glow\n17\nthey reach out, their hands meet in a bewildered\nclasp.\n1905\n18"
+        },
+        {
+          "index": 10,
+          "title": "THE RESCUE",
+          "page_start": 17,
+          "page_end": 17,
+          "text": "Bound for\ndestruction?\nPerhaps,\nbut then, I have\nthis knack\nof saving myself,\nin the nick\nof time, time\nand again.\nI don't want to\nbe overgrown\nby anything.\nThough I would like\nto have the experience.\nI just don't want to.\nSurely,\nI must be saved.\n1905"
+        },
+        {
+          "index": 11,
+          "title": "DREAM",
+          "page_start": 18,
+          "page_end": 19,
+          "text": "I was flying\nhome, where\nthe beginning is.\nIt started with brooding,\nchewing of knuckles\nthen, a smell\nor a taste,\nmy tension\nresolved, completely,\ndissolved,\nlike a lump\nof sugar in water My heart came into it\ntoo, it had always\nbeen much too large, now\nit was swelling, distended,\nhuge. Not a trace\nof anxiety;\nit was carried away\nto a region where lust\nis lost,\nforever.\n19\n20\nIf now a\ndelegation\nwould come,\nfestively\nbowing down\nin front of the artist\nhailing his works\nin gratitudeit would hardly\nsurprise me, for I\nhave been where\nthe beginning is\nI have seen\nmy goddess Madame\nProto-Cell\nand that\nmeans as much as:\nto be\nfertile!\n1906"
+        },
+        {
+          "index": 12,
+          "title": "DREAM",
+          "page_start": 20,
+          "page_end": 21,
+          "text": "To visit a sorcerer\nin his garden ... there is a bench\nof crimson rose petals\nTake a seat, he\nsays, pray\nbe seated, and I\npretend to be so\nhe himself\nsits down without batting\nan eyelid,\nmy pseudo-posture- downright\nembarrassing ....\nOpposite, by a window\nstands the sorcerer's\ndaughter\nI give her\na smile, apologetic, but she\nslams the window! ,\noutraged,\nnevertheless\nstill watching me\n21\n22\nand with less inhibition\nnow,\nbehind her curtain.\nIn dreams\nmoments return\nthat stunned us for moments,\nas often as not\nnegligible\nhappenings;\nthe great\nevents\nthat called for\ndetermination,\ndo not\nreturn.\n1906"
+        },
+        {
+          "index": 13,
+          "title": "POEM",
+          "page_start": 22,
+          "page_end": 23,
+          "text": "Water\nWaves on the water\nA boat on the waves\nOn the boat-deck, a woman\nOn the woman, a man.\n23\n1906\n24"
+        },
+        {
+          "index": 14,
+          "title": "POEM",
+          "page_start": 23,
+          "page_end": 23,
+          "text": "Woe is me\nWeighed down\nBy the hour\nReturning\nAlone\nIn the centre\nThe worm\nProwling\nDown in the deep\n1913"
+        },
+        {
+          "index": 15,
+          "title": "POEM",
+          "page_start": 24,
+          "page_end": 25,
+          "text": "I stand in full armour\nI am not here\nI stand in the depths\nI stand far ...\nI stand very far ...\nI glow with the dead\n25\n1914\n26"
+        },
+        {
+          "index": 16,
+          "title": "POEM",
+          "page_start": 25,
+          "page_end": 27,
+          "text": "The big animals: despondent\nat table: unsated.\nBut the small cunning flies\nscrambling up slopes of bread\ninherit Buttertown.\nThere is\nonly one\ntrue thing:\nin the self\na weight,\na small\nstone.\nAn eye\nthat sees.\nAnother eye\nthat feels.\nMan-Animal:\nClock of Blood.\nThe moon\nin the railway station: one of the many\nlights in the forest; a drop\nin the mountain's beard:\nthat it doesn't trickle!\nthat it is not pierced by the cactus thorn!\nthat you\ndo not sneeze, and\nburst\nthis bladder !\n27\n1914\n28"
+        },
+        {
+          "index": 17,
+          "title": "DREAM",
+          "page_start": 27,
+          "page_end": 28,
+          "text": "I find\nmy house : empty\nGone\nall the wine\nThe river\ndiverted\nStolen\nmy naked joy\nEradicated\nthe epitaph.\nWhite\nin white.\n1914\nNotes\nfrom afar,\nil friend,"
+        },
+        {
+          "index": 18,
+          "title": "A FRIEND",
+          "page_start": 28,
+          "page_end": 29,
+          "text": "soon in the morning, behind the mountain.\nSound of horns.\nEmeralds.\nI am summoned\nby cerebral\nmessage, a promise, an abstract\ne m b r a c e  of minds, surmising e\n~ c h  other.\nWe were joined\nby a star, by an eye\nthat found us out.\nTwo I's,\na content,\nit is more than the vessel.\nYesterday's holy\nstones, shorn of their riddle.\nToday\nthere is meaning :\n29\n'A friend, soon in the morning, behind the mountain.'\n1914\n30"
+        },
+        {
+          "index": 19,
+          "title": "MY STAR",
+          "page_start": 29,
+          "page_end": 29,
+          "text": "My star\nRose deep\nBelow\nMy feet\nWhere does my fox\nGo in the winter?\nWhere does my serpent\nSleep?\n1915"
+        },
+        {
+          "index": 20,
+          "title": "THE WOLF SPEAKS",
+          "page_start": 30,
+          "page_end": 31,
+          "text": "The wolf speaks, while masticating\na man, addressing himself\nto the dogs:\nTell me, where, then, istell me, where ?\nthen, is their god?\nWhere is their god? after this ....\nHere you can see him\nin the dust at your feet, the god\nof the dogs\nTo see and to know\n.\n.\nIS one, IS\nthat who has been torn by me\nis no god!\nWhere, then, is\ntheir god?\n31\n1926\n32"
+        },
+        {
+          "index": 21,
+          "title": "CAUGHT",
+          "page_start": 31,
+          "page_end": 32,
+          "text": "Caught in a room.\nGreat peril.\nNo exit.\nBut there : a window: open : launch\nYourself- I am flying\nFree\nBut it is raining\nA drizzle\nIt is raining, a drizzle\nIt is raining\nrammg\nrammg .. .\nrammg ... .\n1926\n33"
+        },
+        {
+          "index": 22,
+          "title": "BIMBO'S POME",
+          "page_start": 32,
+          "page_end": 33,
+          "text": "-In the manner of Klee's favourite cat, named Bimbo-The Master noes what he wonts.\nhe noes whow.\nBut has one vice: not smokeing.\nBut skratches with wip of hoarsehair on the vielin,\nthat herts Bimbo so mutch in his ear.\n1932\n34"
+        },
+        {
+          "index": 23,
+          "title": "THE CAT",
+          "page_start": 33,
+          "page_end": 33,
+          "text": "part of the cat:\nher ear, feeding\non spoonfuls\nof sound, her foot\ntaking a run, the\nrun,\nher eye, burning inwards, burning\nthrough the thick\nand the thin.\nHer face\nthat forbids all return:\nbeautiful\nand a flower\nbut bristling with weapons,\nand nothing\nto do with us, in\nthe end.\n(undated)"
+        },
+        {
+          "index": 24,
+          "title": "LAST THINGS LAST",
+          "page_start": 34,
+          "page_end": 34,
+          "text": "In the heart's centre\nthe only prayers\nare steps\nreceding\n35"
+        }
+      ],
+      "ingested_at": "2026-05-31"
+    },
+    {
+      "id": "bases-para-la-estructuracin-del-arte",
+      "title": "Bases para la estructuración del arte",
+      "author": "Paul Klee",
+      "year": null,
+      "language": "es",
+      "source_file": "Bases para la estructuración del arte (Paul Klee) .pdf",
+      "total_pages": 76,
+      "total_sections": 88,
+      "total_chars": 27071,
+      "needs_ocr": false,
+      "cover": "/books/bases-para-la-estructuracin-del-arte/cover.jpg",
+      "sections": [
+        {
+          "index": 0,
+          "title": "Paul Klee",
+          "page_start": 1,
+          "page_end": 2,
+          "text": "L"
+        },
+        {
+          "index": 1,
+          "title": "estructuración del arte",
+          "page_start": 3,
+          "page_end": 4,
+          "text": "36"
+        },
+        {
+          "index": 2,
+          "title": "estructuración del arte",
+          "page_start": 5,
+          "page_end": 5,
+          "text": "Paul Klee"
+        },
+        {
+          "index": 3,
+          "title": "oacan",
+          "page_start": 5,
+          "page_end": 6,
+          "text": "Título original: Padagogisches Skizzenbuch\nTraducción: Pedro Tanagra R.\nPrimera edición: 1994, Ediciones Coyoacán, S. A. de C. V.\nSéptima edición: julio 2012\nReservados todos los derechos conforme a la ley\n©Ediciones Coyoacán, S. A. de C. V.\nAv. Hidalgo No. 47-b, Colonia Del Carmen\nDeleg. Coyoacán, 04100, México, D. F.\nTels. 5659-7117 y 5659-7978 Fax 5658-4282\nEmail: contacto@fontamara.com.mx\nwww.fontamara.com.mx"
+        },
+        {
+          "index": 4,
+          "title": "ISBN 978-607-9014-83-4",
+          "page_start": 6,
+          "page_end": 12,
+          "text": "Impreso y hecho en México\nPrinted and made in México\nFig. 1: Una línea activa se desliza li­\nbremente sin final alguno. El conductor es\nun punto que va proyectándose sucesiva­\nmente.\nFigs. 2 y 3: La misma línea, pero acom­\npañada de otras formas.\nFig. 4: La misma línea, pero ensortijada.\n7\n■\nFig. 5: Dos líneas laterales; pero la lí­\nnea principal es imaginaria.\nFig. 6: Una línea activa, delimitada, se\ndesplaza entre determinados puntos.\nFig. 7: Una línea intermedia se halla en­\ntre un punto en movimiento y un efecto de\nsuperficie.\nEstas figuras en su proyección tienen un\nsentido lineal; pero, al final, la representa­\nción de la superficie sustituye de inmedia­\nto el carácter lineal.\n9\n’\nFig. 8: Las líneas pasivas son el pro­\nducto de la actividad sobre un plano. (Lí­\nnea que se desplaza).\nLas líneas cuadradas y las líneas circu­\nlares, ambas pasivas, constituyen formas\nsuperficiales activas.\n10\nR ESU M EN  D E LOS CASOS (Figs.\n9-12):\nPR IM ER  CASO:\nFigs. 9, 9a y 9b: Líneas activas, super­\nficies pasias; energía lineal (causa): efec­\nto lineal (resultado) con efectos secunda­\nrios de superficie.\n11\nSEGUNDO CASO:\nFig. 10: Líneas intermedias; energía li­\nneal (causa), efecto de superficie (resul­\ntado)."
+        },
+        {
+          "index": 5,
+          "title": "zs o",
+          "page_start": 12,
+          "page_end": 14,
+          "text": "T E R C E R  CASO :\nFig. 11: Superficie activa, línea pasiva;\nenergía superficial (causa), efecto de su­\nperficie y efecto lineal secundario.\n12\nLOS T R E S  CA SO S:\n13\nFig. 12: Explicación de los conceptos\nactivo, intermedio y pasivo:\nActivo: Yo corto (el hombre cortó un\nárbol con una hacha).\nIntermedio: Yo caigo (el árbol cayó por\nlos hachazos del hombre).\nPasivo: Yo estoy caído (el árbol está\ncaído en el suelo).\n14"
+        },
+        {
+          "index": 6,
+          "title": "ESTR U C TU R A",
+          "page_start": 15,
+          "page_end": 17,
+          "text": "(Estructura divisible)\nFig. 13: Basados en la repetición de la\nmisma unidad y en la misma dirección, los\nritmos estructurales más elementales van\nde izquierda a derecha o de arriba a abajo.\n=  1+14-1+1+1\nde la izquierda\nhacia la derecha.\n1\narriba\n+ desde\n+ hacia\n^ abajo\n1\n15\nFig. 14: Un ritmo estructural muy ele­\nmental en los dos sentidos: de izquierda\na derecha, de arriba a abajo.\n1\n1\n1\n1\n1 1 1 1 1\nFig. 15: El mismo ritmo, pero en un\ngrado superior. La unidad es uno más dos\n( 1+ 2 ).\nn  * r i  t im j i<i ♦ i m m\n1 + 2 + 1 +  2 + 1 + 2  como forma de re­\npresentación de la medida.\n1 + 2+ 1 + 2 + 1  + 2 como representación\ndel peso.\nSi anoto en vez d e l + 2 + 1 + 2 :  ( 1 + 2 )\n+ (1 + 2),\nel equivalente a esto sería\n3+ 3 +3 +3, con lo cual se llegaría nue­\nvamente a la repetición de una unidad.\n16\n17"
+        },
+        {
+          "index": 7,
+          "title": "( TA BLER O  D E A JED R EZ )",
+          "page_start": 18,
+          "page_end": 18,
+          "text": "ESTRUCTURA DE PESO, según dos\ndimensiones.\n*»\nl\n1\n■M"
+        },
+        {
+          "index": 8,
+          "title": "1 l",
+          "page_start": 18,
+          "page_end": 18,
+          "text": "•4\n>»\n•>»"
+        },
+        {
+          "index": 9,
+          "title": "V- vut*",
+          "page_start": 18,
+          "page_end": 18,
+          "text": "l\n1"
+        },
+        {
+          "index": 10,
+          "title": "± l",
+          "page_start": 18,
+          "page_end": 19,
+          "text": "1\n1 1\ni\ni\n-a\nJh\nt i * 11*íh n*ÍL\nSumas horizontales y sumas verticales\nFig. 16: Sumas horizontales y sumas\nverticales.\n11+ 10+ 11+ 10 + 11+10 =\n(11 + 10)\n(11 + 10)\n(11 + 10) = 21+21 + 21 =\nI + I +1.\n18\nFig. 17: Las dos dimensiones juntas.\nFig .17: Si separamos como unidad el\nsector (sección) 17—a y le damos un va­\nlor numérico de seis, la representación de\nla figura 17 sería:\n6 +6  + 6 +6 =  l\ni\nl\ni\n+\n+\n+\n+"
+        },
+        {
+          "index": 11,
+          "title": "6 + 6 + Ó + 6 =  I I",
+          "page_start": 19,
+          "page_end": 21,
+          "text": "I\nI\n+\n+\n+\n+\n6 + 6 + 6 + 6 =  I I\nI\nI\n+\n+\n+\n+\n6+ 6 +6 +6 =  I I\nI\nI\nEs decir una re­\npetición\nestructural\n19\nFig. 18: Las dos dimensiones juntas y\nvistas diagonalmente.\n20\nFig. 19: Variación lineal.\nManteniendo su sentido rítmico, a to­\ndas estas series numéricas se les puede\nagregar o quitar partes sin alterarlas de­\nbido a que están basadas en la repetición.\nEl sentido estructural es, en consecuen­\ncia, divisible.\nr\n+\n1  .  z *\nI  +  j\n4\nl  *\nJ  +\nI\n♦ r *\ní\n-  I\nr\nI\n,\n>' J .t y t J n .n u '\n■ J\n•d * T 3 * /e f\n•\n4 /  \"/»\n-  / t f\n« .‘«M'XfY'* • '\nr- *  S r  U\ns jjlH\nn m\nf iJ t f M\nífr r  «\n21"
+        },
+        {
+          "index": 12,
+          "title": "INDIVIDUALES",
+          "page_start": 22,
+          "page_end": 23,
+          "text": "En forma opuesta al de las estructuras,\nlas\nestructuraciones\nindividuales\njamás\npueden reducirse hasta el valor 1, sino en\ntérmino de proporción.\nasí 2 : 3 : 5\n0 7\n: 11 : 13 : 17,\n0 a : b =  b : ( a b ) o  sea la medida\náurea.\nSería necesario, ahora, hacer una pausa.\n22\nPresentes en la naturaleza"
+        },
+        {
+          "index": 13,
+          "title": "ESTRUCTURAS MATERIALES",
+          "page_start": 23,
+          "page_end": 24,
+          "text": "El concepto estructural en la naturaleza.\nLa agrupación de los más diminutos\ncorpúsculos, reconocibles en las estructuras\nde la naturaleza, sería la siguiente:\nH uesos: los corpúsculos de éstos tienen\nformas de células o tubitos.\nLigam entos: La estructura de éstos está\ncompuesta por un tejido tendinoso-fibroso.\nM úsculos: En éstos las fibras tendino­\nsas se convierten en fibras musculares, a\nlo cual se agrega un rayado diagonal.\n23\nw"
+        },
+        {
+          "index": 14,
+          "title": "EL O RG A N ISM O , M O TO R  N A TU ­",
+          "page_start": 24,
+          "page_end": 24,
+          "text": "RAL,"
+        },
+        {
+          "index": 15,
+          "title": "COM O",
+          "page_start": 24,
+          "page_end": 24,
+          "text": "LA"
+        },
+        {
+          "index": 16,
+          "title": "M O V IM IE N T O",
+          "page_start": 24,
+          "page_end": 26,
+          "text": "(SOBREMATERIAL).\nAl complementarse, los huesos entre sí\nforman el esqueleto.\nLos ligamentos proporcionan al esque­\nleto, aún en reposo, el soporte recíproco.\nAl hallarse esta función subordinada, se\npuede uno referir ya a una función estruc­\ntural.\nLa siguiente meta en la organización del\nmovimiento sería el paso que nos lleva des­\nde el hueso hasta el músculo.\nEntre estos dos interviene el tendón.\n24\n¿Cuál es la función del músculo con re­\nlación al hueso? Debido a su capacidad de\ncontracción o acortamiento, el músculo\ncrea una nueva relación angular.\nSi analizamos en el estüdio de la rela­\nción de los huesos con los músculos, en el\norganismo motor, hallamos la actividad de\nlos tendones al intervenir entre huesos y\nmúsculos.\nCada vez que el músculo lo exige, la si­\ntuación angular de dos huesos debe cam~\nbiar.\nLos huesos, al tener una función pasiva\ncon relación a los músculos y a la función\nmuscular, éstos últimos adquieren una ca­\nracterística superior.\nLos huesos, aun durante el movimien­\nto, soportan el conjunto, pero sólo ellos no\nbastarían. Los músculos desarrollan aquí,\ntambién, una función superior, ya que tra­\nbajan en forma coordinada e independien­\nte, y, al contraerse unos y otros, se esti­\nran simultáneamente.\n25\nr\nEn comparación con los huesos, la fun­\nción muscular resulta independiente, pero\nes relativo si se tiene en cuenta que los\nmúsculos obedecen instrucciones proceden­\ntes del cerebro; así, de esta forma, su carác­\nter de independiente se reduce a deber ac­\ntuar o cuando más a obedecer. *\nCon el propósito de representar la rela­\ntividad de las funciones, entre lo estructu­\nral y el funcionamiento individual, entre el\ndeber actuar muscular y la función direc­\ntriz del cerebro, trazamos este croquis\n(Fig. 24) semejante a juego de círculos\n(bloques).\nlas valorizaciones, éstas están colocadas en for­\nma creciente hacia el centro de modo contra­\nrio o sea de acuerdo por colocación de masas;\nesto llevaría a reservar para el cerebro el lu­\ngar de mayor diámetro, y las fuerzas estarían\nordenadas en sentido contrario.\n26\n■"
+        },
+        {
+          "index": 17,
+          "title": "T E M A S PARA PRA CTICA",
+          "page_start": 27,
+          "page_end": 27,
+          "text": "(en base a la estructuración triple):\nActivo: Primer órgano: Cerebro.\nIntermedio: Segundo órgano: Músculos\nPasivo: Termer órgano: Hueso."
+        },
+        {
+          "index": 18,
+          "title": "LA RUED A HIDRAULICA Y  EL",
+          "page_start": 27,
+          "page_end": 31,
+          "text": "M ARTILLO  (Fig. 25).\n27\nI —El Salto del agua\nII — El engranaje\n(activo).\n(intermedio).\nIII—El martillo\n(pasivo).\ni_________________________i\nPaletas de la rueda grande.\nI_______________________ _!\nRayos de la rueda pequeña.\n¡___________________________________ I\nCorrea de transmisión.\n28\n■\nEL MOLINO HIDRAULICO (Fig. 26).\n29\nI.\nLas dos fuerzas:\nI.—a) La fuerza de la gravedad.\nII— b) El cerro que se opone (ac­\ntivo ).\nII. La diagonal a las fuerzas I —a y II—b:\nEl salto del agua (intermedio).\nIII. La rueda que gira (pasivo).\nLA PLAN TA (Fig. 27).\nLA REPRO D U CCIO N  (sin figura).\nI. Los órganos masculinos,\nestambres\n(activos).\nII. Los insectos polinizadores (interme­\ndios ).\nIII. El fruto, los órganos femeninos (pa30\nLA CIRCULACION (Fig. 28).\nI. El bombeo del corazón (activo).\nIII. La circulación de la sangre (pasivo).\nII. El pulmón al recibirla y transmitiría\nmodificada participa en el proceso (in­\ntermedio) .\nI. El corazón bombea.\nIII. La sangre circula nuevamente y re­\ngresa sucesivamente al corazón, que\nfue el punto de partida.\n31"
+        },
+        {
+          "index": 19,
+          "title": "PRO D U C TIV O",
+          "page_start": 32,
+          "page_end": 32,
+          "text": "£\nr  L a Q|;)ra\nse ievan(-a\n*ui. I\n‘‘piedra sobre piedra”\n3 i\n(Suma)\n0\na partir de un bloque,\n‘‘una pieza de otra\npieza\"\n(Substracción)."
+        },
+        {
+          "index": 20,
+          "title": "R E C E P T IV O",
+          "page_start": 32,
+          "page_end": 33,
+          "text": "Ambos procesos, el\nconstruir\ny\nel\nde­\nrruir, se repiten en el\ntiempo.\nAl principio del proceso produc­\ntivo o después del movimiento\nproductivo inicial, se crea un . . .\ncontramovimiento o sea el movi­\nmiento respectivo inicial. Esto\nes: E l creador comprueba si lo\nque ha creado hasta allí está\nbien o no.\n32\nLa obra como creación humana\n(génesis) es tanto productiva\ncomo receptiva.\nDe acuerdo con las limitaciones\nmanuales del creador (dos ma­\nnos) depende lo productivo.\nLo receptivo queda limitado a\nlas posibilidades del ojo y de su\nincapacidad para poder abarcar\ncon toda nitidez y a un mismo\ntiempo toda una superficie, por\nmuy pequeña que ésta sea. El\nojo debe recorrer una superficie,\nparte por parte, transmitiendo al\ncerebro la información que la\nmemoria requiera para que ésta\nacumule las impresiones debida­\nmente."
+        },
+        {
+          "index": 21,
+          "title": "INDICADA EN LA OBRA",
+          "page_start": 33,
+          "page_end": 33,
+          "text": "33"
+        },
+        {
+          "index": 22,
+          "title": "D IM EN SIO N ES",
+          "page_start": 34,
+          "page_end": 34,
+          "text": "1? Dimensión: Izquierda (o derecha).\n2? Dimensión: Arriba (o abajo).\n3- Dimensión: Delante (o detrás).\n34"
+        },
+        {
+          "index": 23,
+          "title": "BIDIMENSIONAL",
+          "page_start": 35,
+          "page_end": 35,
+          "text": "a) Dos líneas paralelas, vistas desde un\nángulo recto:\nb) Rieles de ferrocarril, vistos desde un\nángulo visual lateral:\nc) Fig, 31: Dos líneas paralelas, vistas\ndesde un ángulo visual lateral:\nd) Fig. 32: Rieles de ferrocarril vistos la­\nteralmente; los travesaños sirven de\nmedida para la progresión de la pers­\npectiva desde atrás hacia adelante.\ne) Fig. 33: Los mismos rieles vistos de\nfrente."
+        },
+        {
+          "index": 24,
+          "title": "_ u",
+          "page_start": 35,
+          "page_end": 35,
+          "text": "7\ni\n35"
+        },
+        {
+          "index": 25,
+          "title": "DIM EN SIO N",
+          "page_start": 36,
+          "page_end": 36,
+          "text": "tal como se pre­\nsenta al añadirse."
+        },
+        {
+          "index": 26,
+          "title": "O PERA C IO N ES EN T R E S",
+          "page_start": 36,
+          "page_end": 36,
+          "text": "D IM EN SIO N ES (Fig. 34).\n36"
+        },
+        {
+          "index": 27,
+          "title": "LA PERPENDICULAR",
+          "page_start": 37,
+          "page_end": 38,
+          "text": "Fig. 35: Visión frontal de rieles de fe­\nrrocarril, con un travesaño lejano y otro\ncercano,\ndivididas\nambas\nproporcional­\nmente.\nFig. 36: La progresión de la perspecti­\nva está simbolizada por unas líneas traza­\ndas en la misma dirección de los rieles,\nacentuando la vartical frontal (perpendicu­\nlar a los travesaños).\n37\nLA PERPENDICULAR (Cont.)\nAl moverse el sujeto hacia la izquierda\no la derecha se logra un desplazamiento de\nla perpendicular.\nFig. 37: El punto visual del sujeto se ha\ndesplazado hacia la izquierda.\nFig. 38: El punto visual del sujeto se ha\ndesplazado hacia la derecha.\nLa perpendicular representa el camino\nrecto sobre la superficie."
+        },
+        {
+          "index": 28,
+          "title": "LA HORIZONTAL",
+          "page_start": 39,
+          "page_end": 39,
+          "text": "La horizontal representa la medida vi­\nsual del sujeto.\nLa reunión de todos los puntos de un\nespacio que se encuentren a la altura de\nlos ojos se llama línea visual o línea de ho­\nrizonte."
+        },
+        {
+          "index": 29,
+          "title": "H O RIZO N TE",
+          "page_start": 40,
+          "page_end": 41,
+          "text": "Fig. 41: El punto de vista del sujeto es­\ntá por encima de la superficie superior de\nla figura construida, o sea que esta super­\nficie está por debajo de la línea de hori­\nzonte o de su punto de vista.\nFig. 42: El punto de vista del sujeto\nestá por debajo de la superficie superior\nde la figura construida, o sea que esta su­\nperficie está por encima de la línea de ho­\nrizonte o de su punto de vista.\n40\n.\nFig. 43: En este caso la superficie su­\nperior de la figura construida, no puede\nidentificarse ni por abajo ni por arriba ya\nque ésta aparece ahora como una línea ho­\nrizontal que coincide exactamente con la\nlínea horizonte o sea que se encuentra a la\naltura de nuestros ojos. Así la línea fron­\ntal de la superficie superior está situada\nen la misma línea visual que nuestra ho­\nrizontal."
+        },
+        {
+          "index": 30,
+          "title": "O TRA  V EZ  LA PERPEN D ICU LA R",
+          "page_start": 41,
+          "page_end": 43,
+          "text": "¿Por qué la Fig. 44 da una falsa ima­\ngen de la pared de una casa?\nLógicamente no es una imagen falsa, ya\nque el ancho de las ventanas inferiores es­\ntá más cerca de nuestra línea visual que\nel ancho de las ventanas superiores, lo cual\nsignifica que las ventanas inferiores son\nmás grandes en términos de perspectiva.\nComo representación de un pavimento\nesta imagen no es lógicamente falso sino\n41\npsicológicamente falso, ya que el hombre\ninteresado en su equilibrio proyecta todas\nlas verticales de la realidad como las ver­\nticales que él desea ver.\nFig. 45: El equilibrista en la cuerda con\nsu vara de equilibrio.\nLa horizontal: El horizonte como apa­\nriencia.\n42\nFig. 46: El horizonte como represen­\ntación.\nLa vertical representa la vía recta y la\nposición erguida o la posición del hombre.\nLa horizontal equivale a su estatura y a su\nlínea de horizonte. Ambas situaciones son\nestáticas.\nFig. 47: El equilibrista al tantear la fuer­\nza de la gravedad y al ser su preocupación\nel equilibrio, se convierte de este modo en\nuna balanza."
+        },
+        {
+          "index": 31,
+          "title": "LA BALANZA",
+          "page_start": 43,
+          "page_end": 45,
+          "text": "43\nLa esencia de la balanza reside en un\ncruce de la perpendicular con la horizontal.\nPerturbación del equilibrio y su efecto.\n*\nCorrección de esta perturbación con una\ncarga opuesta y su contraefecto.\nCombinación de ambos efectos o (cruz\ndiagonal (equilibrio simétrico como con­\nsecuencia del restablecimiento del equili­\nbrio ).\n44\nL\nEL EQ U ILIBRIO  A SIM ETRIC O .\nFig. 48: Símbolo.\nI *  + -tu\n>/$* f Jí>s"
+        },
+        {
+          "index": 32,
+          "title": "RESTA BLEC ID O",
+          "page_start": 45,
+          "page_end": 47,
+          "text": "a) Medida\nb) Peso\nc) Carácter\n□\n7 ~  /  \\\n«s\n*\n45\nESQ U EM A  D E DESA RRO LLO  para\nel capítulo 23.\nFig. 50-A: El eje A-B (línea oscura)\ndesde a se ha inclinado hacia A y desde b\nse ha alzado hasta B. En un principio coin­\ncidía con la línea horizontal a~b, al igual\nque el eje A-B; ambos ejes tienen en co­\nmún el punto C como punto giratorio. Co­\nmo consecuencia de la rotación, el lado iz­\nquierdo se encuentra más abajo que el lado\nde la izquierda, y de este mismo lado el\ncolor negro interviene como compensación,\no sea en el mismo caso que si uno se in­\nclina demasiado hacia la izquierda levanta\nel brazo como compensación para no caerse.\nI\n46\nJ\nFig. 50-B: Al ser el peso de uno mayor\nen la parte superior, la vertical se inclina ha­\ncia la izquierda, y se caería uno si no corri­\ngiera a tiempo esta posición abriendo ,1a\nparte inferior izquierda o sea que, exten­\ndiendo la pierna izquierda, se amplía la ba­\nse de sustentación."
+        },
+        {
+          "index": 33,
+          "title": "C O N STRU CCIO N  D E UNA T O R R E",
+          "page_start": 47,
+          "page_end": 48,
+          "text": "Fig. 51: Sobre la piedra fundamental\nA se encuentra la piedra I, perturbando el\nequilibrio hacia la izquierda; entonces se\naumenta la piedra II como compensación,\npero, a la vez, como nueva perturbación,\ninclinando la torre hacia la derecha; enton­\nces se agrega la piedra III, como nueva\ncompensación, y vuelve la perturbación al\n47\ninclinarse la torre hacia la izquierda; se\naumenta una piedra más, piedra IV, incli­\nnando ahora hacia la derecha, luego, la pie­\ndra V, inclinando hacia la izquierda y así,\nsucesivamente, hasta que la piedra tope\n(B ) restablece definitivamente la condi­\nción de equilibrio.\nFig. 52: C , C , C , etc., son los pun­\ntos de rotación de las piedras empinadas,\nlas cuales, al unirse entre sí en forma li­\nneal, crean un zigzag que atraviesa el eje\nvertical.\n48"
+        },
+        {
+          "index": 34,
+          "title": "TIERRA, AGUA Y AIRE",
+          "page_start": 49,
+          "page_end": 49,
+          "text": "Los símbolos del campo estático son la\nplomada (posición erguida) y la balanza.\nLa plomada se orienta hacia el centro de\nla Tierra, lugar de donde convergen todos\nlos destinos vinculados con la Tierra.\nPero existen otros símbolos y otras le­\nyes en diferentes medios ambientales con\nun movimiento más suelto y un ambiente\nmás móvil.\nComo un ejemplo de medio ambiental\npodríamos citar: el agua y la atmósfera.\n49"
+        },
+        {
+          "index": 35,
+          "title": "AIRE",
+          "page_start": 50,
+          "page_end": 50,
+          "text": "Fig. 54: Una bala disparada en línea\nvertical sube en el aire con una energía de­\ncreciente y cae a tierra con una energía\ncreciente. (Articulación suelta).\nFig. 55: Al subir la escalera, una per­\nsona realiza un esfuerzo que va creciendo\ngradualmente. (Articulación firme).\n50"
+        },
+        {
+          "index": 36,
+          "title": "AGUA",
+          "page_start": 51,
+          "page_end": 51,
+          "text": "Fig. 56: Los golpes dados con las pier­\nnas por un nadador, dan un ritmo con ar­\nticulación suelta."
+        },
+        {
+          "index": 37,
+          "title": "T IE R R A",
+          "page_start": 51,
+          "page_end": 51,
+          "text": "(M ontaña)"
+        },
+        {
+          "index": 38,
+          "title": "CO M BIN ACION",
+          "page_start": 51,
+          "page_end": 52,
+          "text": "Al caer una piedra desde lo alto de una\npendiente escarpada, la distancia de los\nsaltos progresivos es cada vez mayor. (La\narticulación es a veces firme, y otras veces\nsuelta).\n51\nFig. 58: En su ascenso, un globo libre\npasa de una capa de aire caliente a otra\ntemplada; luego, a una capa más calien­\nte y, finalmente, a una muy caliente. (Ar­\nticulación suelta).\nFig. 59: En el transcurso de su recorri­\ndo, un meteoro es atraído hacia la Tierra;\nen consecuencia, es desviado de su curso.\nPenetra en la atmósfera terrestre, y logra\nescapar de quedarse gravitando eternamen­\nte alrededor de la Tierra gracias a que es\nun asteroide incandescente, lo que le per­\nmite continuar su recorrido, enfriándose y\napagándose, a través del espacio. (Articu­\nlación suelta).\n52\ni ."
+        },
+        {
+          "index": 39,
+          "title": "EL TR O M PO",
+          "page_start": 53,
+          "page_end": 54,
+          "text": "Fig. 60: Si a una balanza se le quita su\npunto de apoyo en la tierra, dejándolo re­\nducido a un solo punto, vacilará y caerá,\naunque se distribuyan de la forma más pre­\ncisa los pesos.\nFig. 61: Al impulsar a esta vertical con\nun movimiento horizontal, se impide la caí­\nda y logramos tener un trompo.\n53\nFig. 62: El diábolo (trompo doble),\nhaciéndolo girar, puede continuar girando,\nsosteniéndose únicamente sobre una cuer­\nda tensa, sin caerse."
+        },
+        {
+          "index": 40,
+          "title": "EL PEN D U LO",
+          "page_start": 54,
+          "page_end": 55,
+          "text": "Fig. 63: Una plomada se convierte en\npéndulo mediante un movimiento de vaivén.\n54\nFig. 64: Mediante el ir y venir se origi­\nna la compensación de movimientos. Fig.\n65: o la forma del movimiento pendular\nprocede de un punto-guía fijo."
+        },
+        {
+          "index": 41,
+          "title": "EL CIRCULO",
+          "page_start": 55,
+          "page_end": 56,
+          "text": "Fig. 66: Ampliando la modalidad del\nmovimiento antes descrito, mediante un\nmovimiento dirigido al péndulo, se pone\nen movimiento el punto-guía, fijo, el cual\nse convierte en formas ampliadas del mo­\nvimiento.\nLa más pura forma de movimientos, o\nsea la cósmica, sólo se logra suprimiendo\nla fuerza de gravedad (es decir, por la\nausencia de toda sujeción terrestre).\nAl hacer intervenir este fenómeno du­\nrante el impulso del péndulo éste continua­\n55\nrá su curso hasta describir un círculo, el\ncual constituye una de las formas más pu­\nras de movimiento.\nLa nueva forma, sin la necesidad del\nmovimiento vaivén, sigue siendo la misma,\nya sea trazada hacia la izquierda o hacia\nla derecha. Fig. 66-a."
+        },
+        {
+          "index": 42,
+          "title": "LA ESPIRA L",
+          "page_start": 56,
+          "page_end": 57,
+          "text": "Para una variación del círculo a espiral,\nse logra mediante la variación de la longi­\ntud del radio combinada con el movimiento\nperiférico. De este alargamiento del radio\nse origina la espiral viva; al ir acortando\nel radio, la rotación disminuye cada vez\nmás, hasta que termina por morir en un\npunto; de forma que el movimiento ya no\nes infinito y la dirección vuelve a tomar\nimportancia, puesto que proporciona el im­\npulso hacia la liberación respecto al centro\nen un movimiento cada vez más libre, o\nbien hacia una adhesión cada vez más es­\ntrecha con el centro, lo cual singifica fi­\nnalmente la anulación de la espiral. En es­\nto, la dirección es cuestión de vida o muer56\nte, y la decisión sobre este punto reside\nen la pequeña flecha que se indica en la\nFig. 67."
+        },
+        {
+          "index": 43,
+          "title": "LA FLECH A",
+          "page_start": 57,
+          "page_end": 59,
+          "text": "¿Cómo ampliar mi territorio hasta allá?\n¡Atravesando este río, este lago, más allá\nde aquel cerro! A partir de este pensa­\nmiento, la capacidad ideológica del hom­\nbre de recorrer a su capricho la Tierra y lo\nultraterrestre, su capacidad física está en\ncontradicción con sus deseos, de allí la\ntragedia humana. De este problema cons­\ntante entre la impotencia y la potencia na­\nce la discrepancia de la existencia huma­\nna: el hombre es, pues, medio libre, me­\ndio prisionero.\n57\nMientras más lejano sea el viaje, se\nacentuará más la tragedia humana, ya que\nel deseo de convertirse en movimiento y al­\ncanzar las metas deseadas, se vuelve un\nimposible. Así el pensamiento se convierte\nen papel de médium entre la tierra y el\nmundo infinito.\nEl recorrido es algo parecido: ¿Cómo\nlogra vencer la flecha el obstáculo de la\nfricción? ¿Cómo puede lograr llegar has­\nta donde el movimiento jamás tenga fin?\nSaber que allí donde hay principio no\nhay eternidad, sin embargo es un consuelo\npoder ir un poco más allá, o un poco más\nallá de lo posible ¡Oh, flechas que les naz­\ncan alas para llegar a su fin, si se cansan\nantes de llegar a su meta!\nLa verdadera flecha está formada por:\nUn asta,\n----------------------------- una punta y un timón\n^\n----La flecha simbólica es una vía.\nLa punta y el timón.\nse unen en forma de timón puntiagudo.\n58\nAlfa\nBeta\nFig. 71: La igualdad de los largos de\nlas puntas del timón y la igualdad de los\nángulos que forman, origina un recorrido\nrecto.\na — b"
+        },
+        {
+          "index": 44,
+          "title": "LA  FL E C H A",
+          "page_start": 59,
+          "page_end": 62,
+          "text": "Fig. 72: De acuerdo a los largos y án­\ngulos desiguales se logra un recorrido ha­\ncia arriba o hacia abajo.\n59\nFig. 73-a: Mientras más pronunciado\nsea el timón de subida, más marcado será\nel ascenso.\nFig. 73-b: Mientras más pronunciado\nsea el timón de bajada más lo será el de\ndescenso.\n60\nFig. 74: Dentro de las leyes físicas de\nla Tierra, una de ellas es la de que todo\nlo que sube tiene que bajar, ya que, al ami­\nnorar la velocidad, la fuerza de la grave­\ndad de la Tierra domina más y más al ti­\nmón de ascenso, por lo cual la curva terres­\ntre termina siendo una recta, que teórica­\nmente encuentra su fin en el centro de la\nTierra.\n/\n/\nto\n-<5.\nfts\nFig. 75: En oposición con la Fig. 74, la\ncurva cósmica —movimiento infinito— se\nalejaría más de la Tierra, convirtiéndose\nsi no en círculo por lo menos en elipse.\n61\n*\nLa composición de la flecha se debe al\ncreciente desarrollo de energía, motivado\npor el color blanco existente, hacia un co­\nlor negro cuya acción ya está iniciada.\n¿Por qué no se da el fenómeno a la inver­\nsa? La respuesta sería: el acento reside en\nla originalidad de la minoría con relación\na la universalidad de la mayoría. Esta actúa\nconstantemente, en forma habitual: la pri­\nmera, en cambio, tiene un efecto disconti­\nnuo activo, y la flecha vuela hacia la ac­\nción.\nBien ordenada una estructura en ambos\nsentidos determina la dirección del movi­\nmiento de manera tan rápida que debe\nabandonarse el símbolo capcioso.\nComo algo habitual, el ojo recibe el co­\nlor blanco que satura la vista, sin regocijo\nalguno, mientras que la vivacidad de la mi­\nrada va en aumento desde la peculiaridad\nde la acción iniciada hasta el final o la cul­\nminación de esta acción.\nEste extraordinario aumento de energía\n(en el sentido productivo o gasto de ener­\ngía (en el sentido receptivo) es determi­\nnante respecto a la dirección del movi­\nmiento.\n62\n-"
+        },
+        {
+          "index": 45,
+          "title": "LA FLECH A  N EG RA",
+          "page_start": 64,
+          "page_end": 64,
+          "text": "Esquema de confrontación"
+        },
+        {
+          "index": 46,
+          "title": "LA FLECH A  CALIDA",
+          "page_start": 64,
+          "page_end": 64,
+          "text": "La flecha se va calentando desde un co­\nlor tenue hasta la incandescencia.\n64"
+        },
+        {
+          "index": 47,
+          "title": "D E LA FLECH A",
+          "page_start": 65,
+          "page_end": 65,
+          "text": "65"
+        },
+        {
+          "index": 48,
+          "title": "D E LA FLECH A",
+          "page_start": 66,
+          "page_end": 66,
+          "text": "Fig. 80: Tabla de caldeamiento de los\ncolores (principalmente desde el azul hacia\nel anaranjado).\nFig. 81: Tabla de enfriamiento de los\ncolores (principalmente desde el anaranja­\ndo hacia el azul).\nK ot\nOflM."
+        },
+        {
+          "index": 49,
+          "title": "■ffr",
+          "page_start": 66,
+          "page_end": 66,
+          "text": "Otame\nya ita -a"
+        },
+        {
+          "index": 50,
+          "title": "4v nv",
+          "page_start": 66,
+          "page_end": 66,
+          "text": "J\n___ >\n.\nw. ziótttb.\n%\\\n*\n66\ni"
+        },
+        {
+          "index": 51,
+          "title": "EL ORGANISMO MOTOR",
+          "page_start": 67,
+          "page_end": 67,
+          "text": "Fig. 82: Los esquemas anteriores (Figs.\n76-81) pueden constituir una ayuda para\ndar una idea de la conformación de los ór­\nganos motores de la composición o para la\ncomposición misma: el organismo de mo­\ntor requiere una planificación altamente\nevolucionada debido a que es un concepto\nde mayor envergadura. Esa composición\npodría admitir como ley la acción conjunta\nde los órganos hacia un todo autónomo, con\nmovimiento pausado o carente de movi­\nmiento y sólo llegaría a finalizar cuando se\nagregasen movimientos contrarios o cuan­\ndo se encuentra una solución de movimien­\nto infinito. (En el primer caso, ver Fig. 82).\n(Ver, también, la Fig. 65).\n67"
+        },
+        {
+          "index": 52,
+          "title": "LO S CO LO RES",
+          "page_start": 68,
+          "page_end": 71,
+          "text": "Al llegar al movimiento infinito y perder\ntoda importancia la dirección del movimien­\nto, debe, por fuerza, eliminarse la flecha.\nDe ese modo se asocian los casos de calen­\ntamiento y enfriamiento. El phatos (la tra­\ngedia) se convierte en un ethos, que une\nen sí mismo el impulso y su contrario.\n68\nSi representamos el movimiento y el\ncontramovimiento o\nasí\nde esta for­\nma se organiza un centro entrambas, o sea\nel gris central (Fig. 83). Así, mientras más\npura sea la representación del gris, más\nestrecho se hará su radio de acción, hasta\nreducirse teóricamente y formar un punto.\n69\nFig. 84: A la derecha, cerca del punto,\nse encuentra el color rojo, y a la izquierda\ndel punto gris se halla el verde, lo cual nos\nlleva a aceptar la siguiente representación\ndesarrollada en la figura 85.\nFig. 85: No siendo lógico poner los pa­\nsos verde-rojo y violeta-amarillo en con­\ntraste con el paso azul-anaranjado.\n70\nI\nFig. 86: Debido a esto, es necesaria una\nrepresentación diagonal para las extremas\nescalas de colores.\nFig. 87: Ligamos, así, al círculo cromá­\ntico del espectro en el que toda flecha ca­\nrece de sentido, pues ya no se trata de con­\nceptos como ‘‘hacia allá”, sino, más bien,\n‘‘por todas partes”.\n71"
+        },
+        {
+          "index": 53,
+          "title": "oacan",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "1."
+        },
+        {
+          "index": 54,
+          "title": "LA PASIÓN POR EL DISCURSO",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "C a rtas a los e stu d ia n te s d e  c o m u n ic a c ió n\nD aniel Prieto Castillo\n2."
+        },
+        {
+          "index": 55,
+          "title": "LA QUERELLA DE MARTÍN LUIS GUZMÁN",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Fernando Curiel\n3."
+        },
+        {
+          "index": 56,
+          "title": "LAS SIETE LÁMPARAS DE LA ARQUITECTURA",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "John Ruskin\n4."
+        },
+        {
+          "index": 57,
+          "title": "RETÓRICA Y MANIPULACIÓN MASIVA",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "D aniel Prieto Castillo\n5."
+        },
+        {
+          "index": 58,
+          "title": "PUNTO Y LÍNEA SOBRE EL PLANO",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "C o n trib u ció n  al análisis\nd e  los ele m e n to s p ic tó rico s\nWassily W asilievich Kandinsky\n6."
+        },
+        {
+          "index": 59,
+          "title": "EL ORIGEN DE LA VIDA",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "A lexander I. O parin\n7."
+        },
+        {
+          "index": 60,
+          "title": "DISEÑO Y C O M UN IC ACIÓN",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "D aniel Prieto Castillo\n8."
+        },
+        {
+          "index": 61,
+          "title": "DE LO ESPIRITUAL EN EL ARTE",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "W assily W asilievich Kandinsky\n9."
+        },
+        {
+          "index": 62,
+          "title": "¿QUÉ ES UNA CONSTITUCIÓN?",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Ferdinand Lassalle\n10."
+        },
+        {
+          "index": 63,
+          "title": "LA FIESTA DEL LENGUAJE",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Daniel Prieto Castillo\n11."
+        },
+        {
+          "index": 64,
+          "title": "LA ENCICLOPEDIA SECRETA",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Francisco Guzmán Burgos\n12."
+        },
+        {
+          "index": 65,
+          "title": "EL SUTRA DE LA SERPIENTE",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "A n tig u a  poesía b ud ista\nC a rm e n  D ra g o n e tti\n13."
+        },
+        {
+          "index": 66,
+          "title": "RIZOMA",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "In tro d u c c ió n\nGilíes Deleuze, Félix G uattari\n14."
+        },
+        {
+          "index": 67,
+          "title": "EL SUICIDIO",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Émile Durkheim\n15."
+        },
+        {
+          "index": 68,
+          "title": "LA POESÍA DEL QUEBEC",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Una in tro d u c c ió n\nA ntonio Urrello\n16."
+        },
+        {
+          "index": 69,
+          "title": "FANTÁSTICA",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Tzvetan Todorov\n17."
+        },
+        {
+          "index": 70,
+          "title": "ABSTRACTA",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Piet M ondrian\n18."
+        },
+        {
+          "index": 71,
+          "title": "DEMOCRACIA POSIBLE",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "El diseño p o lític o  d e  M ax W eber\nG riselda Gutiérrez\n19."
+        },
+        {
+          "index": 72,
+          "title": "PLÁSTICAS",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Juan Acha\n2 0."
+        },
+        {
+          "index": 73,
+          "title": "LAS FORMAS ELEMENTALES DE LA VIDA RELIGIOSA",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Émile Durkheim\n21."
+        },
+        {
+          "index": 74,
+          "title": "EL MIEDO A LA CIRUGÍA",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "G uillerm o Vasconcelos P.\nM auricio Vasconcelos A.\n22."
+        },
+        {
+          "index": 75,
+          "title": "CO M U N IC AC IÓ N  EN LOS VALORES",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Eduardo Garza Cuéllar\n23."
+        },
+        {
+          "index": 76,
+          "title": "ALEGORÍA DE LA CREACIÓN",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "H éctor Ceballos G a rib a  y\n24."
+        },
+        {
+          "index": 77,
+          "title": "LA ÉTICA PROTESTANTE",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Y el espíritu d e l ca p ita lis m o\nMax Weber\n25."
+        },
+        {
+          "index": 78,
+          "title": "TELENOVELAS, TELEVISIÓN Y C O M UN IC ACIÓN",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "El caso d e  M éxico\nFrancisco Javier Torres A.\n(agotado)\n26."
+        },
+        {
+          "index": 79,
+          "title": "ZEN Y EL ARTE DE LOS ARQUEROS JAPONESES",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Eugen Herrigel\n27."
+        },
+        {
+          "index": 80,
+          "title": "EL POLÍTICO Y EL CIENTÍFICO",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Max Weber\n28."
+        },
+        {
+          "index": 81,
+          "title": "EL ORIGEN DE LA FAMILIA",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "La p ro p ie d a d  p riv a d a  y  el Estado\nFriedrich Engels\n(agotado)\n29."
+        },
+        {
+          "index": 82,
+          "title": "CULTURA Y CO M U N IC AC IÓ N",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Francisco Prieto\n30."
+        },
+        {
+          "index": 83,
+          "title": "FOUCAULT Y EL PODER",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "H éctor Ceballos Garibay\n31."
+        },
+        {
+          "index": 84,
+          "title": "LITERATURA E IDEOLOGÍA",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "El prim er M ariano A zuela (1896-1918)\nJorge Ruffinelli\n32."
+        },
+        {
+          "index": 85,
+          "title": "LA LIBERTAD",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "Arthur Schopenhauer\n33."
+        },
+        {
+          "index": 86,
+          "title": "SOCIOLOGÍA DE LA RELIGIÓN",
+          "page_start": 73,
+          "page_end": 73,
+          "text": "M ax Weber\n34."
+        },
+        {
+          "index": 87,
+          "title": "BREVE HISTORIA DE MÉXICO",
+          "page_start": 73,
+          "page_end": 76,
+          "text": "De H id a lg o  a C á rd e n a s (1805-1940)\nJan Bazant\nEsta obra se imprimió bajo el cuidado de Ediciones Coyoacán, S. A. de C. V.,\nAv. Hidalgo No. 47-B, Colonia Del Carmen, Deleg. Coyoacán, 04100,\nMéxico D. F., en julio de 2012\nEl tiraje fue de 1000 ejemplares más sobrantes para reposición.\nE\nl pintor y dibujante Paul Klee es considerado como uno de los\nrepresentantes más originales del arte moderno, sus primeros\ntrabajos fueron estudios para paisajes realizados a lápiz, que\nmuestran la influencia del impresionismo; bajo la influencia del\ncubismo, grabó una serie de Animales asombrosos; realizó asimismo\naguafuertes en blanco y negro, las insinuaciones de fantasía y sátira de\nestos trabajos muestran la influencia del expresionismo del siglo xx. Sus\npinturas y acuarelas son muestra del dominio de sus armonías cromáticas\ndelicadas y de ensueño, que generalmente usó para crear composiciones\nsencillas y semiabstractas o incluso efectos que asemejan a mosaicos.\nKlee poseía la inteligencia suprema entre todos los artistas modernos y, en\nla teoría y en la práctica, estableció fundamentos estéticos admirables. Su\nestilo quedó establecido en sus Ideogramas (1916-1918), en sus óleos,\nen las ilustraciones para Cándido de Voltaire. Fue un maestro del dibujo\ny muchos de ellos son complicadas líneas con un contenido que deriva\nde una imaginería fantástica o ensoñada; describió la técnica de estos\ndibujos como \"sacar a pasear una línea\". Creó elementos fluidos o pája­\nros con una composición de formas lineales y circulares interconectadas,\ncon un efecto evocador mucho más importante que lo que la propia obra\nsignifica.\nPero su obra no se limita exclusivamente a su pintura o dibujo, sino que\ntambién abarcó el campo de los escritores teóricos, a los que él mismo\nconsideraba de un \"inestimable valor para la posteridad\". Al paso del\ntiempo esta consideración se fue haciendo real ya que, por ejemplo, los\ntextos reunidos en Bases para la estructuración del arte no sólo pueden\nestimarse como teorías para sus discípulos, sino que son la suma de prin­\ncipios básicos para todo el arte moderno. Su obra influyó en los surrealis­\ntas posteriores, así como en los artistas no objetivos, y fue una fuente de\ninspiración fundamental para el nacimiento del expresionismo abstracto."
+        }
+      ],
+      "ingested_at": "2026-05-31"
+    },
+    {
+      "id": "sketching-and-drawing",
+      "title": "Sketching and Drawing",
+      "author": "Paul Klee",
+      "year": null,
+      "language": "en",
+      "source_file": "231332962-Paul-Klee-Sketching-and-Drawing.pdf",
+      "total_pages": 14,
+      "total_sections": 23,
+      "total_chars": 1351,
+      "needs_ocr": false,
+      "cover": "/books/sketching-and-drawing/cover.jpg",
+      "sections": [
+        {
+          "index": 0,
+          "title": "Paul Klee, Sketching",
+          "page_start": 1,
+          "page_end": 1,
+          "text": "and Drawing...\n269/388\nhttps://www.facebook.com/media/set/?set=a.\n570735129652084.1073741861.268422276550039..."
+        },
+        {
+          "index": 1,
+          "title": "Art does not reproduce what we see; rather, it",
+          "page_start": 1,
+          "page_end": 1,
+          "text": "makes us see."
+        },
+        {
+          "index": 2,
+          "title": "~ Paul Klee",
+          "page_start": 1,
+          "page_end": 2,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1930"
+        },
+        {
+          "index": 3,
+          "title": "Paul Klee, Great Hall for Singers",
+          "page_start": 2,
+          "page_end": 2,
+          "text": "1921"
+        },
+        {
+          "index": 4,
+          "title": "Paul Klee, All Souls' Picture",
+          "page_start": 2,
+          "page_end": 3,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1922"
+        },
+        {
+          "index": 5,
+          "title": "of the Knight Errant",
+          "page_start": 3,
+          "page_end": 4,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1921"
+        },
+        {
+          "index": 6,
+          "title": "Paul Klee, Winter Journey",
+          "page_start": 4,
+          "page_end": 5,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1930"
+        },
+        {
+          "index": 7,
+          "title": "Paul Klee, Doctor",
+          "page_start": 5,
+          "page_end": 6,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1920"
+        },
+        {
+          "index": 8,
+          "title": "Paul Klee, Phantom Perspective",
+          "page_start": 6,
+          "page_end": 6,
+          "text": "1924"
+        },
+        {
+          "index": 9,
+          "title": "(Take Note!)",
+          "page_start": 6,
+          "page_end": 7,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1923"
+        },
+        {
+          "index": 10,
+          "title": "Town",
+          "page_start": 7,
+          "page_end": 7,
+          "text": "1925"
+        },
+        {
+          "index": 11,
+          "title": "Paul Klee, View of a Fortress",
+          "page_start": 7,
+          "page_end": 8,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1925"
+        },
+        {
+          "index": 12,
+          "title": "Band",
+          "page_start": 8,
+          "page_end": 8,
+          "text": "1927"
+        },
+        {
+          "index": 13,
+          "title": "Paul Klee, Under Water",
+          "page_start": 8,
+          "page_end": 9,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1920"
+        },
+        {
+          "index": 14,
+          "title": "in the Manner of a Net",
+          "page_start": 9,
+          "page_end": 10,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1925"
+        },
+        {
+          "index": 15,
+          "title": "the Tall Door (New Version)",
+          "page_start": 10,
+          "page_end": 11,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1922"
+        },
+        {
+          "index": 16,
+          "title": "Paul Klee, The Chair-Animal",
+          "page_start": 11,
+          "page_end": 11,
+          "text": "1921"
+        },
+        {
+          "index": 17,
+          "title": "Paul Klee, The Hunter",
+          "page_start": 11,
+          "page_end": 12,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1910"
+        },
+        {
+          "index": 18,
+          "title": "Paul Klee, The Pathos of Fertility",
+          "page_start": 12,
+          "page_end": 13,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1921"
+        },
+        {
+          "index": 19,
+          "title": "Good Roast Come From",
+          "page_start": 13,
+          "page_end": 13,
+          "text": "1931"
+        },
+        {
+          "index": 20,
+          "title": "Paul Klee, Episode B at Kairouan",
+          "page_start": 13,
+          "page_end": 14,
+          "text": "Stefano’s Blueberries          Paul Klee, Sketching and Drawing...          269/388\n1925"
+        },
+        {
+          "index": 21,
+          "title": "Here a fantastic collection with 82 drawings",
+          "page_start": 14,
+          "page_end": 14,
+          "text": "(thanks to Metropolitan Museum of Art): http:"
+        },
+        {
+          "index": 22,
+          "title": "//www.metmuseum.org/collec.../search-the-",
+          "page_start": 14,
+          "page_end": 14,
+          "text": "collections..."
+        }
+      ],
+      "ingested_at": "2026-05-31"
+    }
+  ],
+  "total": 6
+}

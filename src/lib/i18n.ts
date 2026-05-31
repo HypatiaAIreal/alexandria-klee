@@ -29,6 +29,7 @@ const en: Dict = {
     search: "Search",
     glossary: "Glossary",
     concepts: "Concept map",
+    library: "Library",
     language: "Language",
   },
   account: {
@@ -235,6 +236,24 @@ const en: Dict = {
     intermediate: "Intermediate",
     advanced: "Advanced",
   },
+  books: {
+    kicker: "Klee's own writings",
+    title: "Library",
+    intro: "Paul Klee's published books and notebooks, beside the teaching manuscripts. Search them, read them, and follow the echoes back into the lessons.",
+    searchPlaceholder: "Search across Klee's books…",
+    results: "{count} passage(s)",
+    noResults: "No passages found.",
+    read: "Read",
+    pagesLabel: "{count} pages",
+    sectionsLabel: "{count} sections",
+    scanned: "Scanned source — full text pending OCR.",
+    contents: "Contents",
+    backToLibrary: "← Library",
+    related: "In Klee's own writings",
+    relatedIntro: "Passages from Klee's books that echo this page.",
+    relatedNone: "No related passages found in the library.",
+    sourcePdf: "Source PDF",
+  },
 };
 
 const de: Dict = {
@@ -244,6 +263,7 @@ const de: Dict = {
     search: "Suche",
     glossary: "Glossar",
     concepts: "Begriffskarte",
+    library: "Bibliothek",
     language: "Sprache",
   },
   account: {
@@ -450,6 +470,24 @@ const de: Dict = {
     intermediate: "Mittel",
     advanced: "Fortgeschritten",
   },
+  books: {
+    kicker: "Klees eigene Schriften",
+    title: "Bibliothek",
+    intro: "Paul Klees veröffentlichte Bücher und Notizbücher, neben den Lehrmanuskripten. Durchsuchen, lesen und den Widerhall zurück in die Lektionen verfolgen.",
+    searchPlaceholder: "In Klees Büchern suchen…",
+    results: "{count} Stelle(n)",
+    noResults: "Keine Stellen gefunden.",
+    read: "Lesen",
+    pagesLabel: "{count} Seiten",
+    sectionsLabel: "{count} Abschnitte",
+    scanned: "Gescannte Quelle — Volltext noch nicht per OCR erfasst.",
+    contents: "Inhalt",
+    backToLibrary: "← Bibliothek",
+    related: "In Klees eigenen Schriften",
+    relatedIntro: "Stellen aus Klees Büchern, die zu dieser Seite passen.",
+    relatedNone: "Keine verwandten Stellen in der Bibliothek gefunden.",
+    sourcePdf: "Quell-PDF",
+  },
 };
 
 const es: Dict = {
@@ -459,6 +497,7 @@ const es: Dict = {
     search: "Buscar",
     glossary: "Glosario",
     concepts: "Mapa de conceptos",
+    library: "Biblioteca",
     language: "Idioma",
   },
   account: {
@@ -664,6 +703,24 @@ const es: Dict = {
     introductory: "Introductorio",
     intermediate: "Intermedio",
     advanced: "Avanzado",
+  },
+  books: {
+    kicker: "Los escritos del propio Klee",
+    title: "Biblioteca",
+    intro: "Los libros y cuadernos publicados de Paul Klee, junto a los manuscritos docentes. Búscalos, léelos y sigue sus ecos de vuelta a las lecciones.",
+    searchPlaceholder: "Buscar en los libros de Klee…",
+    results: "{count} pasaje(s)",
+    noResults: "No se encontraron pasajes.",
+    read: "Leer",
+    pagesLabel: "{count} páginas",
+    sectionsLabel: "{count} secciones",
+    scanned: "Fuente escaneada — texto completo pendiente de OCR.",
+    contents: "Contenido",
+    backToLibrary: "← Biblioteca",
+    related: "En los escritos del propio Klee",
+    relatedIntro: "Pasajes de los libros de Klee que resuenan con esta página.",
+    relatedNone: "No se encontraron pasajes relacionados en la biblioteca.",
+    sourcePdf: "PDF original",
   },
 };
 

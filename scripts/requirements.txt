@@ -3,5 +3,6 @@ requests>=2.31
 beautifulsoup4>=4.12
 lxml>=5.0
 deep-translator>=1.11        # free DE→EN/ES (Google Translate, no API key)
+pymupdf>=1.24                # PDF text/section extraction for the Books library (05_ingest_books.py)
 Pillow>=10.0                 # image handling
-pytesseract>=0.3.10          # optional OCR (requires Tesseract + the 'deu' language pack)
+pytesseract>=0.3.10          # optional OCR (requires the Tesseract binary + 'deu'/'eng' language packs)

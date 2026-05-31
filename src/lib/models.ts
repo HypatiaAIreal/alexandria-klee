@@ -102,6 +102,28 @@ const GlossarySchema = new Schema({
 
 const StatsSchema = new Schema({}, { strict: false });
 
+// Books — Klee's own writings ingested from PDF.
+const BookSectionSchema = new Schema(
+  { index: Number, title: String, page_start: Number, page_end: Number, text: String },
+  { _id: false }
+);
+const BookSchema = new Schema({
+  id: { type: String, index: true, unique: true },
+  title: String,
+  author: String,
+  year: Number,
+  language: String,
+  source_file: String,
+  total_pages: Number,
+  total_sections: Number,
+  total_chars: Number,
+  needs_ocr: Boolean,
+  cover: String,
+  sections: [BookSectionSchema],
+  ingested_at: String,
+});
+BookSchema.index({ title: "text", "sections.text": "text" });
+
 // App users (authentication). Stored in the klee_gestaltungslehre DB.
 const UserSchema = new Schema({
   name: String,
@@ -132,3 +154,4 @@ export const StatsModel = mongoose.models.Stats || mongoose.model("Stats", Stats
 export const AnnotationModel =
   mongoose.models.Annotation || mongoose.model("Annotation", AnnotationSchema, "annotations");
 export const UserModel = mongoose.models.User || mongoose.model("User", UserSchema, "users");
+export const BookModel = mongoose.models.Book || mongoose.model("Book", BookSchema, "books");

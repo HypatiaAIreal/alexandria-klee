@@ -10,8 +10,17 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 import unicodedata
 from pathlib import Path
+
+# Force UTF-8 stdout/stderr so status glyphs (✓, …, —) never crash on a
+# legacy console codepage (Windows cp1252 raises UnicodeEncodeError on ✓).
+for _stream in (sys.stdout, sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8")  # Python 3.7+
+    except Exception:
+        pass
 
 # ── Paths ───────────────────────────────────────────────────────
 SCRIPTS_DIR = Path(__file__).resolve().parent
@@ -23,6 +32,14 @@ ENRICHED_DIR = DATA_DIR / "enriched" / "pages"
 PUBLIC_IMG_DIR = PROJECT_DIR / "public" / "manuscripts"
 SEED_PATH = PROJECT_DIR / "src" / "data" / "seed.json"
 GLOSSARY_PATH = DATA_DIR / "glossary.json"
+
+# ── Books (Klee's own writings) ─────────────────────────────────
+import os as _os
+
+BOOKS_SRC_DIR = Path(_os.environ.get("KLEE_BOOKS_DIR", str(PROJECT_DIR.parent / "books")))
+BOOKS_DATA_DIR = DATA_DIR / "books"                   # one JSON per book
+BOOKS_SEED = PROJECT_DIR / "src" / "data" / "books.json"   # bundled fallback
+PUBLIC_BOOKS_DIR = PROJECT_DIR / "public" / "books"   # cover images
 
 # ── Source archive ──────────────────────────────────────────────
 # The Zentrum Paul Klee Gestaltungslehre archive. Override with the

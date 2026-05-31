@@ -12,6 +12,7 @@ const NAV = [
   { href: "/search", key: "nav.search" },
   { href: "/glossary", key: "nav.glossary" },
   { href: "/concepts", key: "nav.concepts" },
+  { href: "/library", key: "nav.library" },
 ];
 
 export default function SiteHeader() {

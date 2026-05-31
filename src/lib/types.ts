@@ -131,6 +131,51 @@ export interface SeedData {
   };
 }
 
+// ── Books (Klee's own writings) ─────────────────────────────────
+export interface BookSection {
+  index: number;
+  title: string;
+  page_start: number;
+  page_end: number;
+  text: string;
+}
+
+export interface Book {
+  id: string;
+  title: string;
+  author: string;
+  year: number | null;
+  language: string;
+  source_file: string;
+  total_pages: number;
+  total_sections: number;
+  total_chars: number;
+  needs_ocr: boolean;
+  cover: string;
+  sections: BookSection[];
+  ingested_at: string;
+}
+
+export interface BookSearchHit {
+  book_id: string;
+  title: string;
+  author: string;
+  language: string;
+  section_index: number;
+  section_title: string;
+  snippet: string;
+}
+
+export interface RelatedPassage {
+  book_id: string;
+  title: string;
+  language: string;
+  section_index: number;
+  section_title: string;
+  snippet: string;
+  score: number;
+}
+
 /** A node in the concept co-occurrence map. */
 export interface ConceptNode {
   term: string;

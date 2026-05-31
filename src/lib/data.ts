@@ -10,14 +10,18 @@
 //  giving a single code path regardless of the backing store.
 // ─────────────────────────────────────────────────────────────
 import seed from "@/data/seed.json";
+import booksSeed from "@/data/books.json";
 import type {
   Article,
+  Book,
+  BookSearchHit,
   Chapter,
   ConceptGraph,
   CorpusStats,
   GlossaryEntry,
   Lang,
   Page,
+  RelatedPassage,
   SeedData,
 } from "./types";
 import { hasMongo } from "./mongodb";
@@ -36,12 +40,16 @@ async function loadFromMongo(): Promise<SeedData> {
     GlossaryModel.find().lean(),
     StatsModel.findOne().lean(),
   ]);
+  // Mongo lean() docs carry ObjectId `_id` (a class instance), which Next
+  // refuses to pass from Server → Client Components. Round-tripping through
+  // JSON flattens every value to a plain, serialisable object/string.
+  const plain = <T,>(v: unknown): T => JSON.parse(JSON.stringify(v ?? null)) as T;
   return {
-    chapters: chapters as unknown as Chapter[],
-    pages: pages as unknown as Page[],
-    articles: articles as unknown as Article[],
-    glossary: glossary as unknown as GlossaryEntry[],
-    stats: (statsDoc as unknown as CorpusStats) ?? (seed as unknown as SeedData).stats,
+    chapters: plain<Chapter[]>(chapters),
+    pages: plain<Page[]>(pages),
+    articles: plain<Article[]>(articles),
+    glossary: plain<GlossaryEntry[]>(glossary),
+    stats: plain<CorpusStats>(statsDoc) ?? (seed as unknown as SeedData).stats,
     meta: (seed as unknown as SeedData).meta,
   };
 }
@@ -273,4 +281,131 @@ export async function getConceptGraph(minWeight = 1): Promise<ConceptGraph> {
     .filter((e) => e.weight >= minWeight);
 
   return { nodes, edges };
+}
+
+// ── Books (Klee's own writings) ─────────────────────────────────
+let booksPromise: Promise<Book[]> | null = null;
+
+async function loadBooksFromMongo(): Promise<Book[]> {
+  const { connectMongo } = await import("./mongodb");
+  const { BookModel } = await import("./models");
+  await connectMongo();
+  const docs = await BookModel.find().lean();
+  // Flatten ObjectId/_id so books can cross the Server→Client boundary.
+  return JSON.parse(JSON.stringify(docs ?? [])) as Book[];
+}
+
+export function getBooks(): Promise<Book[]> {
+  if (booksPromise) return booksPromise;
+  booksPromise = (async () => {
+    if (hasMongo) {
+      try {
+        const docs = await loadBooksFromMongo();
+        if (docs.length) return docs;
+      } catch (err) {
+        console.warn("[data] Mongo books load failed, using bundled seed:", err);
+      }
+    }
+    return ((booksSeed as { books: Book[] }).books ?? []) as Book[];
+  })();
+  return booksPromise;
+}
+
+export async function getBook(id: string): Promise<Book | undefined> {
+  return (await getBooks()).find((b) => b.id === id);
+}
+
+function snippetAround(text: string, qFold: string): string {
+  const tFold = fold(text);
+  const idx = tFold.indexOf(qFold);
+  const at = idx === -1 ? 0 : idx;
+  const start = Math.max(0, at - 70);
+  const end = Math.min(text.length, at + qFold.length + 130);
+  const raw = (start > 0 ? "… " : "") + text.slice(start, end).replace(/\s+/g, " ").trim() + (end < text.length ? " …" : "");
+  if (idx === -1) return escapeHtml(raw);
+  // re-locate within trimmed snippet for highlight
+  const sFold = fold(raw);
+  const i = sFold.indexOf(qFold);
+  if (i === -1) return escapeHtml(raw);
+  return (
+    escapeHtml(raw.slice(0, i)) +
+    "<mark>" +
+    escapeHtml(raw.slice(i, i + qFold.length)) +
+    "</mark>" +
+    escapeHtml(raw.slice(i + qFold.length))
+  );
+}
+
+export async function searchBooks(q: string, lang?: string): Promise<BookSearchHit[]> {
+  const query = (q ?? "").trim();
+  if (!query) return [];
+  const qFold = fold(query);
+  const books = await getBooks();
+  const hits: BookSearchHit[] = [];
+  for (const b of books) {
+    if (lang && b.language !== lang) continue;
+    for (const s of b.sections) {
+      if (fold(s.text).includes(qFold) || fold(s.title).includes(qFold)) {
+        hits.push({
+          book_id: b.id,
+          title: b.title,
+          author: b.author,
+          language: b.language,
+          section_index: s.index,
+          section_title: s.title,
+          snippet: snippetAround(s.text || s.title, qFold),
+        });
+      }
+    }
+  }
+  return hits.slice(0, 100);
+}
+
+export async function getRelatedPassages(terms: string[], limit = 6): Promise<RelatedPassage[]> {
+  const cleaned = [...new Set(terms.map((t) => fold(t)).filter((t) => t.length >= 3))];
+  if (!cleaned.length) return [];
+  const books = await getBooks();
+  const scored: RelatedPassage[] = [];
+  for (const b of books) {
+    for (const s of b.sections) {
+      const tFold = fold(s.text);
+      let score = 0;
+      let best = "";
+      for (const term of cleaned) {
+        let i = tFold.indexOf(term);
+        if (i === -1) continue;
+        // count occurrences (cheap)
+        let c = 0;
+        while (i !== -1) {
+          c++;
+          i = tFold.indexOf(term, i + term.length);
+        }
+        score += c;
+        if (!best) best = term;
+      }
+      if (score > 0) {
+        scored.push({
+          book_id: b.id,
+          title: b.title,
+          language: b.language,
+          section_index: s.index,
+          section_title: s.title,
+          snippet: snippetAround(s.text, best),
+          score,
+        });
+      }
+    }
+  }
+  scored.sort((a, b) => b.score - a.score);
+  // at most 2 passages per book, then take the top `limit`
+  const perBook = new Map<string, number>();
+  const out: RelatedPassage[] = [];
+  for (const p of scored) {
+    const n = perBook.get(p.book_id) ?? 0;
+    if (n >= 2) continue;
+    perBook.set(p.book_id, n + 1);
+    out.push(p);
+    if (out.length >= limit) break;
+  }
+  return out;
 }

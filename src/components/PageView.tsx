@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { Page } from "@/lib/types";
 import PageReader from "@/components/PageReader";
+import RelatedBooks from "@/components/RelatedBooks";
 import { useI18n } from "@/components/LanguageProvider";
 
 interface NavRef {
@@ -22,6 +23,18 @@ export default function PageView({
   next: NavRef | null;
 }) {
   const { t } = useI18n();
+
+  // Cross-reference keywords: the page's concepts (DE/EN/ES) feed the
+  // "related passages in Klee's books" lookup.
+  const relatedTerms = Array.from(
+    new Set(
+      page.articles.flatMap((a) => [
+        ...(a.metadata?.concepts_en ?? []),
+        ...(a.metadata?.concepts_es ?? []),
+        ...(a.metadata?.concepts_de ?? []),
+      ])
+    )
+  ).slice(0, 12);
 
   return (
     <div className="space-y-6">
@@ -52,6 +65,8 @@ export default function PageView({
       </header>
 
       <PageReader page={page} />
+
+      <RelatedBooks terms={relatedTerms} />
 
       <nav className="flex items-center justify-between gap-3 border-t border-ink-700/60 pt-6">
         {prev ? (

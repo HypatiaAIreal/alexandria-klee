@@ -96,6 +96,17 @@ async function main() {
   await db.collection("stats").insertOne(seed.stats);
   console.log(`  stats: 1`);
 
+  // Books (Klee's own writings) — optional, from src/data/books.json
+  const booksPath = path.join(PROJECT, "src", "data", "books.json");
+  if (fs.existsSync(booksPath)) {
+    const books = JSON.parse(fs.readFileSync(booksPath, "utf-8")).books ?? [];
+    await load("books", books);
+    if (books.length) {
+      await db.collection("books").createIndex({ id: 1 }, { unique: true });
+      await db.collection("books").createIndex({ title: "text", "sections.text": "text" });
+    }
+  }
+
   // Indexes (from the project schema doc)
   await db.collection("articles").createIndex({ text_de: "text", text_en: "text", text_es: "text" });
   await db.collection("articles").createIndex({ section: 1, part: 1, chapter_number: 1, page_number: 1 });

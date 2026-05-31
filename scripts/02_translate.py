@@ -46,40 +46,55 @@ class Translator:
     def __init__(self, demo: bool):
         self.demo = demo
         self.cache: dict[tuple[str, str], str] = {}
-        self._g = None
         if not demo:
             try:
                 from deep_translator import GoogleTranslator  # noqa
                 self._cls = GoogleTranslator
             except ImportError:
-                print("[warn] deep-translator not installed — falling back to --demo stubs")
+                print("[warn] deep-translator not installed — run "
+                      "`pip install -r requirements.txt`. Falling back to demo stubs.")
                 self.demo = True
 
-    def translate(self, text: str, target: str) -> str:
-        if not text or not text.strip():
-            return text
-        if self.demo:
-            return f"[{target.upper()}] {text}"
-        key = (target, text)
-        if key in self.cache:
-            return self.cache[key]
-        try:
-            out = self._cls(source="de", target=target).translate(text)
-            time.sleep(0.4)
-        except Exception as e:  # pragma: no cover
-            print(f"  [translate err] {e}")
-            out = text
-        self.cache[key] = out or text
-        return out or text
+    def translate_many(self, texts: list[str], target: str) -> list[str]:
+        """Translate a list DE→target, batched, with caching. Aligned output."""
+        out: list[str] = [""] * len(texts)
+        miss_i: list[int] = []
+        miss_t: list[str] = []
+        for i, t in enumerate(texts):
+            if not t or not t.strip():
+                out[i] = t
+            elif self.demo:
+                out[i] = f"[{target.upper()}] {t}"
+            elif (target, t) in self.cache:
+                out[i] = self.cache[(target, t)]
+            else:
+                miss_i.append(i)
+                miss_t.append(t)
+        if miss_t and not self.demo:
+            try:
+                res = self._cls(source="de", target=target).translate_batch(miss_t)
+                time.sleep(0.3)
+            except Exception as e:  # pragma: no cover
+                print(f"  [translate err] {e}")
+                res = miss_t  # fall back to the original text
+            for j, i in enumerate(miss_i):
+                val = res[j] if j < len(res) and res[j] else miss_t[j]
+                out[i] = val
+                self.cache[(target, miss_t[j])] = val
+        return out
 
 
 def translate_page(doc: dict, tr: Translator) -> dict:
     for a in doc.get("articles", []):
         paras = a.get("paragraphs_de", [])
-        a["paragraphs_en"] = [tr.translate(p, "en") for p in paras]
-        a["paragraphs_es"] = [tr.translate(p, "es") for p in paras]
-        a["text_en"] = tr.translate(a.get("text_de", ""), "en")
-        a["text_es"] = tr.translate(a.get("text_de", ""), "es")
+        en = tr.translate_many(paras, "en")
+        es = tr.translate_many(paras, "es")
+        a["paragraphs_en"] = en
+        a["paragraphs_es"] = es
+        # Build the full text from the translated paragraphs (avoids a second
+        # round-trip and keeps text/paragraphs consistent).
+        a["text_en"] = "\n".join(p for p in en if p and p.strip())
+        a["text_es"] = "\n".join(p for p in es if p and p.strip())
         # footnotes are mostly markers/fragments — carry across unchanged
         a["footnotes_en"] = list(a.get("footnotes_de", []))
         a["footnotes_es"] = list(a.get("footnotes_de", []))
