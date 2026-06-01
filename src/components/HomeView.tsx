@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ConceptBarChart, DomainDonut, DomainLegend } from "@/components/Charts";
 import { domainColor } from "@/lib/labels";
+import { formatNum } from "@/lib/util";
 import { useI18n } from "@/components/LanguageProvider";
 
 export interface HomeData {
@@ -63,7 +64,7 @@ export default function HomeView({ data }: { data: HomeData }) {
       <section className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         {statCards.map((c) => (
           <div key={c.key} className="panel p-4">
-            <div className="font-display text-3xl text-ochre">{c.value.toLocaleString()}</div>
+            <div className="font-display text-3xl text-ochre">{formatNum(c.value)}</div>
             <div className="label mt-2">{t(c.key)}</div>
           </div>
         ))}
