@@ -25,6 +25,7 @@ import type {
   SeedData,
 } from "./types";
 import { hasMongo } from "./mongodb";
+import { applyImageBase } from "./images";
 
 let cachePromise: Promise<SeedData> | null = null;
 
@@ -60,17 +61,21 @@ async function loadFromMongo(): Promise<SeedData> {
 export function getDataset(): Promise<SeedData> {
   if (cachePromise) return cachePromise;
   cachePromise = (async () => {
+    let data: SeedData;
     if (hasMongo) {
       try {
-        const data = await loadFromMongo();
+        const loaded = await loadFromMongo();
         // If Atlas has no content yet, fall back to the bundled seed.
-        return data.articles?.length ? data : (seed as unknown as SeedData);
+        data = loaded.articles?.length ? loaded : (seed as unknown as SeedData);
       } catch (err) {
         console.warn("[data] Mongo load failed, using bundled seed:", err);
-        return seed as unknown as SeedData;
+        data = seed as unknown as SeedData;
       }
+    } else {
+      data = seed as unknown as SeedData;
     }
-    return seed as unknown as SeedData;
+    // Rewrite /manuscripts image paths to R2 when R2_PUBLIC_URL is set.
+    return applyImageBase(data);
   })();
   return cachePromise;
 }
