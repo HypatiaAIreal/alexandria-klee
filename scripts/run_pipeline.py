@@ -170,7 +170,7 @@ def run_chapter(n: int, demo: bool, ocr: bool, push_mongo: bool) -> None:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Alexandria-Klee extraction pipeline orchestrator")
-    ap.add_argument("--chapter", type=int, help="Chapter number to run end-to-end")
+    ap.add_argument("--chapter", help="Chapter to run end-to-end: number 1–24, 'BF', or 'Anhang'")
     ap.add_argument("--demo", action="store_true", help="Use demo (offline) translations")
     ap.add_argument("--ocr", action="store_true", help="Enable OCR fallback in extraction")
     ap.add_argument("--assemble", action="store_true", help="Only (re)assemble seed.json")

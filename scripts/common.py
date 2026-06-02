@@ -84,19 +84,44 @@ CHAPTERS = [
 ]
 
 
-def chapter_by_number(n: int) -> dict | None:
-    """Resolve a chapter by its chapter_number (e.g. 2 → BG I.2)."""
-    for section, part, num, de, en, es, url in CHAPTERS:
-        if num == n and not (num == 0 and section == "BG"):
-            # avoid the Anhang (num 0, BG); BF is num 0 + section BF
-            return _chapter_dict(section, part, num, de, en, es, url)
-        if num == n and section == "BF":
-            return _chapter_dict(section, part, num, de, en, es, url)
-    # exact match fallback (handles BF=0)
-    for section, part, num, de, en, es, url in CHAPTERS:
-        if num == n:
-            return _chapter_dict(section, part, num, de, en, es, url)
+def _find(pred) -> dict | None:
+    for row in CHAPTERS:
+        if pred(row):
+            return _chapter_dict(*row)
     return None
+
+
+def resolve_chapter(key) -> dict | None:
+    """Resolve a chapter from a CLI key.
+
+    Accepts:
+      • an int / numeric string 1–24  → the matching BG chapter
+      • "BF"                          → Bildnerische Formlehre
+      • "Anhang" / "appendix"         → the BG appendix
+    BF and the Anhang both have chapter_number 0, so they can only be
+    selected by name (not by number).
+    """
+    low = str(key).strip().lower()
+    if low in ("bf",):
+        return _find(lambda c: c[0] == "BF")
+    if low in ("anhang", "appendix", "anh"):
+        return _find(lambda c: c[1] == "Anhang")
+    if low.isdigit():
+        n = int(low)
+        return _find(lambda c: c[2] == n and c[0] == "BG" and c[1] != "Anhang")
+    return None
+
+
+# Backwards-compatible alias used by older calls.
+def chapter_by_number(n) -> dict | None:
+    return resolve_chapter(n)
+
+
+def chapter_file_prefix(ch: dict) -> str:
+    """Filename prefix for a chapter's page files (matches page_file_name)."""
+    if ch["part"]:
+        return f"{ch['section']}_{ch['part']}_{ch['chapter_number']:02d}_"
+    return f"{ch['section']}_{ch['chapter_number']:02d}_"
 
 
 def _chapter_dict(section, part, num, de, en, es, url) -> dict:
@@ -126,7 +151,11 @@ def chapter_id(section: str, part: str | None, num: int) -> str:
 
 
 def page_ref(section: str, part: str | None, num: int, page: int) -> str:
-    return f"{section} {part}.{num}/{page}" if part else f"{section}/{page}"
+    if not part:
+        return f"{section}/{page}"                 # e.g. "BF/12"
+    if num == 0:
+        return f"{section} {part}/{page}"          # e.g. "BG Anhang/12"
+    return f"{section} {part}.{num}/{page}"         # e.g. "BG I.2/3"
 
 
 def page_file_name(section: str, part: str | None, num: int, page: int) -> str:

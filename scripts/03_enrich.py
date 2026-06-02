@@ -181,7 +181,7 @@ def run(chapter: int | None) -> int:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Enrich pages with local keyword analysis")
-    ap.add_argument("--chapter", type=int, help="Chapter number to enrich")
+    ap.add_argument("--chapter", help="Chapter to enrich: number 1–24, 'BF', or 'Anhang'")
     ap.add_argument("--all", action="store_true", help="Enrich every page")
     args = ap.parse_args()
     if not args.all and args.chapter is None:

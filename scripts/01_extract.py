@@ -232,7 +232,7 @@ def extract_chapter(n: int, use_ocr: bool = False) -> int:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Extract a chapter from the ZPK archive")
-    ap.add_argument("--chapter", type=int, help="Chapter number (e.g. 2 for BG I.2)")
+    ap.add_argument("--chapter", help="Chapter: a number 1–24, 'BF', or 'Anhang'")
     ap.add_argument("--ocr", action="store_true", help="Run Tesseract OCR fallback on facsimiles")
     ap.add_argument("--list", action="store_true", help="List chapters")
     args = ap.parse_args()

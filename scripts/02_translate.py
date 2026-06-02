@@ -125,7 +125,7 @@ def run(chapter: int | None, demo: bool) -> int:
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(description="Translate raw pages DE→EN/ES (free)")
-    ap.add_argument("--chapter", type=int, help="Chapter number to translate")
+    ap.add_argument("--chapter", help="Chapter to translate: number 1–24, 'BF', or 'Anhang'")
     ap.add_argument("--all", action="store_true", help="Translate every raw page")
     ap.add_argument("--demo", action="store_true", help="No network; write [EN]/[ES] stubs")
     args = ap.parse_args()
