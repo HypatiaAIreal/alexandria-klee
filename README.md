@@ -232,10 +232,14 @@ Each Klee graphic can carry three forms, all linked to its source page:
   **Paid (~cents/image), reinterprets** — best used selectively on validated
   graphics. Stored in MongoDB so it persists on a read-only serverless
   filesystem. Two providers, chosen per generation in the model selector:
-  - **Google "Nano Banana"** (Gemini `gemini-3-pro-image`, `gemini-3.1-flash-image`,
-    `gemini-2.5-flash-image`) — superb at reproducing hand-drawn line.
+  - **Google "Nano Banana"** (Gemini) — superb at reproducing hand-drawn line:
+    `gemini-3.1-flash-image` (**Nano Banana 2 — default**, in practice the most
+    faithful to Klee's stroke — it nails the *"ideelle Plastik in den Raum"*
+    cube-with-arrows from BF), `gemini-3-pro-image` (Nano Banana Pro),
+    `gemini-2.5-flash-image` (Nano Banana).
   - **OpenAI** `gpt-image-1` — alternative.
-  Only providers with an API key set are offered.
+  Only providers with an API key set are offered; the first available model is
+  the default.
 
 ### Version manager (per graphic)
 
@@ -295,6 +299,33 @@ fallback only), so it deploys cleanly even though that file isn't committed.
 - **i18n / auth / search / glossary / concept map:** complete.
 - **Pending (assets):** upload `public/vectors` to R2 for production vector
   display; optionally AI-redraw selected graphics.
+
+---
+
+## 12. Roadmap
+
+### Next: editorial export
+
+The whole curation flow now feeds one goal — **turning the archive into a
+book**. The planned feature:
+
+- a per-chapter **editorial view / export** that gathers every graphic marked
+  `correct`, paired with its **best version** (chosen rendition, AI or upload)
+  and its **note + categories + themes**;
+- output as a **printable page / PDF** per chapter (and, later, the whole work),
+  with the original transcription and translations alongside the cleaned plates;
+- selection controls (which version is "the plate", ordering, captions) so the
+  human editor stays in charge.
+
+This replaces the old plan of printing raw notebook scans and binding them by
+hand: the same drawings, but cleaned, versioned, annotated, and laid out.
+
+### Beyond Klee
+
+The architecture is **author-agnostic**. The same pipeline + app (trilingual
+search, glossary, concept graphs, per-image studio, notes & taxonomy) can host
+any corpus — e.g. **Nietzsche**'s works, *Nachgelassene Fragmente*, letters and
+notebooks — for exhaustive, cross-linked study.
 
 ---
 

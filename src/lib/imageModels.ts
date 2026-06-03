@@ -19,9 +19,11 @@ export interface ImageModel {
 // Order = preference. The first *available* one is the default.
 // Google "Nano Banana" image models (Gemini) reproduce hand-drawn line
 // art beautifully; OpenAI gpt-image-1 stays as an alternative.
+// Default = Nano Banana 2 (gemini-3.1-flash-image): proven most faithful to
+// Klee's line in practice, and the model used on Gemini's own web app.
 export const IMAGE_MODELS: ImageModel[] = [
-  { id: "gemini-3-pro-image", label: "Nano Banana Pro", provider: "google", note: "Gemini 3 Pro Image" },
   { id: "gemini-3.1-flash-image", label: "Nano Banana 2", provider: "google", note: "Gemini 3.1 Flash Image" },
+  { id: "gemini-3-pro-image", label: "Nano Banana Pro", provider: "google", note: "Gemini 3 Pro Image" },
   { id: "gemini-2.5-flash-image", label: "Nano Banana", provider: "google", note: "Gemini 2.5 Flash Image" },
   { id: "gpt-image-1", label: "GPT Image", provider: "openai", note: "OpenAI gpt-image-1" },
 ];
