@@ -18,6 +18,7 @@ import type {
   Chapter,
   ConceptGraph,
   CorpusStats,
+  Diagram,
   GlossaryEntry,
   Lang,
   Page,
@@ -26,6 +27,7 @@ import type {
 } from "./types";
 import { hasMongo } from "./mongodb";
 import { applyImageBase } from "./images";
+import { chapterIdOf, slug as _slug } from "./util";
 
 let cachePromise: Promise<SeedData> | null = null;
 
@@ -413,4 +415,70 @@ export async function getRelatedPassages(terms: string[], limit = 6): Promise<Re
     if (out.length >= limit) break;
   }
   return out;
+}
+
+// ── Diagrams (individual drawings extracted from manuscript pages) ──
+export interface DiagramChapter {
+  id: string;
+  label: string;
+  count: number;
+}
+
+// NOTE: iterate over PAGES, not the flat articles array — pipeline-produced
+// article docs only carry id/ref, while section/part/page_ref live on pages.
+export async function getDiagramChapters(): Promise<DiagramChapter[]> {
+  const { pages, chapters } = await getDataset();
+  const counts = new Map<string, number>();
+  for (const p of pages) {
+    if (!p.section) continue;
+    const n = (p.articles ?? []).reduce((s, a) => s + (a.images?.length ?? 0), 0);
+    if (!n) continue;
+    const cid = chapterIdOf(p.section, p.part, p.chapter_number);
+    counts.set(cid, (counts.get(cid) ?? 0) + n);
+  }
+  const nameOf = (id: string) => chapters.find((c) => c.id === id);
+  return [...counts.entries()]
+    .map(([id, count]) => {
+      const c = nameOf(id);
+      const label = c
+        ? `${c.section}${c.part ? ` ${c.part}.${c.chapter_number}` : ""} · ${c.name_de}`
+        : id;
+      return { id, label, count };
+    })
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+export async function getDiagrams(opts: {
+  chapter?: string;
+  offset?: number;
+  limit?: number;
+}): Promise<{ total: number; diagrams: Diagram[] }> {
+  const { pages } = await getDataset();
+  const offset = opts.offset ?? 0;
+  const limit = opts.limit ?? 60;
+  const out: Diagram[] = [];
+  for (const p of pages) {
+    if (!p.section || !p.page_ref) continue;
+    const cid = chapterIdOf(p.section, p.part, p.chapter_number);
+    if (opts.chapter && cid !== opts.chapter) continue;
+    for (const a of p.articles ?? []) {
+      for (const img of a.images ?? []) {
+        if (!img?.url_local) continue;
+        out.push({
+          image_url: img.url_local,
+          page_id: p.id || _slug(p.page_ref),
+          page_ref: p.page_ref,
+          article_number: a.article_number,
+          article_ref: a.ref || `${p.page_ref} art.${a.article_number}`,
+          section: p.section,
+          part: p.part,
+          chapter_number: p.chapter_number,
+          chapter_id: cid,
+          chapter_name_de: p.chapter_name_de ?? "",
+          domain: a.metadata?.bauhaus_domain ?? "general",
+        });
+      }
+    }
+  }
+  return { total: out.length, diagrams: out.slice(offset, offset + limit) };
 }

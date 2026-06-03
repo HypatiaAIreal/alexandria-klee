@@ -176,6 +176,35 @@ export interface RelatedPassage {
   score: number;
 }
 
+// ── Diagrams (Klee's individual drawings, isolated from pages) ──
+export interface Diagram {
+  image_url: string;
+  page_id: string;
+  page_ref: string;
+  article_number: number;
+  article_ref: string;
+  section: string;
+  part: string | null;
+  chapter_number: number;
+  chapter_id: string;
+  chapter_name_de: string;
+  domain: string;
+}
+
+export interface DiagramAnnotation {
+  image_url: string;
+  page_ref?: string;
+  page_id?: string;
+  article_number?: number;
+  crop_coords?: unknown;
+  title?: string;
+  description?: string;
+  tags?: string[];
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 /** A node in the concept co-occurrence map. */
 export interface ConceptNode {
   term: string;

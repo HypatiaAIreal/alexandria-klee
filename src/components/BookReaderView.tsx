@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import type { Book } from "@/lib/types";
+import { formatBookText } from "@/lib/util";
 import { useI18n } from "@/components/LanguageProvider";
 
 const LANG_BADGE: Record<string, string> = { en: "EN", es: "ES", de: "DE" };
@@ -86,13 +87,31 @@ export default function BookReaderView({ book }: { book: Book }) {
                     pp. {section.page_start}–{section.page_end}
                   </span>
                 </div>
-                <div className="ms whitespace-pre-line leading-relaxed text-parchment-100">
-                  {section.text}
-                </div>
+                <BookSectionText text={section.text} />
               </>
             )}
           </article>
         </div>
+      )}
+    </div>
+  );
+}
+
+function BookSectionText({ text }: { text: string }) {
+  const { verse, paragraphs } = formatBookText(text);
+  if (paragraphs.length === 0) {
+    return <p className="text-sm italic text-parchment-400">—</p>;
+  }
+  return (
+    <div className="ms space-y-4 leading-relaxed text-parchment-100">
+      {paragraphs.map((p, i) =>
+        verse ? (
+          <p key={i} className="whitespace-pre-line">
+            {p}
+          </p>
+        ) : (
+          <p key={i}>{p}</p>
+        )
       )}
     </div>
   );

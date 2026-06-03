@@ -124,6 +124,21 @@ const BookSchema = new Schema({
 });
 BookSchema.index({ title: "text", "sections.text": "text" });
 
+// Admin annotations on individual diagrams (Klee's drawings/schemas).
+const DiagramAnnotationSchema = new Schema({
+  image_url: { type: String, index: true, unique: true },
+  page_ref: String,
+  page_id: String,
+  article_number: Number,
+  crop_coords: { type: Schema.Types.Mixed, default: null },
+  title: String,
+  description: String,
+  tags: [String],
+  created_by: String,
+  created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
+});
+
 // App users (authentication). Stored in the klee_gestaltungslehre DB.
 const UserSchema = new Schema({
   name: String,
@@ -155,3 +170,6 @@ export const AnnotationModel =
   mongoose.models.Annotation || mongoose.model("Annotation", AnnotationSchema, "annotations");
 export const UserModel = mongoose.models.User || mongoose.model("User", UserSchema, "users");
 export const BookModel = mongoose.models.Book || mongoose.model("Book", BookSchema, "books");
+export const DiagramAnnotationModel =
+  mongoose.models.DiagramAnnotation ||
+  mongoose.model("DiagramAnnotation", DiagramAnnotationSchema, "diagram_annotations");
