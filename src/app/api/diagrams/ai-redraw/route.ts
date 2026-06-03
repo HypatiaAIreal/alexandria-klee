@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "node:fs/promises";
 import path from "node:path";
 import { hasMongo } from "@/lib/mongodb";
-import { imageBase } from "@/lib/images";
 import { COOKIE_NAME, verifyToken } from "@/lib/auth";
 
 export const runtime = "nodejs";
@@ -13,14 +12,6 @@ const DEFAULT_PROMPT =
   "Reproduce this drawing by Paul Klee as clean black line art on a pure white " +
   "background. Faithful to the original strokes, crisp and minimal — no shading, " +
   "no paper texture, no added text.";
-
-// "/manuscripts/BG/.." or "https://r2/BG/.." → "BG/.." (no leading slash)
-function tail(url: string): string {
-  if (url.startsWith("/manuscripts/")) return url.slice("/manuscripts/".length);
-  const base = imageBase();
-  if (base && url.startsWith(base)) return url.slice(base.length).replace(/^\/+/, "");
-  return url.replace(/^\/+/, "");
-}
 
 async function readImageBytes(url: string): Promise<Buffer> {
   if (url.startsWith("http")) {
@@ -68,36 +59,26 @@ export async function POST(req: NextRequest) {
     const b64 = j?.data?.[0]?.b64_json;
     if (!b64) return NextResponse.json({ error: "no_image" }, { status: 502 });
 
-    // save to public/ai/<tail>.png (local; for prod, upload to R2)
-    const relPng = tail(image_url).replace(/\.[^.]+$/, "") + ".png";
-    const outPath = path.join(process.cwd(), "public", "ai", relPng);
-    let ai_url = `/ai/${relPng}`;
+    // Persist the image IN MongoDB (read-only FS on serverless) and serve it
+    // via /api/diagrams/ai-image. ai_url points at that route.
+    if (!hasMongo) return NextResponse.json({ error: "no_db" }, { status: 503 });
+    const ai_url = `/api/diagrams/ai-image?u=${encodeURIComponent(image_url)}`;
     try {
-      await fs.mkdir(path.dirname(outPath), { recursive: true });
-      await fs.writeFile(outPath, Buffer.from(b64, "base64"));
+      const { connectMongo } = await import("@/lib/mongodb");
+      const { DiagramAiImageModel, DiagramAnnotationModel } = await import("@/lib/models");
+      await connectMongo();
+      await DiagramAiImageModel.updateOne(
+        { image_url },
+        { $set: { image_url, content_type: "image/png", data: b64, created_by: user.email, created_at: new Date() } },
+        { upsert: true }
+      );
+      await DiagramAnnotationModel.updateOne(
+        { image_url },
+        { $set: { image_url, ai_url, updated_at: new Date() }, $setOnInsert: { created_by: user.email } },
+        { upsert: true }
+      );
     } catch (e) {
-      // serverless read-only FS → fall back to a data URL so it still displays
-      ai_url = `data:image/png;base64,${b64}`;
-      console.warn("[ai-redraw] could not write file, using data URL:", e);
-    }
-
-    // persist ai_url on the annotation
-    if (hasMongo) {
-      try {
-        const { connectMongo } = await import("@/lib/mongodb");
-        const { DiagramAnnotationModel } = await import("@/lib/models");
-        await connectMongo();
-        await DiagramAnnotationModel.updateOne(
-          { image_url },
-          {
-            $set: { image_url, ai_url: ai_url.startsWith("data:") ? "" : ai_url, updated_at: new Date() },
-            $setOnInsert: { created_by: user.email },
-          },
-          { upsert: true }
-        );
-      } catch (e) {
-        console.warn("[ai-redraw] mongo update failed:", e);
-      }
+      return NextResponse.json({ error: "store_failed", detail: String(e) }, { status: 500 });
     }
 
     return NextResponse.json({ ai_url });

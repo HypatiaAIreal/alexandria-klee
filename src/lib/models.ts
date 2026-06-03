@@ -142,6 +142,16 @@ const DiagramAnnotationSchema = new Schema({
   updated_at: { type: Date, default: Date.now },
 });
 
+// AI-redrawn diagram images, stored in Mongo so they persist on a
+// read-only serverless filesystem (served via /api/diagrams/ai-image).
+const DiagramAiImageSchema = new Schema({
+  image_url: { type: String, index: true, unique: true },
+  content_type: { type: String, default: "image/png" },
+  data: String, // base64
+  created_by: String,
+  created_at: { type: Date, default: Date.now },
+});
+
 // Per-page validation state for the diagram curation workflow.
 const DiagramPageStatusSchema = new Schema({
   page_id: { type: String, index: true, unique: true },
@@ -190,3 +200,6 @@ export const DiagramAnnotationModel =
 export const DiagramPageStatusModel =
   mongoose.models.DiagramPageStatus ||
   mongoose.model("DiagramPageStatus", DiagramPageStatusSchema, "diagram_pages");
+export const DiagramAiImageModel =
+  mongoose.models.DiagramAiImage ||
+  mongoose.model("DiagramAiImage", DiagramAiImageSchema, "diagram_ai_images");

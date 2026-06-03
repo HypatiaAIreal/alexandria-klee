@@ -179,7 +179,7 @@ export default function Lightbox({
           alt={image.caption ?? ""}
           draggable={false}
           onClick={(e) => e.stopPropagation()}
-          className="max-h-[90vh] max-w-[94vw] select-none rounded-md object-contain shadow-2xl ring-1 ring-ink-700"
+          className="max-h-[90vh] max-w-[94vw] select-none rounded-md bg-white object-contain shadow-2xl ring-1 ring-ink-700"
           style={{
             transform: `translate(${tx}px, ${ty}px) scale(${scale})`,
             transition: drag.current || pinch.current ? "none" : "transform 0.12s ease-out",

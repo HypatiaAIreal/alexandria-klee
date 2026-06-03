@@ -30,6 +30,16 @@ export function resolveImageSrc(path: string | undefined | null): string {
   return path;
 }
 
+// Vector SVGs (/vectors/…) live in public/vectors locally. In production set
+// R2_VECTORS_URL (e.g. https://pub-xxx.r2.dev/vectors) after uploading them;
+// then "/vectors/BF/…svg" → "${R2_VECTORS_URL}/BF/…svg". Unset → served locally.
+export function resolveVectorSrc(p: string | undefined | null): string {
+  if (!p) return "";
+  const base = (process.env.R2_VECTORS_URL ?? "").replace(/\/+$/, "");
+  if (base && p.startsWith("/vectors/")) return base + p.slice("/vectors".length);
+  return p;
+}
+
 function rewriteArticleImages(a: Article): void {
   if (a.images) {
     for (const img of a.images) img.url_local = resolveImageSrc(img.url_local);

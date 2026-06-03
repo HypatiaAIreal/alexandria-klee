@@ -27,7 +27,7 @@ import type {
   SeedData,
 } from "./types";
 import { hasMongo } from "./mongodb";
-import { applyImageBase, imageBase } from "./images";
+import { applyImageBase, imageBase, resolveVectorSrc } from "./images";
 import { chapterIdOf, slug as _slug } from "./util";
 import diagramIndex from "@/data/diagram_index.json";
 import vectorIndex from "@/data/vector_index.json";
@@ -542,7 +542,7 @@ export async function getDiagrams(opts: {
           chapter_id: cid,
           chapter_name_de: p.chapter_name_de ?? "",
           domain: a.metadata?.bauhaus_domain ?? "general",
-          vector_url: VECTOR_MAP.get(imageTail(img.url_local)),
+          vector_url: resolveVectorSrc(VECTOR_MAP.get(imageTail(img.url_local))),
         });
       }
     }
