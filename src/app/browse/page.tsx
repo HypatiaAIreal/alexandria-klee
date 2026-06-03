@@ -2,6 +2,7 @@ import { getChapters, getPages } from "@/lib/data";
 import BrowseView, { type BrowseChapter } from "@/components/BrowseView";
 
 export const metadata = { title: "Browse the archive" };
+export const dynamic = "force-dynamic";
 
 export default async function BrowsePage() {
   const [chapters, pages] = await Promise.all([getChapters(), getPages()]);

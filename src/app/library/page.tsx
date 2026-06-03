@@ -2,6 +2,7 @@ import { getBooks } from "@/lib/data";
 import LibraryView, { type BookMeta } from "@/components/LibraryView";
 
 export const metadata = { title: "Library" };
+export const dynamic = "force-dynamic";
 
 export default async function LibraryPage() {
   const books = await getBooks();

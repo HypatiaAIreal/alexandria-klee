@@ -1,11 +1,10 @@
 import { notFound } from "next/navigation";
-import { getChapter, getChapters, getPagesByChapter } from "@/lib/data";
+import { getChapter, getPagesByChapter } from "@/lib/data";
 import ChapterView from "@/components/ChapterView";
 
-export async function generateStaticParams() {
-  const chapters = await getChapters();
-  return chapters.filter((c) => c.extracted).map((c) => ({ chapter: c.id }));
-}
+// Render on demand (data lives in Mongo) so the build never depends on the
+// database and pages always reflect the latest content.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: { chapter: string } }) {
   const c = await getChapter(params.chapter);

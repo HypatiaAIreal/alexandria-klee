@@ -1,12 +1,10 @@
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { getBook, getBooks } from "@/lib/data";
+import { getBook } from "@/lib/data";
 import BookReaderView from "@/components/BookReaderView";
 
-export async function generateStaticParams() {
-  const books = await getBooks();
-  return books.map((b) => ({ id: b.id }));
-}
+// Render on demand so the build never depends on the database.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const book = await getBook(params.id);

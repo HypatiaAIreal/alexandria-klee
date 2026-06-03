@@ -1,6 +1,9 @@
 import { getArticles, getChapters, getDiagrams, getGlossary, getPages, getStats } from "@/lib/data";
 import HomeView, { type HomeData } from "@/components/HomeView";
 
+// Data-backed (Mongo) → render on demand so the build never touches the DB.
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [stats, articles, pages, chapters, glossary, diagrams] = await Promise.all([
     getStats(),

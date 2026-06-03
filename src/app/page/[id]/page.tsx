@@ -1,12 +1,11 @@
 import { notFound } from "next/navigation";
-import { getChapter, getPage, getPages, getPagesByChapter } from "@/lib/data";
+import { getChapter, getPage, getPagesByChapter } from "@/lib/data";
 import { chapterIdOf } from "@/lib/util";
 import PageView from "@/components/PageView";
 
-export async function generateStaticParams() {
-  const pages = await getPages();
-  return pages.map((p) => ({ id: p.id }));
-}
+// Render on demand (~4k pages live in Mongo) so the build never pre-collects
+// the whole corpus and never depends on the database being up.
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const page = await getPage(params.id);
