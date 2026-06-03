@@ -28,7 +28,7 @@ export default function PageReviewModal({
   const [savedFlash, setSavedFlash] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/diagrams?page=${encodeURIComponent(pageId)}&limit=200`)
+    fetch(`/api/diagrams?page=${encodeURIComponent(pageId)}&type=all&limit=200`)
       .then((r) => r.json())
       .then((d) => {
         setDiagrams(d.diagrams ?? []);
@@ -107,6 +107,16 @@ export default function PageReviewModal({
         <div className="flex items-center justify-between border-b border-ink-700/60 px-5 py-3">
           <div className="flex items-center gap-3">
             <span className="font-mono text-sm text-ochre">{pageRef}</span>
+            {(() => {
+              const correct = diagrams.filter((d) => annotations[d.image_url]?.status === "correct").length;
+              const pageType = correct > 0 ? "graphics" : pageStatus.validated ? "text" : null;
+              if (!pageType) return null;
+              return (
+                <span className={`chip ${pageType === "graphics" ? "border-kleeblue/50 text-kleeblue" : "text-parchment-300"}`}>
+                  {t(pageType === "graphics" ? "diagrams.review.typeGraphics" : "diagrams.review.typeText")}
+                </span>
+              );
+            })()}
             {pageStatus.validated && (
               <span className="chip border-teal/50 text-teal">✓ {t("diagrams.review.validated")}</span>
             )}

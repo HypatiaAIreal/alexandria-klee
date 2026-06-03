@@ -283,6 +283,10 @@ const en: Dict = {
     fCorrect: "Correct graphic",
     fText: "Text only",
     fValidated: "Validated pages",
+    typeFilter: "Type",
+    tGraphics: "Diagrams",
+    tText: "Text",
+    tBoth: "Text & diagrams",
     review: {
       open: "Review page",
       facsimile: "Full page — does it look right?",
@@ -296,6 +300,8 @@ const en: Dict = {
       saved: "Saved ✓",
       pending: "unreviewed",
       vector: "Vector",
+      typeGraphics: "Page with graphics",
+      typeText: "Text page",
     },
   },
 };
@@ -561,6 +567,10 @@ const de: Dict = {
     fCorrect: "Korrekte Grafik",
     fText: "Nur Text",
     fValidated: "Validierte Seiten",
+    typeFilter: "Typ",
+    tGraphics: "Diagramme",
+    tText: "Text",
+    tBoth: "Text & Diagramme",
     review: {
       open: "Seite prüfen",
       facsimile: "Ganze Seite — sieht es richtig aus?",
@@ -574,6 +584,8 @@ const de: Dict = {
       saved: "Gespeichert ✓",
       pending: "ungeprüft",
       vector: "Vektor",
+      typeGraphics: "Seite mit Grafiken",
+      typeText: "Textseite",
     },
   },
 };
@@ -839,6 +851,10 @@ const es: Dict = {
     fCorrect: "Gráfico correcto",
     fText: "Solo texto",
     fValidated: "Páginas validadas",
+    typeFilter: "Tipo",
+    tGraphics: "Diagramas",
+    tText: "Texto",
+    tBoth: "Texto y diagramas",
     review: {
       open: "Revisar página",
       facsimile: "Página completa — ¿se ve bien?",
@@ -852,6 +868,8 @@ const es: Dict = {
       saved: "Guardado ✓",
       pending: "sin revisar",
       vector: "Vector",
+      typeGraphics: "Página con gráficos",
+      typeText: "Página de texto",
     },
   },
 };

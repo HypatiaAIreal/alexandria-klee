@@ -15,6 +15,7 @@ export default function DiagramsView({ chapters }: { chapters: DiagramChapter[] 
   const { t } = useI18n();
   const { user } = useAuth();
   const [chapter, setChapter] = useState("");
+  const [type, setType] = useState<"graphics" | "text" | "all">("graphics");
   const [statusFilter, setStatusFilter] = useState("all");
   const [diagrams, setDiagrams] = useState<Diagram[]>([]);
   const [total, setTotal] = useState(0);
@@ -26,10 +27,10 @@ export default function DiagramsView({ chapters }: { chapters: DiagramChapter[] 
   const [editing, setEditing] = useState<string | null>(null);
   const [review, setReview] = useState<{ id: string; ref: string } | null>(null);
 
-  const load = useCallback(async (chap: string, off: number, replace: boolean) => {
+  const load = useCallback(async (chap: string, typ: string, off: number, replace: boolean) => {
     setLoading(true);
     try {
-      const p = new URLSearchParams({ offset: String(off), limit: String(LIMIT) });
+      const p = new URLSearchParams({ offset: String(off), limit: String(LIMIT), type: typ });
       if (chap) p.set("chapter", chap);
       const d = await (await fetch(`/api/diagrams?${p}`)).json();
       setTotal(d.total ?? 0);
@@ -60,8 +61,8 @@ export default function DiagramsView({ chapters }: { chapters: DiagramChapter[] 
 
   useEffect(() => {
     setOffset(0);
-    load(chapter, 0, true);
-  }, [chapter, load]);
+    load(chapter, type, 0, true);
+  }, [chapter, type, load]);
 
   const onAnnoSaved = (a: DiagramAnnotation) => setAnnos((m) => ({ ...m, [a.image_url]: a }));
   const onPageSaved = (p: DiagramPageStatus) => setPageStatuses((m) => ({ ...m, [p.page_id]: p }));
@@ -108,6 +109,14 @@ export default function DiagramsView({ chapters }: { chapters: DiagramChapter[] 
                   {c.label} ({c.count})
                 </option>
               ))}
+            </select>
+          </label>
+          <label className="flex flex-col gap-1">
+            <span className="label">{t("diagrams.typeFilter")}</span>
+            <select value={type} onChange={(e) => setType(e.target.value as "graphics" | "text" | "all")} className={selectCls}>
+              <option value="graphics">{t("diagrams.tGraphics")}</option>
+              <option value="text">{t("diagrams.tText")}</option>
+              <option value="all">{t("diagrams.tBoth")}</option>
             </select>
           </label>
           <label className="flex flex-col gap-1">
@@ -182,7 +191,7 @@ export default function DiagramsView({ chapters }: { chapters: DiagramChapter[] 
             onClick={() => {
               const next = offset + LIMIT;
               setOffset(next);
-              load(chapter, next, false);
+              load(chapter, type, next, false);
             }}
             className="rounded-md border border-ink-700 px-5 py-2.5 text-parchment-100 transition-colors hover:border-ochre/50 hover:text-ochre"
           >
