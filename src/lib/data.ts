@@ -9,7 +9,8 @@
 //  in memory; all search / filtering / graph logic runs on top of it,
 //  giving a single code path regardless of the backing store.
 // ─────────────────────────────────────────────────────────────
-import seed from "@/data/seed.json";
+import fs from "node:fs";
+import path from "node:path";
 import booksSeed from "@/data/books.json";
 import type {
   Article,
@@ -28,6 +29,36 @@ import type {
 import { hasMongo } from "./mongodb";
 import { applyImageBase } from "./images";
 import { chapterIdOf, slug as _slug } from "./util";
+
+// The full corpus (src/data/seed.json) is large and git-ignored, so it is
+// NOT statically imported (that would break the Vercel build when absent).
+// It is read at runtime as a no-DB fallback; production reads MongoDB Atlas.
+let bundledCache: SeedData | null = null;
+function bundledSeed(): SeedData {
+  if (bundledCache) return bundledCache;
+  try {
+    const p = path.join(process.cwd(), "src", "data", "seed.json");
+    bundledCache = JSON.parse(fs.readFileSync(p, "utf-8")) as SeedData;
+  } catch {
+    bundledCache = {
+      chapters: [],
+      pages: [],
+      articles: [],
+      glossary: [],
+      stats: {
+        total_files: 0,
+        total_articles: 0,
+        total_words: 0,
+        unique_words: 0,
+        top_50_words: {},
+        top_concepts: {},
+        glossary_entries: 0,
+      },
+      meta: { project: "Alexandria-Klee", source: "", generated_at: "" },
+    };
+  }
+  return bundledCache;
+}
 
 let cachePromise: Promise<SeedData> | null = null;
 
@@ -52,8 +83,8 @@ async function loadFromMongo(): Promise<SeedData> {
     pages: plain<Page[]>(pages),
     articles: plain<Article[]>(articles),
     glossary: plain<GlossaryEntry[]>(glossary),
-    stats: plain<CorpusStats>(statsDoc) ?? (seed as unknown as SeedData).stats,
-    meta: (seed as unknown as SeedData).meta,
+    stats: plain<CorpusStats>(statsDoc) ?? bundledSeed().stats,
+    meta: bundledSeed().meta,
   };
 }
 
@@ -68,13 +99,13 @@ export function getDataset(): Promise<SeedData> {
       try {
         const loaded = await loadFromMongo();
         // If Atlas has no content yet, fall back to the bundled seed.
-        data = loaded.articles?.length ? loaded : (seed as unknown as SeedData);
+        data = loaded.articles?.length ? loaded : bundledSeed();
       } catch (err) {
         console.warn("[data] Mongo load failed, using bundled seed:", err);
-        data = seed as unknown as SeedData;
+        data = bundledSeed();
       }
     } else {
-      data = seed as unknown as SeedData;
+      data = bundledSeed();
     }
     // Rewrite /manuscripts image paths to R2 when R2_PUBLIC_URL is set.
     return applyImageBase(data);
