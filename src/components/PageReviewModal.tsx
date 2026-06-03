@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Diagram, DiagramAnnotation, DiagramPageStatus, DiagramStatus } from "@/lib/types";
 import { useI18n } from "@/components/LanguageProvider";
+import { useAuth } from "@/components/AuthProvider";
 import Lightbox, { type LightboxImage } from "@/components/Lightbox";
 
 export default function PageReviewModal({
@@ -21,11 +22,38 @@ export default function PageReviewModal({
   onClose: () => void;
 }) {
   const { t } = useI18n();
+  const { user } = useAuth();
   const [diagrams, setDiagrams] = useState<Diagram[]>([]);
   const [facsimile, setFacsimile] = useState("");
   const [pageStatus, setPageStatus] = useState<DiagramPageStatus>({ page_id: pageId });
   const [box, setBox] = useState<LightboxImage | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [aiBusy, setAiBusy] = useState<string | null>(null);
+  const [aiErr, setAiErr] = useState<string | null>(null);
+
+  const generateAI = async (d: Diagram) => {
+    setAiErr(null);
+    setAiBusy(d.image_url);
+    try {
+      const r = await fetch("/api/diagrams/ai-redraw", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image_url: d.image_url }),
+      });
+      const j = await r.json();
+      if (r.ok && j.ai_url) {
+        const existing = annotations[d.image_url] ?? { image_url: d.image_url };
+        onAnnoSaved({ ...existing, image_url: d.image_url, ai_url: j.ai_url });
+        setBox({ src: j.ai_url, caption: `${d.article_ref} · AI` });
+      } else {
+        setAiErr(j.error === "no_model" ? t("diagrams.review.aiNoModel") : t("diagrams.review.aiError"));
+      }
+    } catch {
+      setAiErr(t("diagrams.review.aiError"));
+    } finally {
+      setAiBusy(null);
+    }
+  };
 
   useEffect(() => {
     fetch(`/api/diagrams?page=${encodeURIComponent(pageId)}&type=all&limit=200`)
@@ -121,6 +149,7 @@ export default function PageReviewModal({
               <span className="chip border-teal/50 text-teal">✓ {t("diagrams.review.validated")}</span>
             )}
             {savedFlash && <span className="text-xs text-teal">{t("diagrams.review.saved")}</span>}
+            {aiErr && <span className="text-xs text-rust">{aiErr}</span>}
           </div>
           <button onClick={onClose} className="rounded-md border border-ink-700 px-3 py-1 text-sm text-parchment-300 hover:border-ochre/50 hover:text-ochre">
             ✕
@@ -189,6 +218,23 @@ export default function PageReviewModal({
                             className="rounded-md border border-kleeblue/50 px-2 py-1 text-xs text-kleeblue hover:bg-kleeblue/10"
                           >
                             ◹ {t("diagrams.review.vector")}
+                          </button>
+                        )}
+                        {annotations[d.image_url]?.ai_url && (
+                          <button
+                            onClick={() => setBox({ src: annotations[d.image_url]!.ai_url!, caption: `${d.article_ref} · AI` })}
+                            className="rounded-md border border-amber/50 px-2 py-1 text-xs text-amber hover:bg-amber/10"
+                          >
+                            ✦ {t("diagrams.review.aiView")}
+                          </button>
+                        )}
+                        {user && (
+                          <button
+                            onClick={() => generateAI(d)}
+                            disabled={aiBusy === d.image_url}
+                            className="rounded-md border border-ink-700 px-2 py-1 text-xs text-parchment-300 hover:border-amber/50 hover:text-amber disabled:opacity-50"
+                          >
+                            {aiBusy === d.image_url ? t("diagrams.review.aiGenerating") : "✦ " + t("diagrams.review.aiGenerate")}
                           </button>
                         )}
                       </div>

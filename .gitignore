@@ -46,3 +46,6 @@ scripts/tessdata/
 # generated vector SVGs (run scripts/07_vectorize.py; serve via R2 in prod)
 /public/vectors
 _vec_check/
+
+# AI-redrawn diagrams (generated on demand; serve via R2 in prod)
+/public/ai
