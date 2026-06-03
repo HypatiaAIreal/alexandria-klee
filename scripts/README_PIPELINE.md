@@ -56,6 +56,14 @@ OCR-derived books are paginated into "Pages X–Y" sections automatically.
 | `04_build_glossary.py` | Frequency analysis → trilingual glossary. | `data/enriched` → `data/glossary.json` |
 | `run_pipeline.py` | Run all phases for a chapter, then **assemble** everything into `src/data/seed.json`. | everything → `src/data/seed.json` |
 | `06_extract_diagrams.py` | Classify every article crop as graphic (warm parchment facsimile) vs typeset-text (white render); the Diagrams view shows only graphics. | `public/manuscripts` → `src/data/diagram_index.json` |
+| `07_vectorize.py` | Make crisp, faithful SVG versions of the graphics with vtracer (local, free). Run per `--image`, `--chapter` or `--all`. | `public/manuscripts` → `public/vectors` + `src/data/vector_index.json` |
+
+OCR/vector deps: `pip install vtracer pillow`. Generated SVGs live in
+`public/vectors` (git-ignored; upload to R2 for production, like the
+manuscripts). The Diagrams "Review page" modal shows a **Vector** button on
+any graphic that has been vectorised. AI image-to-image redraw (per the
+"both" option) is planned as an on-demand button once an image model/key is
+configured — vtracer is the faithful, zero-cost default.
 
 ## Usage
 

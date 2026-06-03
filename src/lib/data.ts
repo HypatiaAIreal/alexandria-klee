@@ -30,6 +30,12 @@ import { hasMongo } from "./mongodb";
 import { applyImageBase, imageBase } from "./images";
 import { chapterIdOf, slug as _slug } from "./util";
 import diagramIndex from "@/data/diagram_index.json";
+import vectorIndex from "@/data/vector_index.json";
+
+// image tail → vectorized SVG url (built by 07_vectorize.py)
+const VECTOR_MAP = new Map<string, string>(
+  Object.entries((vectorIndex as { map?: Record<string, string> }).map ?? {})
+);
 
 // Set of GRAPHIC image tails (e.g. "/BG/I/02/003/article1_1_large.jpg") —
 // the typeset-text crops are excluded. Built by 06_extract_diagrams.py.
@@ -531,6 +537,7 @@ export async function getDiagrams(opts: {
           chapter_id: cid,
           chapter_name_de: p.chapter_name_de ?? "",
           domain: a.metadata?.bauhaus_domain ?? "general",
+          vector_url: VECTOR_MAP.get(imageTail(img.url_local)),
         });
       }
     }

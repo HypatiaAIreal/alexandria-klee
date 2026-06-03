@@ -173,6 +173,14 @@ export default function PageReviewModal({
                         >
                           {t("diagrams.review.statusText")}
                         </button>
+                        {d.vector_url && (
+                          <button
+                            onClick={() => setBox({ src: d.vector_url!, caption: `${d.article_ref} · ${t("diagrams.review.vector")}` })}
+                            className="rounded-md border border-kleeblue/50 px-2 py-1 text-xs text-kleeblue hover:bg-kleeblue/10"
+                          >
+                            ◹ {t("diagrams.review.vector")}
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>

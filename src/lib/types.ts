@@ -190,6 +190,7 @@ export interface Diagram {
   chapter_id: string;
   chapter_name_de: string;
   domain: string;
+  vector_url?: string;
 }
 
 export type DiagramStatus = "" | "correct" | "text_only";

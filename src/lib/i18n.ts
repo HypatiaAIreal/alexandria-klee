@@ -295,6 +295,7 @@ const en: Dict = {
       validatePage: "Mark whole page validated",
       saved: "Saved ✓",
       pending: "unreviewed",
+      vector: "Vector",
     },
   },
 };
@@ -572,6 +573,7 @@ const de: Dict = {
       validatePage: "Ganze Seite als validiert markieren",
       saved: "Gespeichert ✓",
       pending: "ungeprüft",
+      vector: "Vektor",
     },
   },
 };
@@ -849,6 +851,7 @@ const es: Dict = {
       validatePage: "Marcar toda la página como validada",
       saved: "Guardado ✓",
       pending: "sin revisar",
+      vector: "Vector",
     },
   },
 };
