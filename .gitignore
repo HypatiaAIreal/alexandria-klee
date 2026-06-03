@@ -39,3 +39,6 @@ __pycache__/
 
 # OCR language data (download locally; see scripts/README_PIPELINE.md)
 scripts/tessdata/
+
+# large generated corpus (app reads Atlas in prod; regenerate locally via run_pipeline --assemble)
+/src/data/seed.json
