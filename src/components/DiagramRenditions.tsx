@@ -48,11 +48,15 @@ export default function DiagramRenditions({
   canEdit,
   onView,
   onLatestChange,
+  plateUrl,
+  onSetPlate,
 }: {
   diagram: Diagram;
   canEdit: boolean;
   onView: (img: LightboxImage) => void;
   onLatestChange?: (image_url: string, aiUrl: string) => void;
+  plateUrl?: string;
+  onSetPlate?: (url: string) => void;
 }) {
   const { t } = useI18n();
   const [open, setOpen] = useState(false);
@@ -245,6 +249,15 @@ export default function DiagramRenditions({
                       {it.kind === "ai" ? "AI" : t("diagrams.versions.upload")}
                     </span>
                     <div className="flex items-center gap-1.5">
+                      {onSetPlate && (
+                        <button
+                          onClick={() => onSetPlate(plateUrl === it.url ? "" : it.url)}
+                          className={`text-[0.72rem] ${plateUrl === it.url ? "text-ochre" : "text-parchment-400 hover:text-ochre"}`}
+                          title={t("diagrams.versions.setPlate")}
+                        >
+                          {plateUrl === it.url ? "★" : "☆"}
+                        </button>
+                      )}
                       <button
                         onClick={() => downloadImage(it.url, `${diagram.article_ref}-${it.kind}-${it.id}`)}
                         className="text-[0.7rem] text-parchment-400 hover:text-ochre"

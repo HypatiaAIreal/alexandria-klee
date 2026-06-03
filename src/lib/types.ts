@@ -210,9 +210,39 @@ export interface DiagramAnnotation {
   themes?: string[];
   vector_url?: string;
   ai_url?: string;
+  plate_url?: string;
   created_by?: string;
   created_at?: string;
   updated_at?: string;
+}
+
+/** One curated plate (a validated drawing) for the editorial export. */
+export interface EditorialPlate {
+  image_url: string; // the original crop
+  plate: string; // the chosen image to print (rendition / vector / original)
+  plate_kind: "chosen" | "ai" | "vector" | "original";
+  article_ref: string;
+  page_ref: string;
+  page_id: string;
+  article_number: number;
+  note?: string;
+  categories?: string[];
+  themes?: string[];
+}
+
+export interface EditorialChapter {
+  id: string;
+  label: string;
+  name_de: string;
+  name_en?: string;
+  name_es?: string;
+  plates: EditorialPlate[];
+}
+
+export interface EditorialChapterSummary {
+  id: string;
+  label: string;
+  count: number;
 }
 
 export interface DiagramPageStatus {

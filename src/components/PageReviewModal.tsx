@@ -37,6 +37,27 @@ export default function PageReviewModal({
     onAnnoSaved({ ...existing, image_url, ai_url: aiUrl });
   };
 
+  // Choose which image is the "plate" for the editorial export.
+  const setPlate = async (d: Diagram, url: string) => {
+    const existing = annotations[d.image_url] ?? { image_url: d.image_url };
+    const r = await fetch("/api/diagrams/annotations", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        image_url: d.image_url,
+        page_ref: d.page_ref,
+        page_id: d.page_id,
+        article_number: d.article_number,
+        plate_url: url,
+      }),
+    });
+    const j = await r.json();
+    if (r.ok) {
+      onAnnoSaved(j.annotation ?? { ...existing, image_url: d.image_url, plate_url: url });
+      flash();
+    }
+  };
+
   useEffect(() => {
     fetch(`/api/diagrams?page=${encodeURIComponent(pageId)}&type=all&limit=200`)
       .then((r) => r.json())
@@ -210,11 +231,36 @@ export default function PageReviewModal({
                           </button>
                         )}
                       </div>
+                      {user && (() => {
+                        const plate = annotations[d.image_url]?.plate_url ?? "";
+                        const pBtn = (active: boolean) =>
+                          `rounded border px-1.5 py-0.5 text-[0.6rem] ${
+                            active ? "border-ochre bg-ochre/15 text-ochre" : "border-ink-700 text-parchment-400 hover:border-ochre/50"
+                          }`;
+                        return (
+                          <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                            <span className="text-[0.6rem] text-parchment-500">★ {t("diagrams.review.plateLabel")}:</span>
+                            <button onClick={() => setPlate(d, "")} className={pBtn(!plate)}>
+                              {t("diagrams.review.plateAuto")}
+                            </button>
+                            <button onClick={() => setPlate(d, d.image_url)} className={pBtn(plate === d.image_url)}>
+                              {t("diagrams.review.plateOriginal")}
+                            </button>
+                            {d.vector_url && (
+                              <button onClick={() => setPlate(d, d.vector_url!)} className={pBtn(plate === d.vector_url)}>
+                                {t("diagrams.review.vector")}
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })()}
                       <DiagramRenditions
                         diagram={d}
                         canEdit={!!user}
                         onView={setBox}
                         onLatestChange={onLatestChange}
+                        plateUrl={annotations[d.image_url]?.plate_url ?? ""}
+                        onSetPlate={(url) => setPlate(d, url)}
                       />
                       <DiagramAnnotator
                         diagram={d}

@@ -140,6 +140,7 @@ const DiagramAnnotationSchema = new Schema({
   themes: [String], //     "
   vector_url: String,
   ai_url: String,
+  plate_url: String, // chosen "plate" image for the editorial export
   created_by: String,
   created_at: { type: Date, default: Date.now },
   updated_at: { type: Date, default: Date.now },

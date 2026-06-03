@@ -53,6 +53,9 @@ and cross-reference the teaching manuscripts against his published books.
     **uploads** of externally edited images, a kept **history**, and **downloads**;
   - per-graphic **notes** plus memorized **categories & themes** (dropdowns that
     grow as you tag) for the study/book.
+- **Editorial** — a printable **book layout per chapter**: every validated
+  drawing with its chosen **plate** + notes + tags, exportable to **PDF**
+  (browser print). Pick the plate with ★ in the review modal.
 - **Library** — Klee's own writings: book reader (contents + section text),
   cross-book full-text search, and a **cross-reference** panel on every
   manuscript page surfacing related passages from his books.
@@ -142,6 +145,7 @@ alexandria-klee/
 │   │   ├── page/[id]/               # manuscript page reader (facsimile + trilingual)
 │   │   ├── search/  glossary/  concepts/
 │   │   ├── diagrams/                # diagram gallery + curation
+│   │   ├── editorial/               # printable book layout per chapter (PDF)
 │   │   ├── library/  library/[id]/  # Klee's books + reader
 │   │   ├── login/  register/
 │   │   └── api/                     # search, stats, glossary, concepts,
@@ -295,6 +299,8 @@ fallback only), so it deploys cleanly even though that file isn't committed.
 - **Diagrams:** 14,106 isolated and vectorized; curation gestor + multi-model AI
   redraw (Nano Banana / Gemini · OpenAI) + per-graphic version manager (custom
   prompt · upload · download · history) + per-image notes & taxonomy live.
+- **Editorial export:** per-chapter printable book layout (plate selection +
+  notes/tags → PDF via browser print) live at `/editorial`.
 - **Library:** 8 books, full-text (3 recovered via OCR).
 - **i18n / auth / search / glossary / concept map:** complete.
 - **Pending (assets):** upload `public/vectors` to R2 for production vector
@@ -302,23 +308,28 @@ fallback only), so it deploys cleanly even though that file isn't committed.
 
 ---
 
-## 12. Roadmap
+## 12. Editorial export
 
-### Next: editorial export
+The whole curation flow feeds one goal — **turning the archive into a book**.
+Live at **`/editorial`**:
 
-The whole curation flow now feeds one goal — **turning the archive into a
-book**. The planned feature:
-
-- a per-chapter **editorial view / export** that gathers every graphic marked
-  `correct`, paired with its **best version** (chosen rendition, AI or upload)
-  and its **note + categories + themes**;
-- output as a **printable page / PDF** per chapter (and, later, the whole work),
-  with the original transcription and translations alongside the cleaned plates;
-- selection controls (which version is "the plate", ordering, captions) so the
-  human editor stays in charge.
+- an index of chapters with a **plate count** (validated drawings);
+- a per-chapter **book-page layout** (`/editorial/[chapter]`) that gathers every
+  graphic marked `correct`, paired with its **plate** and its **note +
+  categories + themes**, rendered on a white "paper" sheet;
+- **plate selection** in the review modal — a ★ on any version (AI / upload), or
+  the **Original** / **Vector** / **Auto** buttons, sets which image is printed.
+  Fallback when unset: latest rendition → vector → original;
+- **Print / PDF** straight from the browser (`@media print` turns the dark UI
+  into a clean white page; the print button and chrome are hidden).
 
 This replaces the old plan of printing raw notebook scans and binding them by
 hand: the same drawings, but cleaned, versioned, annotated, and laid out.
+
+### Roadmap
+
+- **Next:** server-generated PDF; whole-work export; the original transcription
+  + translations printed alongside each plate; plate ordering & captions.
 
 ### Beyond Klee
 

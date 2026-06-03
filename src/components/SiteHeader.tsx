@@ -13,6 +13,7 @@ const NAV = [
   { href: "/glossary", key: "nav.glossary" },
   { href: "/concepts", key: "nav.concepts" },
   { href: "/diagrams", key: "nav.diagrams" },
+  { href: "/editorial", key: "nav.editorial" },
   { href: "/library", key: "nav.library" },
 ];
 

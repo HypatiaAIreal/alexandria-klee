@@ -20,6 +20,9 @@ import type {
   ConceptGraph,
   CorpusStats,
   Diagram,
+  EditorialChapter,
+  EditorialChapterSummary,
+  EditorialPlate,
   GlossaryEntry,
   Lang,
   Page,
@@ -548,4 +551,105 @@ export async function getDiagrams(opts: {
     }
   }
   return { total: out.length, diagrams: out.slice(offset, offset + limit) };
+}
+
+// ── Editorial export (curated plates per chapter) ───────────────────
+// Gathers every diagram marked `correct`, paired with its chosen "plate"
+// (explicit plate_url → latest rendition → vector → original) and its note
+// + categories + themes. Requires MongoDB (annotations live there).
+
+type DiagramAnnotationDoc = {
+  image_url: string;
+  status?: string;
+  note?: string;
+  categories?: string[];
+  themes?: string[];
+  ai_url?: string;
+  plate_url?: string;
+};
+
+async function loadCorrectAnnotations(): Promise<Map<string, DiagramAnnotationDoc>> {
+  if (!hasMongo) return new Map();
+  try {
+    const { connectMongo } = await import("./mongodb");
+    const { DiagramAnnotationModel } = await import("./models");
+    await connectMongo();
+    const docs = await DiagramAnnotationModel.find({ status: "correct" }).lean();
+    const plain = JSON.parse(JSON.stringify(docs ?? [])) as DiagramAnnotationDoc[];
+    const m = new Map<string, DiagramAnnotationDoc>();
+    for (const d of plain) if (d.image_url) m.set(d.image_url, d);
+    return m;
+  } catch (err) {
+    console.warn("[data] correct-annotations load failed:", err);
+    return new Map();
+  }
+}
+
+const platePageSort = (a: { page_ref: string; article_number: number }, b: typeof a) =>
+  a.page_ref.localeCompare(b.page_ref, undefined, { numeric: true }) ||
+  a.article_number - b.article_number;
+
+function resolvePlate(d: Diagram, a: DiagramAnnotationDoc): { plate: string; kind: EditorialPlate["plate_kind"] } {
+  if (a.plate_url) return { plate: a.plate_url, kind: "chosen" };
+  if (a.ai_url) return { plate: a.ai_url, kind: "ai" };
+  if (d.vector_url) return { plate: d.vector_url, kind: "vector" };
+  return { plate: d.image_url, kind: "original" };
+}
+
+export async function getEditorialChapter(chapterId: string): Promise<EditorialChapter | null> {
+  const chapter = await getChapter(chapterId);
+  const ann = await loadCorrectAnnotations();
+  const { diagrams } = await getDiagrams({ chapter: chapterId, type: "all", limit: 1_000_000 });
+  const plates: EditorialPlate[] = [];
+  for (const d of diagrams) {
+    const a = ann.get(d.image_url);
+    if (!a) continue; // only validated ("correct") drawings
+    const { plate, kind } = resolvePlate(d, a);
+    plates.push({
+      image_url: d.image_url,
+      plate,
+      plate_kind: kind,
+      article_ref: d.article_ref,
+      page_ref: d.page_ref,
+      page_id: d.page_id,
+      article_number: d.article_number,
+      note: a.note ?? "",
+      categories: a.categories ?? [],
+      themes: a.themes ?? [],
+    });
+  }
+  plates.sort(platePageSort);
+  const label = chapter
+    ? `${chapter.section}${chapter.part ? ` ${chapter.part}.${chapter.chapter_number}` : ""} · ${chapter.name_de}`
+    : chapterId;
+  return {
+    id: chapterId,
+    label,
+    name_de: chapter?.name_de ?? "",
+    name_en: chapter?.name_en,
+    name_es: chapter?.name_es,
+    plates,
+  };
+}
+
+export async function getEditorialChapters(): Promise<EditorialChapterSummary[]> {
+  const ann = await loadCorrectAnnotations();
+  if (ann.size === 0) return [];
+  const { diagrams } = await getDiagrams({ type: "all", limit: 1_000_000 });
+  const { chapters } = await getDataset();
+  const counts = new Map<string, number>();
+  for (const d of diagrams) {
+    if (!ann.has(d.image_url)) continue;
+    counts.set(d.chapter_id, (counts.get(d.chapter_id) ?? 0) + 1);
+  }
+  const nameOf = (id: string) => chapters.find((c) => c.id === id);
+  return [...counts.entries()]
+    .map(([id, count]) => {
+      const c = nameOf(id);
+      const label = c
+        ? `${c.section}${c.part ? ` ${c.part}.${c.chapter_number}` : ""} · ${c.name_de}`
+        : id;
+      return { id, label, count };
+    })
+    .sort((a, b) => a.label.localeCompare(b.label));
 }

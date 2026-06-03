@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
     if (has("title")) set.title = (body.title ?? "").trim();
     if (has("description")) set.description = (body.description ?? "").trim();
     if (has("note")) set.note = (body.note ?? "").trim();
+    if (has("plate_url")) set.plate_url = body.plate_url ?? "";
     const arr = (v: unknown) => (Array.isArray(v) ? v.filter((x) => typeof x === "string" && x.trim() !== "") : []);
     if (has("tags")) set.tags = arr(body.tags);
     if (has("categories")) set.categories = arr(body.categories);
