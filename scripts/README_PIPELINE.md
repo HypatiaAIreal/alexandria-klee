@@ -55,6 +55,7 @@ OCR-derived books are paginated into "Pages X–Y" sections automatically.
 | `03_enrich.py` | Classify Bauhaus domain, complexity, content type, concepts, tags + build the search index (local). | `data/translated` → `data/enriched` |
 | `04_build_glossary.py` | Frequency analysis → trilingual glossary. | `data/enriched` → `data/glossary.json` |
 | `run_pipeline.py` | Run all phases for a chapter, then **assemble** everything into `src/data/seed.json`. | everything → `src/data/seed.json` |
+| `06_extract_diagrams.py` | Classify every article crop as graphic (warm parchment facsimile) vs typeset-text (white render); the Diagrams view shows only graphics. | `public/manuscripts` → `src/data/diagram_index.json` |
 
 ## Usage
 

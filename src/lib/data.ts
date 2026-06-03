@@ -27,8 +27,26 @@ import type {
   SeedData,
 } from "./types";
 import { hasMongo } from "./mongodb";
-import { applyImageBase } from "./images";
+import { applyImageBase, imageBase } from "./images";
 import { chapterIdOf, slug as _slug } from "./util";
+import diagramIndex from "@/data/diagram_index.json";
+
+// Set of GRAPHIC image tails (e.g. "/BG/I/02/003/article1_1_large.jpg") —
+// the typeset-text crops are excluded. Built by 06_extract_diagrams.py.
+const GRAPHIC_TAILS = new Set<string>((diagramIndex as { graphics: string[] }).graphics ?? []);
+
+// Reduce an image URL (local OR R2-rewritten) to its tail for set lookup.
+function imageTail(url: string): string {
+  if (url.startsWith("/manuscripts/")) return url.slice("/manuscripts".length);
+  const base = imageBase();
+  if (base && url.startsWith(base)) return url.slice(base.length);
+  return url;
+}
+
+function isGraphic(url: string): boolean {
+  if (GRAPHIC_TAILS.size === 0) return true; // no index → don't filter
+  return GRAPHIC_TAILS.has(imageTail(url));
+}
 
 // The full corpus (src/data/seed.json) is large and git-ignored, so it is
 // NOT statically imported (that would break the Vercel build when absent).
@@ -462,7 +480,9 @@ export async function getDiagramChapters(): Promise<DiagramChapter[]> {
   const counts = new Map<string, number>();
   for (const p of pages) {
     if (!p.section) continue;
-    const n = (p.articles ?? []).reduce((s, a) => s + (a.images?.length ?? 0), 0);
+    let n = 0;
+    for (const a of p.articles ?? [])
+      for (const img of a.images ?? []) if (img?.url_local && isGraphic(img.url_local)) n++;
     if (!n) continue;
     const cid = chapterIdOf(p.section, p.part, p.chapter_number);
     counts.set(cid, (counts.get(cid) ?? 0) + n);
@@ -494,7 +514,7 @@ export async function getDiagrams(opts: {
     if (opts.chapter && cid !== opts.chapter) continue;
     for (const a of p.articles ?? []) {
       for (const img of a.images ?? []) {
-        if (!img?.url_local) continue;
+        if (!img?.url_local || !isGraphic(img.url_local)) continue;
         out.push({
           image_url: img.url_local,
           page_id: p.id || _slug(p.page_ref),

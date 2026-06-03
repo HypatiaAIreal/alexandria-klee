@@ -1,16 +1,17 @@
-import { getArticles, getChapters, getGlossary, getPages, getStats } from "@/lib/data";
+import { getArticles, getChapters, getDiagrams, getGlossary, getPages, getStats } from "@/lib/data";
 import HomeView, { type HomeData } from "@/components/HomeView";
 
 export default async function HomePage() {
-  const [stats, articles, pages, chapters, glossary] = await Promise.all([
+  const [stats, articles, pages, chapters, glossary, diagrams] = await Promise.all([
     getStats(),
     getArticles(),
     getPages(),
     getChapters(),
     getGlossary(),
+    getDiagrams({ limit: 1 }),
   ]);
 
-  const articleImages = articles.reduce((n, a) => n + a.images.length, 0);
+  const articleImages = diagrams.total; // graphic crops only (text renders excluded)
   const facsimiles = pages.filter((p) => p.facsimile_local).length;
 
   const conceptArr = Object.entries(stats.top_concepts ?? {})
