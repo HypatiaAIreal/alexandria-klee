@@ -39,21 +39,27 @@ export async function POST(req: NextRequest) {
     const { connectMongo } = await import("@/lib/mongodb");
     const { DiagramAnnotationModel } = await import("@/lib/models");
     await connectMongo();
+
+    // Partial update: only touch the fields actually present in the body, so
+    // saving (say) a status never wipes notes/categories saved elsewhere.
+    const set: Record<string, unknown> = { image_url, updated_at: new Date() };
+    const has = (k: string) => Object.prototype.hasOwnProperty.call(body, k);
+    if (has("page_ref")) set.page_ref = body.page_ref ?? "";
+    if (has("page_id")) set.page_id = body.page_id ?? "";
+    if (has("article_number")) set.article_number = body.article_number ?? null;
+    if (has("crop_coords")) set.crop_coords = body.crop_coords ?? null;
+    if (has("status")) set.status = body.status ?? "";
+    if (has("title")) set.title = (body.title ?? "").trim();
+    if (has("description")) set.description = (body.description ?? "").trim();
+    if (has("note")) set.note = (body.note ?? "").trim();
+    const arr = (v: unknown) => (Array.isArray(v) ? v.filter((x) => typeof x === "string" && x.trim() !== "") : []);
+    if (has("tags")) set.tags = arr(body.tags);
+    if (has("categories")) set.categories = arr(body.categories);
+    if (has("themes")) set.themes = arr(body.themes);
+
     const doc = await DiagramAnnotationModel.findOneAndUpdate(
       { image_url },
-      {
-        image_url,
-        page_ref: body.page_ref ?? "",
-        page_id: body.page_id ?? "",
-        article_number: body.article_number ?? null,
-        crop_coords: body.crop_coords ?? null,
-        status: body.status ?? "",
-        title: (body.title ?? "").trim(),
-        description: (body.description ?? "").trim(),
-        tags: Array.isArray(body.tags) ? body.tags : [],
-        created_by: user.email,
-        updated_at: new Date(),
-      },
+      { $set: set, $setOnInsert: { created_by: user.email } },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     ).lean();
     return NextResponse.json({ persisted: true, annotation: JSON.parse(JSON.stringify(doc)) });

@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { hasMongo } from "@/lib/mongodb";
 import { COOKIE_NAME, verifyToken } from "@/lib/auth";
+import { availableModels, findModel } from "@/lib/imageModels";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -25,6 +26,57 @@ async function readImageBytes(url: string): Promise<Buffer> {
   return fs.readFile(local);
 }
 
+type Generated = { b64: string; content_type: string };
+
+// OpenAI image-edit (gpt-image-1): returns a PNG.
+async function generateWithOpenAI(model: string, bytes: Buffer, prompt: string, key: string): Promise<Generated> {
+  const form = new FormData();
+  form.append("model", model);
+  form.append("prompt", prompt);
+  form.append("size", process.env.IMAGE_SIZE || "auto");
+  form.append("image", new Blob([new Uint8Array(bytes)], { type: "image/jpeg" }), "klee.jpg");
+  const r = await fetch("https://api.openai.com/v1/images/edits", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}` },
+    body: form,
+  });
+  const j = await r.json();
+  if (!r.ok) throw new Error(j?.error?.message ?? "openai_error");
+  const b64 = j?.data?.[0]?.b64_json;
+  if (!b64) throw new Error("no_image");
+  return { b64, content_type: "image/png" };
+}
+
+// Google Gemini image models ("Nano Banana"): image-to-image editing via
+// generateContent — the input crop is grounded and redrawn per the prompt.
+async function generateWithGoogle(model: string, bytes: Buffer, prompt: string, key: string): Promise<Generated> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+  const reqBody = {
+    contents: [
+      {
+        parts: [
+          { text: prompt },
+          { inline_data: { mime_type: "image/jpeg", data: bytes.toString("base64") } },
+        ],
+      },
+    ],
+  };
+  const r = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "x-goog-api-key": key },
+    body: JSON.stringify(reqBody),
+  });
+  const j = await r.json();
+  if (!r.ok) throw new Error(j?.error?.message ?? "google_error");
+  const parts: Array<Record<string, { data?: string; mimeType?: string; mime_type?: string }>> =
+    j?.candidates?.[0]?.content?.parts ?? [];
+  const imgPart = parts.find((p) => p.inlineData?.data || p.inline_data?.data);
+  const data = imgPart?.inlineData?.data ?? imgPart?.inline_data?.data;
+  if (!data) throw new Error("no_image");
+  const content_type = imgPart?.inlineData?.mimeType ?? imgPart?.inline_data?.mime_type ?? "image/png";
+  return { b64: data, content_type };
+}
+
 const serveUrl = (id: string) => `/api/diagrams/rendition?id=${id}`;
 
 // ── List every rendition for one source graphic ───────────────────────────
@@ -37,7 +89,7 @@ export async function GET(req: NextRequest) {
     const { DiagramRenditionModel } = await import("@/lib/models");
     await connectMongo();
     const docs = await DiagramRenditionModel.find({ image_url })
-      .select("kind prompt label created_by created_at content_type")
+      .select("kind prompt label model created_by created_at content_type")
       .sort({ created_at: -1 })
       .lean<
         Array<{
@@ -45,6 +97,7 @@ export async function GET(req: NextRequest) {
           kind?: string;
           prompt?: string;
           label?: string;
+          model?: string;
           created_by?: string;
           created_at?: Date;
         }>
@@ -54,6 +107,7 @@ export async function GET(req: NextRequest) {
       kind: d.kind ?? "ai",
       prompt: d.prompt ?? "",
       label: d.label ?? "",
+      model: d.model ?? "",
       created_by: d.created_by ?? "",
       created_at: d.created_at ?? null,
       url: serveUrl(String(d._id)),
@@ -75,6 +129,7 @@ export async function POST(req: NextRequest) {
   let image_url = "";
   let kind: "ai" | "upload" = "ai";
   let prompt = "";
+  let model = "";
   let b64 = "";
   let content_type = "image/png";
 
@@ -94,36 +149,36 @@ export async function POST(req: NextRequest) {
       content_type = (file as File).type || "image/png";
       prompt = String(form.get("label") || "");
     } else {
-      // ── Generate with AI (optional custom prompt) ──
-      const key = process.env.OPENAI_API_KEY;
-      if (!key) return NextResponse.json({ error: "no_model" }, { status: 503 });
+      // ── Generate with AI (chosen model + optional custom prompt) ──
       const body = await req.json().catch(() => ({}));
       image_url = body?.image_url;
       if (!image_url) return NextResponse.json({ error: "image_url required" }, { status: 400 });
+
+      // Resolve the requested model, falling back to the first available one.
+      const requested = findModel(body?.model) ?? availableModels()[0];
+      if (!requested) return NextResponse.json({ error: "no_model" }, { status: 503 });
+      const key = requested.provider === "google" ? process.env.GOOGLE_AI_API_KEY : process.env.OPENAI_API_KEY;
+      if (!key) return NextResponse.json({ error: "no_model" }, { status: 503 });
+
       const custom = (body?.prompt ?? "").toString().trim();
       // A custom instruction is appended to the faithful-linework base so the
       // result stays clean line art while honouring the user's direction.
-      prompt = custom ? `${DEFAULT_PROMPT}\n\nAdditional instruction: ${custom}` : DEFAULT_PROMPT;
+      const fullPrompt = custom ? `${DEFAULT_PROMPT}\n\nAdditional instruction: ${custom}` : DEFAULT_PROMPT;
 
-      const model = process.env.IMAGE_MODEL || "gpt-image-1";
       const bytes = await readImageBytes(image_url);
-      const aiForm = new FormData();
-      aiForm.append("model", model);
-      aiForm.append("prompt", prompt);
-      aiForm.append("size", process.env.IMAGE_SIZE || "auto");
-      aiForm.append("image", new Blob([new Uint8Array(bytes)], { type: "image/jpeg" }), "klee.jpg");
-
-      const r = await fetch("https://api.openai.com/v1/images/edits", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${key}` },
-        body: aiForm,
-      });
-      const j = await r.json();
-      if (!r.ok)
-        return NextResponse.json({ error: "model_error", detail: j?.error?.message ?? j }, { status: 502 });
-      b64 = j?.data?.[0]?.b64_json;
-      if (!b64) return NextResponse.json({ error: "no_image" }, { status: 502 });
+      let gen: Generated;
+      try {
+        gen =
+          requested.provider === "google"
+            ? await generateWithGoogle(requested.id, bytes, fullPrompt, key)
+            : await generateWithOpenAI(requested.id, bytes, fullPrompt, key);
+      } catch (e) {
+        return NextResponse.json({ error: "model_error", detail: String((e as Error)?.message ?? e) }, { status: 502 });
+      }
+      b64 = gen.b64;
+      content_type = gen.content_type;
       prompt = custom; // store only the user's words for display
+      model = requested.label;
     }
 
     const { connectMongo } = await import("@/lib/mongodb");
@@ -135,6 +190,7 @@ export async function POST(req: NextRequest) {
       content_type,
       data: b64,
       prompt,
+      model,
       created_by: user.email,
       created_at: new Date(),
     });
@@ -151,6 +207,7 @@ export async function POST(req: NextRequest) {
         id,
         kind,
         prompt,
+        model,
         label: "",
         created_by: user.email,
         created_at: created.created_at,

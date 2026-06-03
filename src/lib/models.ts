@@ -134,7 +134,10 @@ const DiagramAnnotationSchema = new Schema({
   status: String, // "" | "correct" | "text_only"
   title: String,
   description: String,
+  note: String, // free-text note tied to this single image
   tags: [String],
+  categories: [String], // memorized, dropdown-selectable taxonomy
+  themes: [String], //     "
   vector_url: String,
   ai_url: String,
   created_by: String,
@@ -161,6 +164,7 @@ const DiagramRenditionSchema = new Schema({
   content_type: { type: String, default: "image/png" },
   data: String, // base64
   prompt: String, // the instruction used (for ai)
+  model: String, // model id that produced it (for ai)
   label: String,
   created_by: String,
   created_at: { type: Date, default: Date.now },

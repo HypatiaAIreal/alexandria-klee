@@ -6,6 +6,7 @@ import { useI18n } from "@/components/LanguageProvider";
 import { useAuth } from "@/components/AuthProvider";
 import Lightbox, { type LightboxImage } from "@/components/Lightbox";
 import DiagramRenditions from "@/components/DiagramRenditions";
+import DiagramAnnotator from "@/components/DiagramAnnotator";
 
 export default function PageReviewModal({
   pageId,
@@ -214,6 +215,12 @@ export default function PageReviewModal({
                         canEdit={!!user}
                         onView={setBox}
                         onLatestChange={onLatestChange}
+                      />
+                      <DiagramAnnotator
+                        diagram={d}
+                        annotation={annotations[d.image_url]}
+                        canEdit={!!user}
+                        onSaved={onAnnoSaved}
                       />
                     </div>
                   </div>

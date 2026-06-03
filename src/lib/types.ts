@@ -204,7 +204,10 @@ export interface DiagramAnnotation {
   status?: DiagramStatus;
   title?: string;
   description?: string;
+  note?: string;
   tags?: string[];
+  categories?: string[];
+  themes?: string[];
   vector_url?: string;
   ai_url?: string;
   created_by?: string;

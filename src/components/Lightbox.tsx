@@ -53,6 +53,29 @@ export default function Lightbox({
     };
   }, [image, onClose, reset]);
 
+  // Download the current image. Fetches as a blob so it works even for
+  // cross-origin assets (R2), where the <a download> attribute is ignored.
+  const download = async () => {
+    if (!image) return;
+    const ext = (type: string) =>
+      type.includes("svg") ? ".svg" : type.includes("png") ? ".png" : type.includes("webp") ? ".webp" : ".jpg";
+    const name = (image.caption || "klee-diagram").replace(/[^\w.-]+/g, "_");
+    try {
+      const res = await fetch(image.src);
+      const blob = await res.blob();
+      const obj = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = obj;
+      a.download = name + ext(blob.type);
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(obj);
+    } catch {
+      window.open(image.src, "_blank");
+    }
+  };
+
   if (!image) return null;
 
   // Zoom toward the cursor so the point under it stays put.
@@ -155,6 +178,7 @@ export default function Lightbox({
         </span>
         <button className={btn} onClick={() => zoomAt(innerWidth / 2, innerHeight / 2, 1.3)} disabled={scale >= MAX} aria-label="Zoom in">+</button>
         <button className={btn} onClick={reset} disabled={scale === 1} aria-label="Reset">⊙</button>
+        <button className={btn} onClick={download} aria-label="Download" title="Download">⬇</button>
         <button className={btn} onClick={onClose} aria-label="Close">✕</button>
       </div>
 

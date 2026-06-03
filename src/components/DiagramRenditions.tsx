@@ -10,10 +10,33 @@ export type Rendition = {
   kind: "ai" | "upload";
   prompt: string;
   label: string;
+  model?: string;
   created_by: string;
   created_at: string | null;
   url: string;
 };
+
+type ModelOption = { id: string; label: string; provider: string; note?: string };
+
+// Fetch & download a same/cross-origin image as a file.
+async function downloadImage(url: string, name: string) {
+  const ext = (type: string) =>
+    type.includes("svg") ? ".svg" : type.includes("png") ? ".png" : type.includes("webp") ? ".webp" : ".jpg";
+  try {
+    const res = await fetch(url);
+    const blob = await res.blob();
+    const obj = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = obj;
+    a.download = name.replace(/[^\w.-]+/g, "_") + ext(blob.type);
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(obj);
+  } catch {
+    window.open(url, "_blank");
+  }
+}
 
 /**
  * Version manager for a single diagram: AI redraws (with an optional custom
@@ -38,14 +61,23 @@ export default function DiagramRenditions({
   const [prompt, setPrompt] = useState("");
   const [busy, setBusy] = useState<"ai" | "upload" | null>(null);
   const [err, setErr] = useState<string | null>(null);
+  const [models, setModels] = useState<ModelOption[]>([]);
+  const [model, setModel] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     setLoaded(true);
     try {
-      const r = await fetch(`/api/diagrams/renditions?image_url=${encodeURIComponent(diagram.image_url)}`);
+      const [r, m] = await Promise.all([
+        fetch(`/api/diagrams/renditions?image_url=${encodeURIComponent(diagram.image_url)}`),
+        fetch("/api/diagrams/models"),
+      ]);
       const j = await r.json();
       setItems(j.renditions ?? []);
+      const mj = await m.json();
+      const list: ModelOption[] = mj.models ?? [];
+      setModels(list);
+      if (list[0]) setModel((prev) => prev || list[0].id);
     } catch {
       setItems([]);
     }
@@ -77,7 +109,7 @@ export default function DiagramRenditions({
       const r = await fetch("/api/diagrams/renditions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image_url: diagram.image_url, prompt: prompt.trim() }),
+        body: JSON.stringify({ image_url: diagram.image_url, prompt: prompt.trim(), model }),
       });
       const j = await r.json();
       if (r.ok && j.rendition) {
@@ -139,6 +171,23 @@ export default function DiagramRenditions({
         <div className="mt-2 space-y-3 rounded-lg border border-ink-700/70 bg-ink-900/70 p-3">
           {canEdit ? (
             <>
+              {models.length > 0 && (
+                <label className="flex items-center gap-2 text-[0.62rem] text-parchment-400">
+                  <span className="shrink-0">{t("diagrams.versions.model")}</span>
+                  <select
+                    value={model}
+                    onChange={(e) => setModel(e.target.value)}
+                    className="flex-1 rounded-md border border-ink-700 bg-ink-950 px-2 py-1 text-xs text-parchment-100 focus:border-amber/50 focus:outline-none"
+                  >
+                    {models.map((m) => (
+                      <option key={m.id} value={m.id}>
+                        {m.label}
+                        {m.note ? ` — ${m.note}` : ""}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              )}
               <textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
@@ -149,7 +198,8 @@ export default function DiagramRenditions({
               <div className="flex flex-wrap items-center gap-2">
                 <button
                   onClick={generate}
-                  disabled={busy !== null}
+                  disabled={busy !== null || models.length === 0}
+                  title={models.length === 0 ? t("diagrams.review.aiNoModel") : undefined}
                   className="rounded-md border border-amber/50 px-2.5 py-1 text-xs text-amber hover:bg-amber/10 disabled:opacity-50"
                 >
                   {busy === "ai" ? t("diagrams.review.aiGenerating") : "✦ " + t("diagrams.versions.generate")}
@@ -194,16 +244,28 @@ export default function DiagramRenditions({
                     <span className={`chip text-[0.55rem] ${it.kind === "ai" ? "border-amber/40 text-amber" : "border-kleeblue/40 text-kleeblue"}`}>
                       {it.kind === "ai" ? "AI" : t("diagrams.versions.upload")}
                     </span>
-                    {canEdit && (
+                    <div className="flex items-center gap-1.5">
                       <button
-                        onClick={() => remove(it.id)}
-                        className="text-[0.62rem] text-parchment-500 hover:text-rust"
-                        title={t("diagrams.versions.delete")}
+                        onClick={() => downloadImage(it.url, `${diagram.article_ref}-${it.kind}-${it.id}`)}
+                        className="text-[0.7rem] text-parchment-400 hover:text-ochre"
+                        title={t("diagrams.versions.download")}
                       >
-                        ✕
+                        ⬇
                       </button>
-                    )}
+                      {canEdit && (
+                        <button
+                          onClick={() => remove(it.id)}
+                          className="text-[0.62rem] text-parchment-500 hover:text-rust"
+                          title={t("diagrams.versions.delete")}
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
                   </div>
+                  {it.model && (
+                    <p className="mt-0.5 text-[0.55rem] text-parchment-500">{it.model}</p>
+                  )}
                   {it.prompt && (
                     <p className="mt-0.5 line-clamp-2 text-[0.58rem] leading-snug text-parchment-500" title={it.prompt}>
                       {it.prompt}

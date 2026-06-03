@@ -47,10 +47,12 @@ and cross-reference the teaching manuscripts against his published books.
   - a **Page Review** modal (the full facsimile + every graphic on that page) to
     **validate** each crop (`correct` / `text only`) and the page
     (`validated` / `missing images`) — human curation instead of fragile CV;
-  - a faithful **vector (SVG)** of every graphic, and an **on-demand AI redraw**;
+  - a faithful **vector (SVG)** of every graphic, and an **on-demand AI redraw**
+    with a **model selector** (Google "Nano Banana" / Gemini · OpenAI);
   - a per-graphic **version manager** — AI redraws with a **custom instruction**,
-    **uploads** of externally edited images, and a kept **history** of versions;
-  - per-graphic **annotations** (title, description, tags) for the study/book.
+    **uploads** of externally edited images, a kept **history**, and **downloads**;
+  - per-graphic **notes** plus memorized **categories & themes** (dropdowns that
+    grow as you tag) for the study/book.
 - **Library** — Klee's own writings: book reader (contents + section text),
   cross-book full-text search, and a **cross-reference** panel on every
   manuscript page surfacing related passages from his books.
@@ -145,8 +147,8 @@ alexandria-klee/
 │   │   └── api/                     # search, stats, glossary, concepts,
 │   │       ├── auth/                #   auth (login/register/logout/me)
 │   │       ├── books/               #   books search + related
-│   │       ├── diagrams/            #   list, annotations, page-status,
-│   │       │                        #   renditions (AI+upload), rendition
+│   │       ├── diagrams/            #   list, annotations, page-status, taxonomy,
+│   │       │                        #   models, renditions (AI+upload), rendition
 │   │       └── annotations/         #   page annotations
 │   ├── components/                  # SiteHeader, PageReader, DiagramsView,
 │   │                                # PageReviewModal, Lightbox, Charts, …
@@ -212,8 +214,9 @@ gracefully), but production needs the first four.
 | `ACCESS_CODE` | Invite code to register (default `alexandriaklee2026`). |
 | `R2_PUBLIC_URL` | Cloudflare R2 base for `/manuscripts` images in production. |
 | `R2_VECTORS_URL` | R2 base for the vector SVGs (after uploading `public/vectors`). |
-| `OPENAI_API_KEY` | Enables the on-demand AI diagram redraw (optional, paid). |
-| `IMAGE_MODEL` / `IMAGE_SIZE` / `AI_REDRAW_PROMPT` | Tune the AI redraw. |
+| `GOOGLE_AI_API_KEY` | Enables Google "Nano Banana" (Gemini) image models for the AI redraw (optional, paid). |
+| `OPENAI_API_KEY` | Enables OpenAI `gpt-image-1` as an alternative redraw provider (optional, paid). |
+| `IMAGE_MODEL` / `IMAGE_SIZE` | Tune the AI redraw. The in-app model selector lists whichever providers have a key. |
 
 ---
 
@@ -225,29 +228,45 @@ Each Klee graphic can carry three forms, all linked to its source page:
 - **Vector (◹)** — `vtracer` traces the real strokes into a scalable SVG.
   **Free, local, faithful** (it doesn't reinvent the line). Run
   `python scripts/07_vectorize.py --all`. All 14,106 are done.
-- **AI (✦)** — an image model (OpenAI `gpt-image-1`) redraws a clean, idealized
-  version on demand. **Paid (~cents/image), reinterprets** — best used
-  selectively on validated graphics. Stored in MongoDB so it persists on a
-  read-only serverless filesystem.
+- **AI (✦)** — an image model redraws a clean, idealized version on demand.
+  **Paid (~cents/image), reinterprets** — best used selectively on validated
+  graphics. Stored in MongoDB so it persists on a read-only serverless
+  filesystem. Two providers, chosen per generation in the model selector:
+  - **Google "Nano Banana"** (Gemini `gemini-3-pro-image`, `gemini-3.1-flash-image`,
+    `gemini-2.5-flash-image`) — superb at reproducing hand-drawn line.
+  - **OpenAI** `gpt-image-1` — alternative.
+  Only providers with an API key set are offered.
 
 ### Version manager (per graphic)
 
 Every graphic has a **Versions (✦)** panel in the review modal — a small studio
 for getting the drawing exactly right:
 
+- **Model selector** — pick which image model generates the redraw.
 - **Custom AI instruction** — type a direction ("thicker strokes, keep the
   arrows, ignore the handwriting") before generating; it's appended to the
   faithful-linework base prompt.
 - **Upload your own** — edited a crop externally (Photoshop, Illustrator, a
   scan)? Upload it (≤ 8 MB) and it becomes a version like any other.
 - **Gallery & history** — every AI redraw and upload is kept, labelled by kind
-  (AI / upload) and the prompt used. View any in the lightbox, or delete it.
+  (AI / upload), the model used, and the prompt. View any in the lightbox,
+  **download** it, or delete it.
 - The newest version becomes the card's quick-view (✦). All versions persist in
   MongoDB (`diagram_renditions`), served by `/api/diagrams/rendition?id=…`.
 
-Curation is **human-in-the-loop**: review a page, mark each crop, validate the
-page, and iterate on renditions until the line is right — no fragile machine
-text/drawing separation.
+### Notes & taxonomy (per graphic)
+
+A **Notes & tags (✎)** panel ties scholarship to each single image:
+
+- a free-text **note** for that drawing;
+- **categories** and **themes** as memorized, growing dropdowns — pick an
+  existing value or type a new one; new values are remembered corpus-wide
+  (via `/api/diagrams/taxonomy`) and offered next time.
+
+Everything downloads, so the curated drawings + notes become **the editorial
+layer of a printed/PDF book**. Curation stays **human-in-the-loop**: review a
+page, mark each crop, validate the page, iterate on renditions, and annotate —
+no fragile machine text/drawing separation.
 
 ---
 
@@ -269,8 +288,9 @@ fallback only), so it deploys cleanly even though that file isn't committed.
 ## 11. Status
 
 - **Manuscripts:** complete — all 26 chapters extracted, translated, enriched.
-- **Diagrams:** 14,106 isolated and vectorized; curation gestor + AI redraw +
-  per-graphic version manager (custom prompt · upload · history) live.
+- **Diagrams:** 14,106 isolated and vectorized; curation gestor + multi-model AI
+  redraw (Nano Banana / Gemini · OpenAI) + per-graphic version manager (custom
+  prompt · upload · download · history) + per-image notes & taxonomy live.
 - **Library:** 8 books, full-text (3 recovered via OCR).
 - **i18n / auth / search / glossary / concept map:** complete.
 - **Pending (assets):** upload `public/vectors` to R2 for production vector
