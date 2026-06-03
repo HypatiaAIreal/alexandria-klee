@@ -308,6 +308,18 @@ const en: Dict = {
       aiNoModel: "Set OPENAI_API_KEY to enable AI redraw.",
       aiError: "AI generation failed.",
     },
+    versions: {
+      manage: "Versions",
+      generate: "Generate (AI)",
+      generating: "Generating…",
+      upload: "Upload",
+      uploading: "Uploading…",
+      delete: "Delete version",
+      empty: "No versions yet.",
+      promptPlaceholder: "Optional instruction for the AI — e.g. 'thicker strokes, keep the arrows, ignore the handwriting'",
+      hint: "Generate a clean redraw with your own instruction, or upload an image you edited externally. Every version is kept here.",
+      tooLarge: "Image too large (max 8 MB).",
+    },
   },
 };
 
@@ -597,6 +609,18 @@ const de: Dict = {
       aiNoModel: "OPENAI_API_KEY setzen, um KI zu nutzen.",
       aiError: "KI-Erzeugung fehlgeschlagen.",
     },
+    versions: {
+      manage: "Versionen",
+      generate: "Erzeugen (KI)",
+      generating: "Wird erzeugt…",
+      upload: "Hochladen",
+      uploading: "Wird hochgeladen…",
+      delete: "Version löschen",
+      empty: "Noch keine Versionen.",
+      promptPlaceholder: "Optionale Anweisung für die KI — z. B. „dickere Striche, Pfeile behalten, Handschrift ignorieren“",
+      hint: "Erzeuge eine saubere Nachzeichnung mit eigener Anweisung oder lade ein extern bearbeitetes Bild hoch. Jede Version bleibt hier erhalten.",
+      tooLarge: "Bild zu groß (max. 8 MB).",
+    },
   },
 };
 
@@ -885,6 +909,18 @@ const es: Dict = {
       aiView: "Ver IA",
       aiNoModel: "Configura OPENAI_API_KEY para usar IA.",
       aiError: "Falló la generación con IA.",
+    },
+    versions: {
+      manage: "Versiones",
+      generate: "Generar (IA)",
+      generating: "Generando…",
+      upload: "Subir imagen",
+      uploading: "Subiendo…",
+      delete: "Eliminar versión",
+      empty: "Aún no hay versiones.",
+      promptPlaceholder: "Indicación opcional para la IA — p. ej. «trazos más gruesos, conserva las flechas, ignora la escritura a mano»",
+      hint: "Genera un redibujado limpio con tu propia indicación, o sube una imagen que hayas editado externamente. Cada versión se guarda aquí.",
+      tooLarge: "Imagen demasiado grande (máx. 8 MB).",
     },
   },
 };

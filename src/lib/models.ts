@@ -152,6 +152,20 @@ const DiagramAiImageSchema = new Schema({
   created_at: { type: Date, default: Date.now },
 });
 
+// Versioned renditions of a diagram: AI redraws (with their prompt) and
+// manual uploads. Multiple per source graphic; stored in Mongo so they
+// persist on a read-only serverless filesystem.
+const DiagramRenditionSchema = new Schema({
+  image_url: { type: String, index: true }, // the source graphic crop
+  kind: String, // "ai" | "upload"
+  content_type: { type: String, default: "image/png" },
+  data: String, // base64
+  prompt: String, // the instruction used (for ai)
+  label: String,
+  created_by: String,
+  created_at: { type: Date, default: Date.now },
+});
+
 // Per-page validation state for the diagram curation workflow.
 const DiagramPageStatusSchema = new Schema({
   page_id: { type: String, index: true, unique: true },
@@ -203,3 +217,6 @@ export const DiagramPageStatusModel =
 export const DiagramAiImageModel =
   mongoose.models.DiagramAiImage ||
   mongoose.model("DiagramAiImage", DiagramAiImageSchema, "diagram_ai_images");
+export const DiagramRenditionModel =
+  mongoose.models.DiagramRendition ||
+  mongoose.model("DiagramRendition", DiagramRenditionSchema, "diagram_renditions");

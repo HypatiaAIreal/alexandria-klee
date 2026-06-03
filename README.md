@@ -48,6 +48,8 @@ and cross-reference the teaching manuscripts against his published books.
     **validate** each crop (`correct` / `text only`) and the page
     (`validated` / `missing images`) — human curation instead of fragile CV;
   - a faithful **vector (SVG)** of every graphic, and an **on-demand AI redraw**;
+  - a per-graphic **version manager** — AI redraws with a **custom instruction**,
+    **uploads** of externally edited images, and a kept **history** of versions;
   - per-graphic **annotations** (title, description, tags) for the study/book.
 - **Library** — Klee's own writings: book reader (contents + section text),
   cross-book full-text search, and a **cross-reference** panel on every
@@ -144,7 +146,7 @@ alexandria-klee/
 │   │       ├── auth/                #   auth (login/register/logout/me)
 │   │       ├── books/               #   books search + related
 │   │       ├── diagrams/            #   list, annotations, page-status,
-│   │       │                        #   ai-redraw, ai-image
+│   │       │                        #   renditions (AI+upload), rendition
 │   │       └── annotations/         #   page annotations
 │   ├── components/                  # SiteHeader, PageReader, DiagramsView,
 │   │                                # PageReviewModal, Lightbox, Charts, …
@@ -226,10 +228,26 @@ Each Klee graphic can carry three forms, all linked to its source page:
 - **AI (✦)** — an image model (OpenAI `gpt-image-1`) redraws a clean, idealized
   version on demand. **Paid (~cents/image), reinterprets** — best used
   selectively on validated graphics. Stored in MongoDB so it persists on a
-  read-only serverless filesystem (served via `/api/diagrams/ai-image`).
+  read-only serverless filesystem.
+
+### Version manager (per graphic)
+
+Every graphic has a **Versions (✦)** panel in the review modal — a small studio
+for getting the drawing exactly right:
+
+- **Custom AI instruction** — type a direction ("thicker strokes, keep the
+  arrows, ignore the handwriting") before generating; it's appended to the
+  faithful-linework base prompt.
+- **Upload your own** — edited a crop externally (Photoshop, Illustrator, a
+  scan)? Upload it (≤ 8 MB) and it becomes a version like any other.
+- **Gallery & history** — every AI redraw and upload is kept, labelled by kind
+  (AI / upload) and the prompt used. View any in the lightbox, or delete it.
+- The newest version becomes the card's quick-view (✦). All versions persist in
+  MongoDB (`diagram_renditions`), served by `/api/diagrams/rendition?id=…`.
 
 Curation is **human-in-the-loop**: review a page, mark each crop, validate the
-page — no fragile machine text/drawing separation.
+page, and iterate on renditions until the line is right — no fragile machine
+text/drawing separation.
 
 ---
 
@@ -251,7 +269,8 @@ fallback only), so it deploys cleanly even though that file isn't committed.
 ## 11. Status
 
 - **Manuscripts:** complete — all 26 chapters extracted, translated, enriched.
-- **Diagrams:** 14,106 isolated and vectorized; curation gestor + AI redraw live.
+- **Diagrams:** 14,106 isolated and vectorized; curation gestor + AI redraw +
+  per-graphic version manager (custom prompt · upload · history) live.
 - **Library:** 8 books, full-text (3 recovered via OCR).
 - **i18n / auth / search / glossary / concept map:** complete.
 - **Pending (assets):** upload `public/vectors` to R2 for production vector

@@ -43,6 +43,9 @@ scripts/tessdata/
 # large generated corpus (app reads Atlas in prod; regenerate locally via run_pipeline --assemble)
 /src/data/seed.json
 
+# manuscript facsimiles & drawings (thousands of images; served from R2 in prod)
+/public/manuscripts
+
 # generated vector SVGs (run scripts/07_vectorize.py; serve via R2 in prod)
 /public/vectors
 _vec_check/
