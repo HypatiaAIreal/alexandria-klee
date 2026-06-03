@@ -501,6 +501,7 @@ export async function getDiagramChapters(): Promise<DiagramChapter[]> {
 
 export async function getDiagrams(opts: {
   chapter?: string;
+  page?: string;
   offset?: number;
   limit?: number;
 }): Promise<{ total: number; diagrams: Diagram[] }> {
@@ -510,6 +511,8 @@ export async function getDiagrams(opts: {
   const out: Diagram[] = [];
   for (const p of pages) {
     if (!p.section || !p.page_ref) continue;
+    const pid = p.id || _slug(p.page_ref);
+    if (opts.page && pid !== opts.page) continue;
     const cid = chapterIdOf(p.section, p.part, p.chapter_number);
     if (opts.chapter && cid !== opts.chapter) continue;
     for (const a of p.articles ?? []) {
@@ -517,7 +520,8 @@ export async function getDiagrams(opts: {
         if (!img?.url_local || !isGraphic(img.url_local)) continue;
         out.push({
           image_url: img.url_local,
-          page_id: p.id || _slug(p.page_ref),
+          facsimile: p.facsimile_local || "",
+          page_id: pid,
           page_ref: p.page_ref,
           article_number: a.article_number,
           article_ref: a.ref || `${p.page_ref} art.${a.article_number}`,

@@ -128,14 +128,28 @@ BookSchema.index({ title: "text", "sections.text": "text" });
 const DiagramAnnotationSchema = new Schema({
   image_url: { type: String, index: true, unique: true },
   page_ref: String,
-  page_id: String,
+  page_id: { type: String, index: true },
   article_number: Number,
   crop_coords: { type: Schema.Types.Mixed, default: null },
+  status: String, // "" | "correct" | "text_only"
   title: String,
   description: String,
   tags: [String],
+  vector_url: String,
+  ai_url: String,
   created_by: String,
   created_at: { type: Date, default: Date.now },
+  updated_at: { type: Date, default: Date.now },
+});
+
+// Per-page validation state for the diagram curation workflow.
+const DiagramPageStatusSchema = new Schema({
+  page_id: { type: String, index: true, unique: true },
+  page_ref: String,
+  validated: Boolean,
+  missing_images: Boolean,
+  note: String,
+  validated_by: String,
   updated_at: { type: Date, default: Date.now },
 });
 
@@ -173,3 +187,6 @@ export const BookModel = mongoose.models.Book || mongoose.model("Book", BookSche
 export const DiagramAnnotationModel =
   mongoose.models.DiagramAnnotation ||
   mongoose.model("DiagramAnnotation", DiagramAnnotationSchema, "diagram_annotations");
+export const DiagramPageStatusModel =
+  mongoose.models.DiagramPageStatus ||
+  mongoose.model("DiagramPageStatus", DiagramPageStatusSchema, "diagram_pages");

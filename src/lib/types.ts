@@ -179,6 +179,7 @@ export interface RelatedPassage {
 // ── Diagrams (Klee's individual drawings, isolated from pages) ──
 export interface Diagram {
   image_url: string;
+  facsimile: string;
   page_id: string;
   page_ref: string;
   article_number: number;
@@ -191,17 +192,32 @@ export interface Diagram {
   domain: string;
 }
 
+export type DiagramStatus = "" | "correct" | "text_only";
+
 export interface DiagramAnnotation {
   image_url: string;
   page_ref?: string;
   page_id?: string;
   article_number?: number;
   crop_coords?: unknown;
+  status?: DiagramStatus;
   title?: string;
   description?: string;
   tags?: string[];
+  vector_url?: string;
+  ai_url?: string;
   created_by?: string;
   created_at?: string;
+  updated_at?: string;
+}
+
+export interface DiagramPageStatus {
+  page_id: string;
+  page_ref?: string;
+  validated?: boolean;
+  missing_images?: boolean;
+  note?: string;
+  validated_by?: string;
   updated_at?: string;
 }
 

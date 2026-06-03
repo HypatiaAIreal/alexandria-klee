@@ -47,6 +47,7 @@ export async function POST(req: NextRequest) {
         page_id: body.page_id ?? "",
         article_number: body.article_number ?? null,
         crop_coords: body.crop_coords ?? null,
+        status: body.status ?? "",
         title: (body.title ?? "").trim(),
         description: (body.description ?? "").trim(),
         tags: Array.isArray(body.tags) ? body.tags : [],
