@@ -7,6 +7,7 @@ import { useAuth } from "@/components/AuthProvider";
 import Lightbox, { type LightboxImage } from "@/components/Lightbox";
 import DiagramRenditions from "@/components/DiagramRenditions";
 import DiagramAnnotator from "@/components/DiagramAnnotator";
+import PageTextModal from "@/components/PageTextModal";
 
 export default function PageReviewModal({
   pageId,
@@ -30,6 +31,7 @@ export default function PageReviewModal({
   const [pageStatus, setPageStatus] = useState<DiagramPageStatus>({ page_id: pageId });
   const [box, setBox] = useState<LightboxImage | null>(null);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [showText, setShowText] = useState(false);
 
   // Keep the card's quick-view (✦) pointed at the newest rendition.
   const onLatestChange = (image_url: string, aiUrl: string) => {
@@ -161,7 +163,15 @@ export default function PageReviewModal({
         <div className="grid flex-1 gap-5 overflow-y-auto p-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           {/* facsimile */}
           <div className="lg:sticky lg:top-0 lg:h-fit">
-            <p className="label mb-2">{t("diagrams.review.facsimile")}</p>
+            <div className="mb-2 flex items-center justify-between gap-2">
+              <p className="label">{t("diagrams.review.facsimile")}</p>
+              <button
+                onClick={() => setShowText(true)}
+                className="rounded-md border border-ink-700 px-2.5 py-1 text-xs text-parchment-300 hover:border-ochre/50 hover:text-ochre"
+              >
+                ▤ {t("diagrams.review.readPage")}
+              </button>
+            </div>
             {facsimile ? (
               <button onClick={() => setBox({ src: facsimile, caption: pageRef })} className="block w-full">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -300,6 +310,7 @@ export default function PageReviewModal({
       </div>
 
       <Lightbox image={box} onClose={() => setBox(null)} />
+      {showText && <PageTextModal pageId={pageId} pageRef={pageRef} onClose={() => setShowText(false)} />}
     </div>
   );
 }

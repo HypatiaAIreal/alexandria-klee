@@ -324,6 +324,11 @@ const en: Dict = {
       plateLabel: "Plate",
       plateAuto: "Auto",
       plateOriginal: "Original",
+      readPage: "Read page",
+    },
+    pageText: {
+      empty: "No text for this page.",
+      noText: "No text in this language.",
     },
     versions: {
       manage: "Versions",
@@ -656,6 +661,11 @@ const de: Dict = {
       plateLabel: "Tafel",
       plateAuto: "Auto",
       plateOriginal: "Original",
+      readPage: "Seite lesen",
+    },
+    pageText: {
+      empty: "Kein Text für diese Seite.",
+      noText: "Kein Text in dieser Sprache.",
     },
     versions: {
       manage: "Versionen",
@@ -988,6 +998,11 @@ const es: Dict = {
       plateLabel: "Lámina",
       plateAuto: "Auto",
       plateOriginal: "Original",
+      readPage: "Leer página",
+    },
+    pageText: {
+      empty: "No hay texto para esta página.",
+      noText: "No hay texto en este idioma.",
     },
     versions: {
       manage: "Versiones",
