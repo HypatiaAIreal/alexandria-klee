@@ -30,7 +30,7 @@ import type {
   SeedData,
 } from "./types";
 import { hasMongo } from "./mongodb";
-import { applyImageBase, imageBase, resolveVectorSrc } from "./images";
+import { applyImageBase, imageBase, resolveImageSrc, resolveVectorSrc } from "./images";
 import { chapterIdOf, slug as _slug } from "./util";
 import diagramIndex from "@/data/diagram_index.json";
 import vectorIndex from "@/data/vector_index.json";
@@ -140,6 +140,38 @@ export function getDataset(): Promise<SeedData> {
   return cachePromise;
 }
 
+// ── lightweight per-need loaders ─────────────────────────────────
+// The full corpus is ~85 MB. Loading + deep-cloning all of it inside a
+// serverless function (which `getDataset()` does) is too slow on the free
+// Atlas tier and times out the request. So the hot paths query Mongo
+// directly for ONLY the documents/fields they need, and fall back to the
+// cached dataset only when there's no database (local dev with the seed).
+const plainClone = <T,>(v: unknown): T => JSON.parse(JSON.stringify(v ?? null)) as T;
+
+async function models() {
+  const { connectMongo } = await import("./mongodb");
+  const m = await import("./models");
+  await connectMongo();
+  return m;
+}
+
+function rewritePage<T extends Page>(p: T): T {
+  if (!imageBase()) return p;
+  p.facsimile_local = resolveImageSrc(p.facsimile_local);
+  for (const a of p.articles ?? [])
+    for (const img of a.images ?? []) if (img) img.url_local = resolveImageSrc(img.url_local);
+  return p;
+}
+
+const sortChapters = (chapters: Chapter[]): Chapter[] =>
+  [...chapters].sort((a, b) => {
+    const order = (c: Chapter) =>
+      (c.section === "BF" ? 0 : 1) * 1000 +
+      ({ I: 1, II: 2, III: 3, Anhang: 4 }[c.part ?? ""] ?? 0) * 100 +
+      c.chapter_number;
+    return order(a) - order(b);
+  });
+
 // ── normalisation (diacritic-insensitive search) ────────────────
 const fold = (s: string) =>
   s
@@ -150,22 +182,38 @@ const fold = (s: string) =>
 
 // ── queries ─────────────────────────────────────────────────────
 export async function getChapters(): Promise<Chapter[]> {
+  if (hasMongo) {
+    try {
+      const { ChapterModel } = await models();
+      const docs = await ChapterModel.find().lean();
+      if (docs.length) return sortChapters(plainClone<Chapter[]>(docs));
+    } catch (e) {
+      console.warn("[data] getChapters Mongo failed:", e);
+    }
+  }
   const { chapters } = await getDataset();
-  return [...chapters].sort((a, b) => {
-    const order = (c: Chapter) =>
-      (c.section === "BF" ? 0 : 1) * 1000 +
-      ({ I: 1, II: 2, III: 3, Anhang: 4 }[c.part ?? ""] ?? 0) * 100 +
-      c.chapter_number;
-    return order(a) - order(b);
-  });
+  return sortChapters(chapters);
 }
 
 export async function getChapter(id: string): Promise<Chapter | undefined> {
-  const { chapters } = await getDataset();
-  return chapters.find((c) => c.id === id);
+  return (await getChapters()).find((c) => c.id === id);
 }
 
+// All pages WITHOUT their (heavy) articles — for list/grid views (home,
+// browse) that only need page-level metadata.
 export async function getPages(): Promise<Page[]> {
+  if (hasMongo) {
+    try {
+      const { PageModel } = await models();
+      const docs = await PageModel.find().select("-articles").lean();
+      if (docs.length)
+        return plainClone<Page[]>(docs)
+          .map((p) => rewritePage(p))
+          .sort((a, b) => a.page_number - b.page_number);
+    } catch (e) {
+      console.warn("[data] getPages Mongo failed:", e);
+    }
+  }
   const { pages } = await getDataset();
   return [...pages].sort((a, b) => a.page_number - b.page_number);
 }
@@ -173,6 +221,23 @@ export async function getPages(): Promise<Page[]> {
 export async function getPagesByChapter(chapterId: string): Promise<Page[]> {
   const chapter = await getChapter(chapterId);
   if (!chapter) return [];
+  if (hasMongo) {
+    try {
+      const { PageModel } = await models();
+      // One chapter's pages, with articles but without the unused search_index.
+      const docs = await PageModel.find({
+        section: chapter.section,
+        chapter_number: chapter.chapter_number,
+      })
+        .select("-articles.search_index")
+        .lean();
+      const filtered = plainClone<Page[]>(docs).filter((p) => (p.part ?? "") === (chapter.part ?? ""));
+      if (filtered.length || docs.length)
+        return filtered.map((p) => rewritePage(p)).sort((a, b) => a.page_number - b.page_number);
+    } catch (e) {
+      console.warn("[data] getPagesByChapter Mongo failed:", e);
+    }
+  }
   const { pages } = await getDataset();
   return pages
     .filter(
@@ -185,26 +250,72 @@ export async function getPagesByChapter(chapterId: string): Promise<Page[]> {
 }
 
 export async function getPage(id: string): Promise<Page | undefined> {
+  if (hasMongo) {
+    try {
+      const { PageModel } = await models();
+      const doc = await PageModel.findOne({ id }).select("-articles.search_index").lean();
+      if (doc) return rewritePage(plainClone<Page>(doc));
+    } catch (e) {
+      console.warn("[data] getPage Mongo failed:", e);
+    }
+  }
   const { pages } = await getDataset();
   return pages.find((p) => p.id === id);
 }
 
 export async function getArticle(id: string): Promise<Article | undefined> {
-  const { articles } = await getDataset();
+  if (hasMongo) {
+    try {
+      const { ArticleModel } = await models();
+      const doc = await ArticleModel.findOne({ id }).select("-search_index").lean();
+      if (doc) return plainClone<Article>(doc);
+    } catch (e) {
+      console.warn("[data] getArticle Mongo failed:", e);
+    }
+  }
+  const articles = await getArticles();
   return articles.find((a) => a.id === id);
 }
 
+// All articles WITHOUT search_index — for search & the concept graph.
 export async function getArticles(): Promise<Article[]> {
-  const { articles } = await getDataset();
+  if (hasMongo) {
+    try {
+      const { ArticleModel } = await models();
+      const docs = await ArticleModel.find().select("-search_index").lean();
+      if (docs.length) return plainClone<Article[]>(docs);
+    } catch (e) {
+      console.warn("[data] getArticles Mongo failed:", e);
+    }
+  }
+  const articles = await getArticles();
   return articles;
 }
 
 export async function getGlossary(): Promise<GlossaryEntry[]> {
+  if (hasMongo) {
+    try {
+      const { GlossaryModel } = await models();
+      const docs = await GlossaryModel.find().lean();
+      if (docs.length) return plainClone<GlossaryEntry[]>(docs).sort((a, b) => b.frequency - a.frequency);
+    } catch (e) {
+      console.warn("[data] getGlossary Mongo failed:", e);
+    }
+  }
   const { glossary } = await getDataset();
   return [...glossary].sort((a, b) => b.frequency - a.frequency);
 }
 
 export async function getStats(): Promise<CorpusStats> {
+  if (hasMongo) {
+    try {
+      const { StatsModel } = await models();
+      const doc = await StatsModel.findOne().lean();
+      if (doc) return plainClone<CorpusStats>(doc);
+    } catch (e) {
+      console.warn("[data] getStats Mongo failed:", e);
+    }
+  }
   const { stats } = await getDataset();
   return stats;
 }
@@ -218,7 +329,7 @@ export interface FilterOptions {
 }
 
 export async function getFilterOptions(): Promise<FilterOptions> {
-  const { articles } = await getDataset();
+  const articles = await getArticles();
   const domains = new Set<string>();
   const complexities = new Set<string>();
   const contentTypes = new Set<string>();
@@ -270,7 +381,7 @@ function escapeHtml(s: string) {
 }
 
 export async function searchArticles(params: SearchParams): Promise<SearchHit[]> {
-  const { articles } = await getDataset();
+  const articles = await getArticles();
   const q = (params.q ?? "").trim();
   const qFold = fold(q);
   const lang = params.lang ?? "all";
@@ -308,7 +419,7 @@ export async function searchArticles(params: SearchParams): Promise<SearchHit[]>
 
 // ── concept co-occurrence graph ─────────────────────────────────
 export async function getConceptGraph(minWeight = 1): Promise<ConceptGraph> {
-  const { articles } = await getDataset();
+  const articles = await getArticles();
   const freq = new Map<string, number>();
   const domain = new Map<string, string>();
   const enMap = new Map<string, string>();
@@ -482,10 +593,69 @@ export interface DiagramChapter {
   count: number;
 }
 
+// Slim page loader for diagram views: only the fields needed to list/curate
+// drawings — never the heavy multilingual text or search_index.
+const DIAGRAM_PAGE_FIELDS =
+  "id page_ref section part chapter_number chapter_name_de page_number facsimile_local " +
+  "articles.ref articles.article_number articles.images articles.metadata.bauhaus_domain";
+
+async function loadDiagramPages(filter: Record<string, unknown> = {}): Promise<Page[]> {
+  if (hasMongo) {
+    try {
+      const { PageModel } = await models();
+      const docs = await PageModel.find(filter).select(DIAGRAM_PAGE_FIELDS).lean();
+      return plainClone<Page[]>(docs).map((p) => rewritePage(p));
+    } catch (e) {
+      console.warn("[data] loadDiagramPages Mongo failed:", e);
+    }
+  }
+  const { pages } = await getDataset();
+  return pages;
+}
+
+// Total number of graphic crops (from the prebuilt index) — instant, no DB.
+export function getDrawingCount(): number {
+  return GRAPHIC_TAILS.size;
+}
+
+// Article count + per-domain distribution via a cheap aggregation (no full load).
+export async function getArticleDomainCounts(): Promise<{
+  total: number;
+  domains: { domain: string; count: number }[];
+}> {
+  if (hasMongo) {
+    try {
+      const { ArticleModel } = await models();
+      const [total, agg] = await Promise.all([
+        ArticleModel.estimatedDocumentCount(),
+        ArticleModel.aggregate([
+          { $group: { _id: { $ifNull: ["$metadata.bauhaus_domain", "general"] }, count: { $sum: 1 } } },
+        ]),
+      ]);
+      const domains = (agg as { _id: string; count: number }[])
+        .map((d) => ({ domain: d._id || "general", count: d.count }))
+        .sort((a, b) => b.count - a.count);
+      return { total, domains };
+    } catch (e) {
+      console.warn("[data] getArticleDomainCounts Mongo failed:", e);
+    }
+  }
+  const articles = await getArticles();
+  const m = new Map<string, number>();
+  for (const a of articles) {
+    const d = a.metadata.bauhaus_domain || "general";
+    m.set(d, (m.get(d) ?? 0) + 1);
+  }
+  return {
+    total: articles.length,
+    domains: [...m.entries()].map(([domain, count]) => ({ domain, count })).sort((a, b) => b.count - a.count),
+  };
+}
+
 // NOTE: iterate over PAGES, not the flat articles array — pipeline-produced
 // article docs only carry id/ref, while section/part/page_ref live on pages.
 export async function getDiagramChapters(): Promise<DiagramChapter[]> {
-  const { pages, chapters } = await getDataset();
+  const [pages, chapters] = await Promise.all([loadDiagramPages(), getChapters()]);
   const counts = new Map<string, number>();
   for (const p of pages) {
     if (!p.section) continue;
@@ -515,7 +685,16 @@ export async function getDiagrams(opts: {
   offset?: number;
   limit?: number;
 }): Promise<{ total: number; diagrams: Diagram[] }> {
-  const { pages } = await getDataset();
+  // Narrow the Mongo query to the requested page/chapter so we never scan the
+  // whole corpus. The per-row checks below still refine (e.g. chapter part).
+  let filter: Record<string, unknown> = {};
+  if (opts.page) {
+    filter = { id: opts.page };
+  } else if (opts.chapter) {
+    const ch = await getChapter(opts.chapter);
+    if (ch) filter = { section: ch.section, chapter_number: ch.chapter_number };
+  }
+  const pages = await loadDiagramPages(filter);
   const offset = opts.offset ?? 0;
   const limit = opts.limit ?? 60;
   const type = opts.type ?? "graphics";
