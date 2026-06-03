@@ -21,13 +21,24 @@ const cached: Cached = globalAny._kleeMongoose || (globalAny._kleeMongoose = { c
 
 export async function connectMongo(): Promise<typeof mongoose> {
   if (!MONGODB_URI) throw new Error("MONGODB_URI is not set");
-  if (cached.conn) return cached.conn;
+  if (cached.conn && cached.conn.connection.readyState === 1) return cached.conn;
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
       dbName: MONGODB_DB,
       bufferCommands: false,
+      // Fail fast instead of hanging ~30s if Atlas is paused/unreachable.
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 10000,
     });
   }
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (err) {
+    // Reset so the NEXT request retries the connection (self-heals once
+    // Atlas is back) instead of awaiting a permanently-rejected promise.
+    cached.promise = null;
+    cached.conn = null;
+    throw err;
+  }
   return cached.conn;
 }
