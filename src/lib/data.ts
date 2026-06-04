@@ -11,6 +11,7 @@
 // ─────────────────────────────────────────────────────────────
 import fs from "node:fs";
 import path from "node:path";
+import { unstable_cache } from "next/cache";
 import booksSeed from "@/data/books.json";
 import type {
   Article,
@@ -312,9 +313,10 @@ export async function getGlossary(): Promise<GlossaryEntry[]> {
   if (hasMongo) {
     try {
       const { GlossaryModel } = await models();
-      // Cap example_contexts to 8 per term — the rest are never shown and make
-      // the payload huge ($slice keeps all other fields).
-      const docs = await GlossaryModel.find().select({ example_contexts: { $slice: 8 } }).lean();
+      // Only the fields the glossary UI shows, with at most 3 example contexts.
+      const docs = await GlossaryModel.find()
+        .select({ term_de: 1, term_en: 1, term_es: 1, frequency: 1, example_contexts: { $slice: 3 } })
+        .lean();
       if (docs.length) return plainClone<GlossaryEntry[]>(docs).sort((a, b) => b.frequency - a.frequency);
     } catch (e) {
       console.warn("[data] getGlossary Mongo failed:", e);
@@ -509,6 +511,35 @@ function escapeHtml(s: string) {
 
 const SEARCH_LIMIT = 120;
 
+function plainExcerpt(text: string): string {
+  if (!text) return "";
+  const t = text.replace(/\s+/g, " ").trim();
+  return escapeHtml(t.slice(0, 180)) + (t.length > 180 ? " …" : "");
+}
+
+// Build the per-language highlighted snippets for one matching article.
+function buildHit(a: Article, qFold: string, lang: Lang | "all"): SearchHit {
+  const snippets: { lang: Lang; html: string }[] = [];
+  const fields: [Lang, string][] = [
+    ["de", a.text_de],
+    ["en", a.text_en],
+    ["es", a.text_es],
+  ];
+  for (const [l, text] of fields) {
+    if (lang !== "all" && lang !== l) continue;
+    const s = makeSnippet(text, qFold, l);
+    if (s) snippets.push(s);
+  }
+  // Word-stem matches (from the text index) may not contain the exact folded
+  // substring — show a plain excerpt so the result still has context.
+  if (snippets.length === 0) {
+    const l: Lang = lang === "all" ? "de" : lang;
+    const primary = l === "en" ? a.text_en : l === "es" ? a.text_es : a.text_de;
+    snippets.push({ lang: l, html: plainExcerpt(primary || a.text_de || a.text_en || a.text_es) });
+  }
+  return { article: a, snippets };
+}
+
 export async function searchArticles(params: SearchParams): Promise<SearchHit[]> {
   const q = (params.q ?? "").trim();
   const qFold = fold(q);
@@ -519,8 +550,33 @@ export async function searchArticles(params: SearchParams): Promise<SearchHit[]>
   // ENTIRE corpus just to "show all articles", which hung the search page.)
   if (!q && !hasFilters) return [];
 
-  const articles = await getArticles();
+  const filterDoc: Record<string, unknown> = {};
+  if (params.domain) filterDoc["metadata.bauhaus_domain"] = params.domain;
+  if (params.complexity) filterDoc["metadata.complexity_level"] = params.complexity;
+  if (params.contentType) filterDoc["metadata.content_type"] = params.contentType;
+  if (params.tag) filterDoc["metadata.semantic_tags"] = params.tag;
 
+  // ── Fast path: MongoDB text index returns only matching docs ──
+  if (hasMongo) {
+    try {
+      const { ArticleModel } = await models();
+      if (q) {
+        const docs = await ArticleModel.find({ $text: { $search: q }, ...filterDoc })
+          .select("-search_index")
+          .limit(SEARCH_LIMIT)
+          .lean();
+        return plainClone<Article[]>(docs).map((a) => buildHit(a, qFold, lang));
+      }
+      // filters only (no query word) → return the matching subset
+      const docs = await ArticleModel.find(filterDoc).select("-search_index").limit(SEARCH_LIMIT).lean();
+      return plainClone<Article[]>(docs).map((a) => ({ article: a, snippets: [] }));
+    } catch (e) {
+      console.warn("[data] text-index search failed, using in-memory:", e);
+    }
+  }
+
+  // ── Fallback: in-memory scan (no DB, or the text index is missing) ──
+  const articles = await getArticles();
   const matchesFilters = (a: Article) =>
     (!params.domain || a.metadata.bauhaus_domain === params.domain) &&
     (!params.complexity || a.metadata.complexity_level === params.complexity) &&
@@ -530,13 +586,11 @@ export async function searchArticles(params: SearchParams): Promise<SearchHit[]>
   const hits: SearchHit[] = [];
   for (const a of articles) {
     if (!matchesFilters(a)) continue;
-
     if (!q) {
       hits.push({ article: a, snippets: [] });
       if (hits.length >= SEARCH_LIMIT) break;
       continue;
     }
-
     const snippets: { lang: Lang; html: string }[] = [];
     const fields: [Lang, string][] = [
       ["de", a.text_de],
@@ -582,7 +636,13 @@ async function getConceptSeeds(): Promise<{ concepts_de: string[]; concepts_en: 
 }
 
 // ── concept co-occurrence graph ─────────────────────────────────
-export async function getConceptGraph(minWeight = 1): Promise<ConceptGraph> {
+// Cached: computed once and reused across requests (the corpus is static), so
+// the concept map doesn't re-scan every article on every visit.
+export const getConceptGraph = unstable_cache(computeConceptGraph, ["concept-graph-v1"], {
+  revalidate: 86400,
+});
+
+async function computeConceptGraph(minWeight = 1): Promise<ConceptGraph> {
   const articles = await getConceptSeeds();
   const freq = new Map<string, number>();
   const domain = new Map<string, string>();
