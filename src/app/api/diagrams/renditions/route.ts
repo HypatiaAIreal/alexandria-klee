@@ -16,7 +16,25 @@ const DEFAULT_PROMPT =
 
 const MAX_UPLOAD = 8 * 1024 * 1024; // 8 MB raw (base64 fits well under Mongo's 16 MB)
 
+function idFromUrl(url: string): string | null {
+  return new URLSearchParams(url.split("?")[1] ?? "").get("id");
+}
+
+async function bytesFromMongo(modelName: "manual" | "rendition", id: string | null): Promise<Buffer> {
+  if (!id) throw new Error("missing id");
+  const { connectMongo } = await import("@/lib/mongodb");
+  const models = await import("@/lib/models");
+  await connectMongo();
+  const Model = modelName === "manual" ? models.ManualDiagramModel : models.DiagramRenditionModel;
+  const doc = await Model.findById(id).lean<{ data?: string }>();
+  if (!doc?.data) throw new Error(`${modelName} image not found`);
+  return Buffer.from(doc.data, "base64");
+}
+
 async function readImageBytes(url: string): Promise<Buffer> {
+  // Internal images live in Mongo, not on disk — read their bytes directly.
+  if (url.startsWith("/api/diagrams/capture-image")) return bytesFromMongo("manual", idFromUrl(url));
+  if (url.startsWith("/api/diagrams/rendition")) return bytesFromMongo("rendition", idFromUrl(url));
   if (url.startsWith("http")) {
     const r = await fetch(url);
     if (!r.ok) throw new Error(`fetch crop failed: ${r.status}`);
