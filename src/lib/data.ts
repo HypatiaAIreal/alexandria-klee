@@ -434,6 +434,29 @@ export interface FilterOptions {
 }
 
 export async function getFilterOptions(): Promise<FilterOptions> {
+  const order = ["introductory", "intermediate", "advanced"];
+  if (hasMongo) {
+    try {
+      const { ArticleModel } = await models();
+      // distinct() returns only the small set of unique values — no full load.
+      const [domains, complexities, contentTypes, tags] = await Promise.all([
+        ArticleModel.distinct("metadata.bauhaus_domain"),
+        ArticleModel.distinct("metadata.complexity_level"),
+        ArticleModel.distinct("metadata.content_type"),
+        ArticleModel.distinct("metadata.semantic_tags"),
+      ]);
+      const clean = (a: unknown[]) =>
+        Array.from(new Set(a.filter((x): x is string => typeof x === "string" && x.trim() !== "")));
+      return {
+        domains: clean(domains).sort(),
+        complexities: clean(complexities).sort((a, b) => order.indexOf(a) - order.indexOf(b)),
+        contentTypes: clean(contentTypes).sort(),
+        tags: clean(tags).sort(),
+      };
+    } catch (e) {
+      console.warn("[data] getFilterOptions Mongo failed:", e);
+    }
+  }
   const articles = await getArticleMetas();
   const domains = new Set<string>();
   const complexities = new Set<string>();
@@ -445,7 +468,6 @@ export async function getFilterOptions(): Promise<FilterOptions> {
     if (a.metadata.content_type) contentTypes.add(a.metadata.content_type);
     a.metadata.semantic_tags?.forEach((t) => tags.add(t));
   }
-  const order = ["introductory", "intermediate", "advanced"];
   return {
     domains: [...domains].sort(),
     complexities: [...complexities].sort((a, b) => order.indexOf(a) - order.indexOf(b)),
@@ -485,11 +507,19 @@ function escapeHtml(s: string) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
+const SEARCH_LIMIT = 120;
+
 export async function searchArticles(params: SearchParams): Promise<SearchHit[]> {
-  const articles = await getArticles();
   const q = (params.q ?? "").trim();
   const qFold = fold(q);
   const lang = params.lang ?? "all";
+  const hasFilters = !!(params.domain || params.complexity || params.contentType || params.tag);
+
+  // Nothing to search → return nothing. (Prevents the page from loading the
+  // ENTIRE corpus just to "show all articles", which hung the search page.)
+  if (!q && !hasFilters) return [];
+
+  const articles = await getArticles();
 
   const matchesFilters = (a: Article) =>
     (!params.domain || a.metadata.bauhaus_domain === params.domain) &&
@@ -503,6 +533,7 @@ export async function searchArticles(params: SearchParams): Promise<SearchHit[]>
 
     if (!q) {
       hits.push({ article: a, snippets: [] });
+      if (hits.length >= SEARCH_LIMIT) break;
       continue;
     }
 
@@ -518,24 +549,52 @@ export async function searchArticles(params: SearchParams): Promise<SearchHit[]>
       if (s) snippets.push(s);
     }
     if (snippets.length) hits.push({ article: a, snippets });
+    if (hits.length >= SEARCH_LIMIT) break;
   }
   return hits;
 }
 
+// Only the fields the concept graph needs (concepts + domain) — much lighter
+// than loading every article's full metadata.
+async function getConceptSeeds(): Promise<{ concepts_de: string[]; concepts_en: string[]; bauhaus_domain: string }[]> {
+  if (hasMongo) {
+    try {
+      const { ArticleModel } = await models();
+      const docs = await ArticleModel.find()
+        .select("metadata.concepts_de metadata.concepts_en metadata.bauhaus_domain")
+        .lean<{ metadata?: { concepts_de?: string[]; concepts_en?: string[]; bauhaus_domain?: string } }[]>();
+      if (docs.length)
+        return docs.map((d) => ({
+          concepts_de: d.metadata?.concepts_de ?? [],
+          concepts_en: d.metadata?.concepts_en ?? [],
+          bauhaus_domain: d.metadata?.bauhaus_domain ?? "general",
+        }));
+    } catch (e) {
+      console.warn("[data] getConceptSeeds Mongo failed:", e);
+    }
+  }
+  const articles = await getArticleMetas();
+  return articles.map((a) => ({
+    concepts_de: a.metadata.concepts_de ?? [],
+    concepts_en: a.metadata.concepts_en ?? [],
+    bauhaus_domain: a.metadata.bauhaus_domain ?? "general",
+  }));
+}
+
 // ── concept co-occurrence graph ─────────────────────────────────
 export async function getConceptGraph(minWeight = 1): Promise<ConceptGraph> {
-  const articles = await getArticleMetas();
+  const articles = await getConceptSeeds();
   const freq = new Map<string, number>();
   const domain = new Map<string, string>();
   const enMap = new Map<string, string>();
   const pairs = new Map<string, number>();
 
   for (const a of articles) {
-    const concepts = a.metadata.concepts_de ?? [];
-    const enc = a.metadata.concepts_en ?? [];
+    const concepts = a.concepts_de ?? [];
+    const enc = a.concepts_en ?? [];
     concepts.forEach((c, i) => {
       freq.set(c, (freq.get(c) ?? 0) + 1);
-      if (!domain.has(c)) domain.set(c, a.metadata.bauhaus_domain);
+      if (!domain.has(c)) domain.set(c, a.bauhaus_domain);
       if (enc[i] && !enMap.has(c)) enMap.set(c, enc[i]);
     });
     const uniq = [...new Set(concepts)].sort();
