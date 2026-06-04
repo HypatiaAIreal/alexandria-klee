@@ -22,6 +22,30 @@ export default function GlossaryClient({ glossary }: { glossary: GlossaryEntry[]
   const [category, setCategory] = useState<"all" | "core_concept" | "discovered">("all");
   const [sort, setSort] = useState<Sort>("frequency");
   const [openTerm, setOpenTerm] = useState<string | null>(null);
+  // Example contexts are fetched lazily per term (the list itself ships without
+  // them so the page loads fast).
+  const [ctxCache, setCtxCache] = useState<Record<string, { ref: string; context: string }[]>>({});
+  const [ctxLoading, setCtxLoading] = useState<string | null>(null);
+
+  const toggleTerm = async (term: string) => {
+    if (openTerm === term) {
+      setOpenTerm(null);
+      return;
+    }
+    setOpenTerm(term);
+    if (!ctxCache[term]) {
+      setCtxLoading(term);
+      try {
+        const r = await fetch(`/api/glossary/contexts?term=${encodeURIComponent(term)}`);
+        const j = await r.json();
+        setCtxCache((prev) => ({ ...prev, [term]: j.contexts ?? [] }));
+      } catch {
+        setCtxCache((prev) => ({ ...prev, [term]: [] }));
+      } finally {
+        setCtxLoading(null);
+      }
+    }
+  };
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -115,7 +139,7 @@ export default function GlossaryClient({ glossary }: { glossary: GlossaryEntry[]
             return (
               <li key={g.term_de} className="border-b border-ink-700/40 last:border-0">
                 <button
-                  onClick={() => setOpenTerm(open ? null : g.term_de)}
+                  onClick={() => toggleTerm(g.term_de)}
                   className="grid w-full grid-cols-[1.4fr_1.4fr_1.4fr_auto] items-center gap-3 px-5 py-3 text-left transition-colors hover:bg-ink-800/50"
                 >
                   <span className="flex items-center gap-2">
@@ -133,9 +157,11 @@ export default function GlossaryClient({ glossary }: { glossary: GlossaryEntry[]
                 {open && (
                   <div className="bg-ink-900/40 px-5 pb-4 pt-1">
                     <span className="chip">{catLabel(g.category)}</span>
-                    {g.example_contexts.length > 0 ? (
+                    {ctxLoading === g.term_de && !ctxCache[g.term_de] ? (
+                      <p className="mt-3 text-sm text-parchment-400">…</p>
+                    ) : (ctxCache[g.term_de]?.length ?? 0) > 0 ? (
                       <ul className="mt-3 space-y-2">
-                        {g.example_contexts.map((ctx, i) => {
+                        {ctxCache[g.term_de].map((ctx, i) => {
                           const { href, label } = refToHref(ctx.ref);
                           return (
                             <li key={i} className="text-sm">

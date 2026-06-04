@@ -309,21 +309,42 @@ export async function getArticleMetas(): Promise<Pick<Article, "metadata">[]> {
   return articles;
 }
 
-export async function getGlossary(): Promise<GlossaryEntry[]> {
+// Glossary list = TERMS ONLY (no example_contexts) → tiny & cacheable. The
+// contexts are fetched on demand when a term is expanded (getGlossaryContexts).
+async function computeGlossary(): Promise<GlossaryEntry[]> {
   if (hasMongo) {
     try {
       const { GlossaryModel } = await models();
-      // Only the fields the glossary UI shows, with at most 3 example contexts.
-      const docs = await GlossaryModel.find()
-        .select({ term_de: 1, term_en: 1, term_es: 1, frequency: 1, example_contexts: { $slice: 3 } })
-        .lean();
-      if (docs.length) return plainClone<GlossaryEntry[]>(docs).sort((a, b) => b.frequency - a.frequency);
+      const docs = await GlossaryModel.find().select("term_de term_en term_es frequency category").lean();
+      if (docs.length)
+        return plainClone<GlossaryEntry[]>(docs)
+          .map((g) => ({ ...g, example_contexts: g.example_contexts ?? [] }))
+          .sort((a, b) => b.frequency - a.frequency);
     } catch (e) {
       console.warn("[data] getGlossary Mongo failed:", e);
     }
   }
   const { glossary } = await getDataset();
   return [...glossary].sort((a, b) => b.frequency - a.frequency);
+}
+export const getGlossary = unstable_cache(computeGlossary, ["glossary-terms-v1"], { revalidate: 86400 });
+
+// Example contexts for ONE term, fetched lazily when the user expands it.
+export async function getGlossaryContexts(term: string): Promise<{ ref: string; context: string }[]> {
+  if (!term) return [];
+  if (hasMongo) {
+    try {
+      const { GlossaryModel } = await models();
+      const doc = await GlossaryModel.findOne({ term_de: term })
+        .select({ example_contexts: { $slice: 6 } })
+        .lean<{ example_contexts?: { ref: string; context: string }[] }>();
+      return doc?.example_contexts ?? [];
+    } catch (e) {
+      console.warn("[data] getGlossaryContexts Mongo failed:", e);
+    }
+  }
+  const { glossary } = await getDataset();
+  return glossary.find((g) => g.term_de === term)?.example_contexts ?? [];
 }
 
 export async function getStats(): Promise<CorpusStats> {
