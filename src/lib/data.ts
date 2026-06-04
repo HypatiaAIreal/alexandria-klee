@@ -739,29 +739,42 @@ export async function getArticleDomainCounts(): Promise<{
   };
 }
 
-// NOTE: iterate over PAGES, not the flat articles array — pipeline-produced
-// article docs only carry id/ref, while section/part/page_ref live on pages.
-export async function getDiagramChapters(): Promise<DiagramChapter[]> {
-  const [pages, chapters] = await Promise.all([loadDiagramPages(), getChapters()]);
-  const counts = new Map<string, number>();
-  for (const p of pages) {
-    if (!p.section) continue;
-    let n = 0;
-    for (const a of p.articles ?? [])
-      for (const img of a.images ?? []) if (img?.url_local && isGraphic(img.url_local)) n++;
-    if (!n) continue;
-    const cid = chapterIdOf(p.section, p.part, p.chapter_number);
-    counts.set(cid, (counts.get(cid) ?? 0) + n);
+// Graphic count per chapter id, derived from the prebuilt diagram index — the
+// tail path encodes section/part/chapter (e.g. "/BG/II/05/001/…" or
+// "/BF/00/003/…"). No database load at all → instant.
+// "/BG/II/05/001/…" or "/BF/00/003/…" → the chapter id (chapterIdOf).
+function chapterIdFromTail(tail: string): string | null {
+  const seg = tail.split("/").filter(Boolean); // section[/part]/chapter/page/file
+  if (seg.length < 3) return null;
+  const section = seg[0];
+  const part = section === "BF" ? null : seg[1];
+  const num = parseInt(section === "BF" ? seg[1] : seg[2], 10);
+  if (Number.isNaN(num)) return null;
+  return chapterIdOf(section, part, num);
+}
+
+let GRAPHIC_CHAPTER_COUNTS: Record<string, number> | null = null;
+function graphicCountsByChapter(): Record<string, number> {
+  if (GRAPHIC_CHAPTER_COUNTS) return GRAPHIC_CHAPTER_COUNTS;
+  const out: Record<string, number> = {};
+  for (const tail of GRAPHIC_TAILS) {
+    const id = chapterIdFromTail(tail);
+    if (id) out[id] = (out[id] ?? 0) + 1;
   }
-  const nameOf = (id: string) => chapters.find((c) => c.id === id);
-  return [...counts.entries()]
-    .map(([id, count]) => {
-      const c = nameOf(id);
-      const label = c
-        ? `${c.section}${c.part ? ` ${c.part}.${c.chapter_number}` : ""} · ${c.name_de}`
-        : id;
-      return { id, label, count };
-    })
+  GRAPHIC_CHAPTER_COUNTS = out;
+  return out;
+}
+
+export async function getDiagramChapters(): Promise<DiagramChapter[]> {
+  const chapters = await getChapters(); // light (one small collection)
+  const counts = graphicCountsByChapter();
+  return chapters
+    .map((c) => ({
+      id: c.id,
+      label: `${c.section}${c.part ? ` ${c.part}.${c.chapter_number}` : ""} · ${c.name_de}`,
+      count: counts[c.id] ?? 0,
+    }))
+    .filter((c) => c.count > 0)
     .sort((a, b) => a.label.localeCompare(b.label));
 }
 
@@ -901,21 +914,19 @@ export async function getEditorialChapter(chapterId: string): Promise<EditorialC
 export async function getEditorialChapters(): Promise<EditorialChapterSummary[]> {
   const ann = await loadCorrectAnnotations();
   if (ann.size === 0) return [];
-  const { diagrams } = await getDiagrams({ type: "all", limit: 1_000_000 });
-  const { chapters } = await getDataset();
-  const counts = new Map<string, number>();
-  for (const d of diagrams) {
-    if (!ann.has(d.image_url)) continue;
-    counts.set(d.chapter_id, (counts.get(d.chapter_id) ?? 0) + 1);
+  const chapters = await getChapters(); // light
+  // Derive each validated drawing's chapter from its image path — no page load.
+  const counts: Record<string, number> = {};
+  for (const a of ann.values()) {
+    const id = chapterIdFromTail(imageTail(a.image_url));
+    if (id) counts[id] = (counts[id] ?? 0) + 1;
   }
-  const nameOf = (id: string) => chapters.find((c) => c.id === id);
-  return [...counts.entries()]
-    .map(([id, count]) => {
-      const c = nameOf(id);
-      const label = c
-        ? `${c.section}${c.part ? ` ${c.part}.${c.chapter_number}` : ""} · ${c.name_de}`
-        : id;
-      return { id, label, count };
-    })
+  return chapters
+    .map((c) => ({
+      id: c.id,
+      label: `${c.section}${c.part ? ` ${c.part}.${c.chapter_number}` : ""} · ${c.name_de}`,
+      count: counts[c.id] ?? 0,
+    }))
+    .filter((c) => c.count > 0)
     .sort((a, b) => a.label.localeCompare(b.label));
 }
