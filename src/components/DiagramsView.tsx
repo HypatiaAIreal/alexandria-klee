@@ -14,7 +14,9 @@ const LIMIT = 60;
 export default function DiagramsView({ chapters }: { chapters: DiagramChapter[] }) {
   const { t } = useI18n();
   const { user } = useAuth();
-  const [chapter, setChapter] = useState("");
+  // Start on the first chapter (loads one chapter = fast) rather than "all
+  // chapters", which would scan the whole corpus just to show the first page.
+  const [chapter, setChapter] = useState(chapters[0]?.id ?? "");
   const [type, setType] = useState<"graphics" | "text" | "all">("graphics");
   const [statusFilter, setStatusFilter] = useState("all");
   const [diagrams, setDiagrams] = useState<Diagram[]>([]);
