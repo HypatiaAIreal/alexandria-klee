@@ -277,7 +277,7 @@ export async function getArticle(id: string): Promise<Article | undefined> {
   return articles.find((a) => a.id === id);
 }
 
-// All articles WITHOUT search_index — for search & the concept graph.
+// All articles WITHOUT search_index — for full-text search.
 export async function getArticles(): Promise<Article[]> {
   if (hasMongo) {
     try {
@@ -292,11 +292,29 @@ export async function getArticles(): Promise<Article[]> {
   return articles;
 }
 
+// Just article metadata (no text) — for the concept graph & filter options,
+// which never touch the multilingual body text.
+export async function getArticleMetas(): Promise<Pick<Article, "metadata">[]> {
+  if (hasMongo) {
+    try {
+      const { ArticleModel } = await models();
+      const docs = await ArticleModel.find().select("metadata").lean();
+      if (docs.length) return plainClone<Pick<Article, "metadata">[]>(docs);
+    } catch (e) {
+      console.warn("[data] getArticleMetas Mongo failed:", e);
+    }
+  }
+  const { articles } = await getDataset();
+  return articles;
+}
+
 export async function getGlossary(): Promise<GlossaryEntry[]> {
   if (hasMongo) {
     try {
       const { GlossaryModel } = await models();
-      const docs = await GlossaryModel.find().lean();
+      // Cap example_contexts to 8 per term — the rest are never shown and make
+      // the payload huge ($slice keeps all other fields).
+      const docs = await GlossaryModel.find().select({ example_contexts: { $slice: 8 } }).lean();
       if (docs.length) return plainClone<GlossaryEntry[]>(docs).sort((a, b) => b.frequency - a.frequency);
     } catch (e) {
       console.warn("[data] getGlossary Mongo failed:", e);
@@ -416,7 +434,7 @@ export interface FilterOptions {
 }
 
 export async function getFilterOptions(): Promise<FilterOptions> {
-  const articles = await getArticles();
+  const articles = await getArticleMetas();
   const domains = new Set<string>();
   const complexities = new Set<string>();
   const contentTypes = new Set<string>();
@@ -506,7 +524,7 @@ export async function searchArticles(params: SearchParams): Promise<SearchHit[]>
 
 // ── concept co-occurrence graph ─────────────────────────────────
 export async function getConceptGraph(minWeight = 1): Promise<ConceptGraph> {
-  const articles = await getArticles();
+  const articles = await getArticleMetas();
   const freq = new Map<string, number>();
   const domain = new Map<string, string>();
   const enMap = new Map<string, string>();
