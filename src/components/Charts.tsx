@@ -23,6 +23,10 @@ const tooltipStyle = {
   fontSize: 12,
   fontFamily: "var(--font-mono, monospace)",
 };
+// Recharts colours the item/label lines with the series colour by default,
+// which is unreadable on the dark tooltip — force them light.
+const tooltipItemStyle = { color: "#efe6d4" };
+const tooltipLabelStyle = { color: "#a99d88" };
 
 export function ConceptBarChart({
   data,
@@ -42,7 +46,12 @@ export function ConceptBarChart({
           axisLine={false}
           tickLine={false}
         />
-        <Tooltip contentStyle={tooltipStyle} cursor={{ fill: "rgba(216,166,87,0.08)" }} />
+        <Tooltip
+          contentStyle={tooltipStyle}
+          itemStyle={tooltipItemStyle}
+          labelStyle={tooltipLabelStyle}
+          cursor={{ fill: "rgba(216,166,87,0.08)" }}
+        />
         <Bar dataKey="count" radius={[0, 4, 4, 0]} barSize={16}>
           {data.map((d) => (
             <Cell key={d.term} fill={d.color} />
@@ -74,6 +83,8 @@ export function DomainDonut({ data }: { data: { domain: string; count: number }[
         </Pie>
         <Tooltip
           contentStyle={tooltipStyle}
+          itemStyle={tooltipItemStyle}
+          labelStyle={tooltipLabelStyle}
           formatter={(value: number, name: string) => [`${value}`, t(`domains.${name}`)]}
         />
       </PieChart>
