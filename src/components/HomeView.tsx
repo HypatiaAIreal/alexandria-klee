@@ -39,25 +39,40 @@ export default function HomeView({ data }: { data: HomeData }) {
   return (
     <div className="space-y-12">
       <section className="animate-fade-up pt-6">
-        <p className="label mb-4">{t("home.kicker")}</p>
-        <h1 className="max-w-4xl font-display text-4xl leading-[1.1] text-parchment-50 sm:text-6xl">
-          {t("home.heroPre")} <span className="text-ochre">{t("home.heroHighlight")}</span>
-        </h1>
-        <p className="mt-6 max-w-2xl font-serif text-lg leading-relaxed text-parchment-200">
-          {t("home.heroBody")}
-        </p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link href="/browse" className="rounded-md bg-ochre px-5 py-2.5 font-medium text-ink-950 transition-colors hover:bg-amber">
-            {t("home.browseCta")}
-          </Link>
-          {data.featured && (
-            <Link
-              href={`/page/${data.featured.id}`}
-              className="rounded-md border border-ink-700 px-5 py-2.5 text-parchment-100 transition-colors hover:border-ochre/50 hover:text-ochre"
-            >
-              {t("home.beginReading")} · {data.featured.page_ref}
-            </Link>
-          )}
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0 flex-1">
+            <p className="label mb-4">{t("home.kicker")}</p>
+            <h1 className="max-w-4xl font-display text-4xl leading-[1.1] text-parchment-50 sm:text-6xl">
+              {t("home.heroPre")} <span className="text-ochre">{t("home.heroHighlight")}</span>
+            </h1>
+            <p className="mt-6 max-w-2xl font-serif text-lg leading-relaxed text-parchment-200">
+              {t("home.heroBody")}
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/browse" className="rounded-md bg-ochre px-5 py-2.5 font-medium text-ink-950 transition-colors hover:bg-amber">
+                {t("home.browseCta")}
+              </Link>
+              {data.featured && (
+                <Link
+                  href={`/page/${data.featured.id}`}
+                  className="rounded-md border border-ink-700 px-5 py-2.5 text-parchment-100 transition-colors hover:border-ochre/50 hover:text-ochre"
+                >
+                  {t("home.beginReading")} · {data.featured.page_ref}
+                </Link>
+              )}
+            </div>
+          </div>
+          <figure className="mx-auto w-40 shrink-0 sm:w-48 lg:mx-0 lg:w-56">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/site/klee-portrait.jpg"
+              alt="Paul Klee, 1922"
+              className="w-full rounded-lg border border-ink-700 object-cover shadow-2xl"
+            />
+            <figcaption className="mt-2 text-center font-mono text-[0.58rem] tracking-wide text-parchment-400">
+              Paul Klee · Hugo Erfurth, 1922
+            </figcaption>
+          </figure>
         </div>
       </section>
 

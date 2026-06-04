@@ -987,7 +987,66 @@ export async function getDiagrams(opts: {
       }
     }
   }
+
+  // Merge manually-captured crops (pasted from a page's facsimile). They show
+  // first so a freshly-added capture is easy to find. Skipped for type "text".
+  if (type !== "text") {
+    const manual = await loadManualDiagrams(opts);
+    out.unshift(...manual);
+  }
+
   return { total: out.length, diagrams: out.slice(offset, offset + limit) };
+}
+
+// User-captured crops stored in Mongo, mapped to Diagram objects.
+async function loadManualDiagrams(opts: { chapter?: string; page?: string }): Promise<Diagram[]> {
+  if (!hasMongo) return [];
+  try {
+    const { ManualDiagramModel } = await models();
+    const q: Record<string, unknown> = opts.page
+      ? { page_id: opts.page }
+      : opts.chapter
+        ? { chapter_id: opts.chapter }
+        : {};
+    const docs = await ManualDiagramModel.find(q)
+      .select("page_id page_ref chapter_id section part chapter_number chapter_name_de article_number facsimile created_at")
+      .sort({ created_at: -1 })
+      .lean<
+        Array<{
+          _id: unknown;
+          page_id?: string;
+          page_ref?: string;
+          chapter_id?: string;
+          section?: string;
+          part?: string | null;
+          chapter_number?: number;
+          chapter_name_de?: string;
+          article_number?: number;
+          facsimile?: string;
+        }>
+      >();
+    return docs.map((d) => {
+      const id = String(d._id);
+      return {
+        image_url: `/api/diagrams/capture-image?id=${id}`,
+        facsimile: d.facsimile || "",
+        page_id: d.page_id ?? "",
+        page_ref: d.page_ref ?? "",
+        article_number: d.article_number ?? 0,
+        article_ref: `${d.page_ref ?? ""} · ✂`,
+        section: d.section ?? "",
+        part: d.part ?? null,
+        chapter_number: d.chapter_number ?? 0,
+        chapter_id: d.chapter_id ?? "",
+        chapter_name_de: d.chapter_name_de ?? "",
+        domain: "general",
+        vector_url: undefined,
+      };
+    });
+  } catch (e) {
+    console.warn("[data] loadManualDiagrams failed:", e);
+    return [];
+  }
 }
 
 // ── Editorial export (curated plates per chapter) ───────────────────

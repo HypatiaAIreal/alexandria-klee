@@ -171,6 +171,26 @@ const DiagramRenditionSchema = new Schema({
   created_at: { type: Date, default: Date.now },
 });
 
+// Manually-captured graphics: crops the user pastes/uploads from a page's
+// facsimile (when the automatic extraction missed a drawing). Stored in Mongo
+// and merged into the diagram gallery for that page/chapter.
+const ManualDiagramSchema = new Schema({
+  page_id: { type: String, index: true },
+  page_ref: String,
+  chapter_id: { type: String, index: true },
+  section: String,
+  part: String,
+  chapter_number: Number,
+  chapter_name_de: String,
+  article_number: Number,
+  facsimile: String, // the source page facsimile URL (for the review modal)
+  content_type: { type: String, default: "image/png" },
+  data: String, // base64
+  label: String,
+  created_by: String,
+  created_at: { type: Date, default: Date.now },
+});
+
 // Per-page validation state for the diagram curation workflow.
 const DiagramPageStatusSchema = new Schema({
   page_id: { type: String, index: true, unique: true },
@@ -225,3 +245,6 @@ export const DiagramAiImageModel =
 export const DiagramRenditionModel =
   mongoose.models.DiagramRendition ||
   mongoose.model("DiagramRendition", DiagramRenditionSchema, "diagram_renditions");
+export const ManualDiagramModel =
+  mongoose.models.ManualDiagram ||
+  mongoose.model("ManualDiagram", ManualDiagramSchema, "manual_diagrams");

@@ -5,6 +5,7 @@ import type { Article, Lang, Page } from "@/lib/types";
 import { MetaChips, TagList } from "@/components/MetaChips";
 import Lightbox, { type LightboxImage } from "@/components/Lightbox";
 import AnnotationPanel from "@/components/AnnotationPanel";
+import DiagramCapture from "@/components/DiagramCapture";
 import { useI18n } from "@/components/LanguageProvider";
 
 const ZPK = "http://www.kleegestaltungslehre.zpk.org";
@@ -117,6 +118,7 @@ export default function PageReader({ page }: { page: Page }) {
               {t("page.viewOnZpk")}
             </a>
           </div>
+          <DiagramCapture page={page} />
         </div>
 
         {/* Articles column */}
