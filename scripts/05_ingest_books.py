@@ -31,7 +31,10 @@ import common as C
 # ── Registry: only works BY Paul Klee ───────────────────────────
 # file, title, year, language, [skip_by_default]
 BOOKS = [
-    ("70856952-5-a-the-Diaries-of-Klee.pdf", "The Diaries of Paul Klee, 1898–1918", 1957, "en", False),
+    # Clean, complete text edition (478 pp, real text layer) — far better than
+    # the old 29-page scan. Its text layer has no font-based headings, so force
+    # page-chunk navigation (6th tuple field) instead of broken auto-headings.
+    ("news/The Diaries of Paul Klee, 1898-1918 (Art Ebook).pdf", "The Diaries of Paul Klee, 1898–1918", 1957, "en", False, True),
     ("134343205-Klee-Paul-on-Modern-Art.pdf", "On Modern Art", 1948, "en", False),
     # Use the text-based Praeger edition (the 146335658 scan has no text layer).
     ("Klee, Paul - Pedagogical Sketchbook.pdf", "Pedagogical Sketchbook", 1925, "en", False),
@@ -225,7 +228,7 @@ def page_lines(page) -> list[tuple[str, float]]:
     return out
 
 
-def ingest_book(path, title, year, language, do_ocr=False, do_cover=True, ocr_lang="eng+deu") -> dict:
+def ingest_book(path, title, year, language, do_ocr=False, do_cover=True, ocr_lang="eng+deu", force_chunk=False) -> dict:
     doc = fitz.open(path)
     n_pages = doc.page_count
     book_id = C.slug(title)
@@ -272,9 +275,14 @@ def ingest_book(path, title, year, language, do_ocr=False, do_cover=True, ocr_la
                 cur["page_end"] = pno
     flush()
 
-    # Fallback: no real headings, OR an OCR-derived book (font sizes are
-    # meaningless after OCR) → chunk by pages for clean navigation.
-    if len(sections) < 2 or ocr_pages >= max(1, n_pages * 0.5):
+    # Detect over-segmentation: lots of "heading" lines with near-empty bodies
+    # (happens when a text layer has many short/caps lines) → unusable TOC.
+    tiny = sum(1 for s in sections if len(s["text"].strip()) < 40)
+    oversegmented = len(sections) >= 8 and tiny / max(1, len(sections)) > 0.4
+
+    # Fallback: no real headings, an OCR-derived book (font sizes meaningless
+    # after OCR), or over-segmented → chunk by pages for clean navigation.
+    if force_chunk or len(sections) < 2 or ocr_pages >= max(1, n_pages * 0.5) or oversegmented:
         sections = []
         CH = 10
         for start in range(0, n_pages, CH):
@@ -347,7 +355,8 @@ def run(only_file: str | None, include_large: bool, do_ocr: bool, max_mb: float,
         targets = [(only_file, C.Path(only_file).stem, None, "en", False)]
 
     done = 0
-    for fname, title, year, lang, skip in targets:
+    for fname, title, year, lang, skip, *rest in targets:
+        force_chunk = bool(rest[0]) if rest else False
         path = C.BOOKS_SRC_DIR / fname
         if not path.exists():
             print(f"  [skip] not found: {fname}")
@@ -360,7 +369,7 @@ def run(only_file: str | None, include_large: bool, do_ocr: bool, max_mb: float,
             print(f"  [skip] {size_mb:.0f} MB > {max_mb} MB cap: {title}")
             continue
         print(f"  Ingesting: {title}  ({size_mb:.0f} MB)…")
-        book = ingest_book(str(path), title, year, lang, do_ocr=do_ocr, ocr_lang=ocr_lang)
+        book = ingest_book(str(path), title, year, lang, do_ocr=do_ocr, ocr_lang=ocr_lang, force_chunk=force_chunk)
         C.write_json(C.BOOKS_DATA_DIR / f"{book['id']}.json", book)
         flag = " [needs OCR — image PDF]" if book["needs_ocr"] else ""
         print(f"    → {book['total_pages']} pages, {book['total_sections']} sections, "
@@ -385,7 +394,7 @@ if __name__ == "__main__":
     args = ap.parse_args()
 
     if args.list:
-        for fname, title, year, lang, skip in BOOKS:
+        for fname, title, year, lang, skip, *_rest in BOOKS:
             exists = (C.BOOKS_SRC_DIR / fname).exists()
             print(f"  [{'x' if exists else ' '}] {lang} {year or '----'}  {title}"
                   + ("  (large)" if skip else ""))
