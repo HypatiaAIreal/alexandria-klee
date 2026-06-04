@@ -36,7 +36,8 @@ BOOKS = [
     # Use the text-based Praeger edition (the 146335658 scan has no text layer).
     ("Klee, Paul - Pedagogical Sketchbook.pdf", "Pedagogical Sketchbook", 1925, "en", False),
     ("101315116-Paul-Klee-Some-Poems-by-Paul-Klee-1962.pdf", "Some Poems by Paul Klee", 1962, "en", False),
-    ("231332962-Paul-Klee-Sketching-and-Drawing.pdf", "Sketching and Drawing", None, "en", False),
+    # "Sketching and Drawing" removed: it's a 14-page scanned plate booklet with
+    # no usable text layer (OCR yields nothing) — not a readable work.
     ("Bases para la estructuración del arte (Paul Klee) .pdf", "Bases para la estructuración del arte", None, "es", False),
     # Large notebooks — skipped unless --all
     ("408268293-Paul-Klee-Notebooks-v1-The-Thinking-Eye-Art-Ebook-pdf.pdf", "Notebooks, Vol. 1 — The Thinking Eye", 1961, "en", True),
@@ -51,6 +52,89 @@ def clean_text(s: str) -> str:
     s = re.sub(r"[ \t]+\n", "\n", s)
     s = re.sub(r"\n{3,}", "\n\n", s)
     return s.strip()
+
+
+# ── v2 cleanup: strip page numbers, library call-numbers, running headers,
+#    and skip front-matter (copyright/colophon) pages. ────────────────
+_PAGE_NUM_RE = re.compile(r"^[\divxlcdmIVXLCDM]{1,6}$")
+# Library call numbers / shelfmarks, e.g. "ND588", "K5 S6a4", "ND588 .K5"
+_CALLNUM_RE = re.compile(r"^[A-Z]{1,3}\s?\d{2,5}[A-Za-z0-9 .]{0,8}$")
+_FRONTMATTER_RE = re.compile(
+    r"all rights reserved|copyright|\bISBN\b|printed in|printed and|"
+    r"published (in|by)|first (edition|published|printing)|reprinted|"
+    r"library of congress|catalog|no part (of|may)|translated (by|from)|"
+    r"verlag|all enquiries|manufactured in|типограф",
+    re.I,
+)
+
+
+def _strip_inline_noise(text: str) -> str:
+    out = []
+    for ln in text.split("\n"):
+        s = ln.strip()
+        if not s:
+            out.append("")
+            continue
+        if _PAGE_NUM_RE.match(s):            # a line that is just a page number
+            continue
+        if len(s) <= 16 and _CALLNUM_RE.match(s):  # library shelfmark
+            continue
+        out.append(ln)
+    return "\n".join(out)
+
+
+def running_headers(page_texts: list[str], n_pages: int) -> set[str]:
+    """Lines that repeat as the first/last line across many pages = headers/footers."""
+    c: Counter = Counter()
+    for t in page_texts:
+        lines = [l.strip() for l in t.split("\n") if l.strip()]
+        if not lines:
+            continue
+        for cand in {lines[0], lines[-1]}:
+            if 3 <= len(cand) <= 60:
+                c[cand] += 1
+    thresh = max(4, int(n_pages * 0.25))
+    return {line for line, n in c.items() if n >= thresh}
+
+
+def _remove_header_lines(text: str, headers: set[str]) -> str:
+    if not headers:
+        return text
+    return "\n".join(ln for ln in text.split("\n") if ln.strip() not in headers)
+
+
+def is_frontmatter(text: str) -> bool:
+    """A copyright/colophon block: several boilerplate markers near the top."""
+    head = text[:700]
+    return len(_FRONTMATTER_RE.findall(head)) >= 2
+
+
+def polish_sections(sections: list[dict], page_texts: list[str], n_pages: int) -> list[dict]:
+    headers = running_headers(page_texts, n_pages)
+
+    def polish(t: str) -> str:
+        return clean_text(_strip_inline_noise(_remove_header_lines(t, headers)))
+
+    cleaned = []
+    for s in sections:
+        txt = polish(s.get("text", ""))
+        if txt.strip():
+            cleaned.append({**s, "text": txt})
+    # Drop leading front-matter: title pages (short), translation credits,
+    # copyright/colophon — keep popping until the first substantial section of
+    # real text that carries no boilerplate markers.
+    def fm_markers(t: str) -> int:
+        return len(_FRONTMATTER_RE.findall(t[:700]))
+
+    while len(cleaned) > 1:
+        s0 = cleaned[0]
+        if fm_markers(s0["text"]) >= 1 or len(s0["text"]) < 300:
+            cleaned.pop(0)
+        else:
+            break
+    for i, s in enumerate(cleaned):
+        s["index"] = i
+    return cleaned
 
 
 def is_heading(text: str, size: float, heading_min: float) -> bool:
@@ -205,6 +289,10 @@ def ingest_book(path, title, year, language, do_ocr=False, do_cover=True, ocr_la
                 "page_end": end,
                 "text": text,
             })
+
+    # v2 cleanup: strip page numbers / call-numbers / running headers, drop
+    # leading copyright pages, de-hyphenate & reflow.
+    sections = polish_sections(sections, page_texts, n_pages)
 
     total_chars = sum(len(s["text"]) for s in sections)
     needs_ocr = total_chars < n_pages * 40  # likely a scanned/image PDF
