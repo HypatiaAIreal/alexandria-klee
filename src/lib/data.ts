@@ -288,7 +288,7 @@ export async function getArticles(): Promise<Article[]> {
       console.warn("[data] getArticles Mongo failed:", e);
     }
   }
-  const articles = await getArticles();
+  const { articles } = await getDataset();
   return articles;
 }
 
@@ -318,6 +318,93 @@ export async function getStats(): Promise<CorpusStats> {
   }
   const { stats } = await getDataset();
   return stats;
+}
+
+// ── light summaries (counts/aggregations — never a full corpus load) ──
+
+// Total page count + how many have a facsimile (for the home stat tiles).
+export async function getCorpusSummary(): Promise<{ pages: number; facsimiles: number }> {
+  if (hasMongo) {
+    try {
+      const { PageModel } = await models();
+      const [pages, facsimiles] = await Promise.all([
+        PageModel.estimatedDocumentCount(),
+        PageModel.countDocuments({ facsimile_local: { $nin: [null, ""] } }),
+      ]);
+      return { pages, facsimiles };
+    } catch (e) {
+      console.warn("[data] getCorpusSummary Mongo failed:", e);
+    }
+  }
+  const { pages } = await getDataset();
+  return { pages: pages.length, facsimiles: pages.filter((p) => p.facsimile_local).length };
+}
+
+// The page with the most articles (home "featured"), fetched as one tiny doc.
+export async function getFeaturedPage(): Promise<{ id: string; page_ref: string } | null> {
+  if (hasMongo) {
+    try {
+      const { PageModel } = await models();
+      const doc = await PageModel.findOne().sort({ total_articles: -1 }).select("id page_ref").lean<{ id?: string; page_ref?: string }>();
+      if (doc?.id) return { id: doc.id, page_ref: doc.page_ref ?? "" };
+    } catch (e) {
+      console.warn("[data] getFeaturedPage Mongo failed:", e);
+    }
+  }
+  const { pages } = await getDataset();
+  const f = [...pages].sort((a, b) => b.total_articles - a.total_articles)[0];
+  return f ? { id: f.id, page_ref: f.page_ref } : null;
+}
+
+// Page count per chapter id (for the browse list) via one aggregation.
+export async function getChapterPageCounts(): Promise<Record<string, number>> {
+  if (hasMongo) {
+    try {
+      const { PageModel } = await models();
+      const agg = (await PageModel.aggregate([
+        { $group: { _id: { section: "$section", part: "$part", chapter_number: "$chapter_number" }, count: { $sum: 1 } } },
+      ])) as { _id: { section: string; part: string | null; chapter_number: number }; count: number }[];
+      const out: Record<string, number> = {};
+      for (const r of agg) {
+        const id = chapterIdOf(r._id.section, r._id.part ?? null, r._id.chapter_number);
+        out[id] = (out[id] ?? 0) + r.count;
+      }
+      return out;
+    } catch (e) {
+      console.warn("[data] getChapterPageCounts Mongo failed:", e);
+    }
+  }
+  const { pages } = await getDataset();
+  const out: Record<string, number> = {};
+  for (const p of pages) {
+    const id = chapterIdOf(p.section, p.part, p.chapter_number);
+    out[id] = (out[id] ?? 0) + 1;
+  }
+  return out;
+}
+
+// Slim prev/next navigation list for one chapter (page reader) — no article text.
+export async function getChapterPageNav(
+  chapterId: string
+): Promise<{ id: string; page_ref: string; page_number: number }[]> {
+  const chapter = await getChapter(chapterId);
+  if (!chapter) return [];
+  if (hasMongo) {
+    try {
+      const { PageModel } = await models();
+      const docs = await PageModel.find({ section: chapter.section, chapter_number: chapter.chapter_number })
+        .select("id page_ref page_number part")
+        .lean<{ id: string; page_ref: string; page_number: number; part: string | null }[]>();
+      return docs
+        .filter((p) => (p.part ?? "") === (chapter.part ?? ""))
+        .map((p) => ({ id: p.id, page_ref: p.page_ref, page_number: p.page_number }))
+        .sort((a, b) => a.page_number - b.page_number);
+    } catch (e) {
+      console.warn("[data] getChapterPageNav Mongo failed:", e);
+    }
+  }
+  const pages = await getPagesByChapter(chapterId);
+  return pages.map((p) => ({ id: p.id, page_ref: p.page_ref, page_number: p.page_number }));
 }
 
 // ── filters ─────────────────────────────────────────────────────

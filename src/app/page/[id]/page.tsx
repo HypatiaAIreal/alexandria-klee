@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
-import { getChapter, getPage, getPagesByChapter } from "@/lib/data";
+import { getChapter, getChapterPageNav, getPage } from "@/lib/data";
 import { chapterIdOf } from "@/lib/util";
 import PageView from "@/components/PageView";
 
-// Render on demand (~4k pages live in Mongo) so the build never pre-collects
-// the whole corpus and never depends on the database being up.
-export const dynamic = "force-dynamic";
+// Cached per-page (ISR): the first visit renders & caches, later visits are
+// instant. Generated on demand, so the build never pre-collects the corpus.
+export const revalidate = 600;
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const page = await getPage(params.id);
@@ -19,7 +19,7 @@ export default async function PageDetail({ params }: { params: { id: string } })
   const chapterId = chapterIdOf(page.section, page.part, page.chapter_number);
   const [chapter, siblings] = await Promise.all([
     getChapter(chapterId),
-    getPagesByChapter(chapterId),
+    getChapterPageNav(chapterId), // slim prev/next list (no article text)
   ]);
 
   const idx = siblings.findIndex((p) => p.id === page.id);

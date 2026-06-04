@@ -4,7 +4,7 @@ import { getBook } from "@/lib/data";
 import BookReaderView from "@/components/BookReaderView";
 
 // Render on demand so the build never depends on the database.
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const book = await getBook(params.id);

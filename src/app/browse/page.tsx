@@ -1,20 +1,15 @@
-import { getChapters, getPages } from "@/lib/data";
+import { getChapterPageCounts, getChapters } from "@/lib/data";
 import BrowseView, { type BrowseChapter } from "@/components/BrowseView";
 
 export const metadata = { title: "Browse the archive" };
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 
 export default async function BrowsePage() {
-  const [chapters, pages] = await Promise.all([getChapters(), getPages()]);
+  const [chapters, counts] = await Promise.all([getChapters(), getChapterPageCounts()]);
 
   const withCounts: BrowseChapter[] = chapters.map((c) => ({
     ...c,
-    pageCount: pages.filter(
-      (p) =>
-        p.section === c.section &&
-        (p.part ?? "") === (c.part ?? "") &&
-        p.chapter_number === c.chapter_number
-    ).length,
+    pageCount: counts[c.id] ?? 0,
   }));
 
   return <BrowseView chapters={withCounts} />;

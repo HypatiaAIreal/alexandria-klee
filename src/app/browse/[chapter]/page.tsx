@@ -4,7 +4,7 @@ import ChapterView from "@/components/ChapterView";
 
 // Render on demand (data lives in Mongo) so the build never depends on the
 // database and pages always reflect the latest content.
-export const dynamic = "force-dynamic";
+export const revalidate = 600;
 
 export async function generateMetadata({ params }: { params: { chapter: string } }) {
   const c = await getChapter(params.chapter);

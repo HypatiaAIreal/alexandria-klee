@@ -1,19 +1,25 @@
-import { getArticleDomainCounts, getChapters, getDrawingCount, getPages, getStats } from "@/lib/data";
+import {
+  getArticleDomainCounts,
+  getChapters,
+  getCorpusSummary,
+  getDrawingCount,
+  getFeaturedPage,
+  getStats,
+} from "@/lib/data";
 import HomeView, { type HomeData } from "@/components/HomeView";
 
-// Data-backed (Mongo) → render on demand so the build never touches the DB.
-// Uses only light counts/aggregates (never the full corpus) to stay fast.
-export const dynamic = "force-dynamic";
+// Cached (ISR): rendered once and reused so navigation is instant; refreshes
+// in the background every 10 min. Uses only light counts/aggregates.
+export const revalidate = 600;
 
 export default async function HomePage() {
-  const [stats, pages, chapters, domain] = await Promise.all([
+  const [stats, summary, chapters, domain, featuredPage] = await Promise.all([
     getStats(),
-    getPages(), // slim: page metadata only (no article text)
+    getCorpusSummary(), // counts only
     getChapters(),
     getArticleDomainCounts(), // aggregation, not a full load
+    getFeaturedPage(), // one tiny doc
   ]);
-
-  const facsimiles = pages.filter((p) => p.facsimile_local).length;
 
   const conceptArr = Object.entries(stats.top_concepts ?? {})
     .sort((a, b) => b[1] - a[1])
@@ -21,20 +27,19 @@ export default async function HomePage() {
     .map(([term, count]) => ({ term, count, color: "#d8a657" }));
 
   const ext = chapters.find((c) => c.extracted);
-  const featuredPage = [...pages].sort((a, b) => b.total_articles - a.total_articles)[0];
 
   const data: HomeData = {
     stats: {
-      pages: pages.length,
+      pages: summary.pages,
       articles: domain.total,
       drawings: getDrawingCount(),
-      facsimiles,
+      facsimiles: summary.facsimiles,
       glossary: stats.glossary_entries ?? 0,
       words: stats.total_words,
     },
     conceptArr,
     domainData: domain.domains,
-    featured: featuredPage ? { id: featuredPage.id, page_ref: featuredPage.page_ref } : null,
+    featured: featuredPage,
     extracted: ext
       ? {
           id: ext.id,
